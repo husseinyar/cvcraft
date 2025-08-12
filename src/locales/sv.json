@@ -37,8 +37,35 @@
     "creative": "Kreativ",
     "minimal": "Minimalistisk"
   },
+  "testimonials": {
+    "title": "Älskad av tusentals arbetssökande",
+    "subtitle": "Se vad våra användare säger om CV Craft.",
+    "one": {
+      "quote": "CV Craft hjälpte mig att skapa ett professionellt CV på några minuter. Jag fick tre intervjuinbjudningar inom en vecka!",
+      "author": "Sara L.",
+      "title": "Marknadschef"
+    },
+    "two": {
+      "quote": "AI-förslagen är en game-changer. Det är som att ha en personlig karriärcoach som granskar ditt CV.",
+      "author": "Mikael B.",
+      "title": "Mjukvaruutvecklare"
+    },
+    "three": {
+      "quote": "Jag har alltid haft svårt att formatera mitt CV. Mallarna är vackra och så enkla att använda.",
+      "author": "Jessica P.",
+      "title": "Grafisk designer"
+    }
+  },
   "footer": {
-    "rights": "Alla rättigheter förbehållna."
+    "rights": "Alla rättigheter förbehållna.",
+    "product": "Produkt",
+    "company": "Företag",
+    "legal": "Juridiskt",
+    "follow_us": "Följ oss",
+    "features": "Funktioner",
+    "about": "Om oss",
+    "privacy": "Integritetspolicy",
+    "terms": "Användarvillkor"
   },
   "editor": {
     "header": {

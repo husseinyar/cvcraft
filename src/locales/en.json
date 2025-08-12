@@ -37,8 +37,35 @@
     "creative": "Creative",
     "minimal": "Minimal"
   },
+  "testimonials": {
+    "title": "Loved by thousands of job seekers",
+    "subtitle": "See what our users are saying about CV Craft.",
+    "one": {
+      "quote": "CV Craft helped me create a professional CV in minutes. I got three interview invitations within a week!",
+      "author": "Sarah L.",
+      "title": "Marketing Manager"
+    },
+    "two": {
+      "quote": "The AI suggestions are a game-changer. It's like having a personal career coach review your CV.",
+      "author": "Michael B.",
+      "title": "Software Developer"
+    },
+    "three": {
+      "quote": "I've always struggled with formatting my CV. The templates are beautiful and so easy to use.",
+      "author": "Jessica P.",
+      "title": "Graphic Designer"
+    }
+  },
   "footer": {
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "follow_us": "Follow Us",
+    "features": "Features",
+    "about": "About Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
   },
   "editor": {
     "header": {

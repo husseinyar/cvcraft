@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Bot, Palette, FileText } from 'lucide-react';
+import { ArrowRight, Bot, Palette, FileText, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
@@ -108,12 +108,88 @@ export default function LandingPage() {
                 </div>
             </div>
         </section>
-
+        
+        {/* Testimonials Section */}
+        <section className="py-20 bg-muted/40">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                    <h3 className="text-3xl font-bold">{t('testimonials.title')}</h3>
+                    <p className="text-muted-foreground mt-2">{t('testimonials.subtitle')}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex mb-4">
+                                {[...Array(5)].map((_,i) => <Star key={i} className="text-yellow-400 fill-yellow-400" />)}
+                            </div>
+                            <p className="text-muted-foreground mb-4 italic">"{t('testimonials.one.quote')}"</p>
+                            <p className="font-semibold">{t('testimonials.one.author')}</p>
+                            <p className="text-sm text-muted-foreground">{t('testimonials.one.title')}</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-6">
+                           <div className="flex mb-4">
+                                {[...Array(5)].map((_,i) => <Star key={i} className="text-yellow-400 fill-yellow-400" />)}
+                            </div>
+                            <p className="text-muted-foreground mb-4 italic">"{t('testimonials.two.quote')}"</p>
+                            <p className="font-semibold">{t('testimonials.two.author')}</p>
+                            <p className="text-sm text-muted-foreground">{t('testimonials.two.title')}</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-6">
+                           <div className="flex mb-4">
+                                {[...Array(5)].map((_,i) => <Star key={i} className="text-yellow-400 fill-yellow-400" />)}
+                            </div>
+                            <p className="text-muted-foreground mb-4 italic">"{t('testimonials.three.quote')}"</p>
+                            <p className="font-semibold">{t('testimonials.three.author')}</p>
+                            <p className="text-sm text-muted-foreground">{t('testimonials.three.title')}</p>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </section>
       </main>
 
-      <footer className="bg-primary text-primary-foreground py-6">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p>&copy; {new Date().getFullYear()} CV Craft. {t('footer.rights')}</p>
+      <footer className="bg-primary text-primary-foreground py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+                <div>
+                    <h4 className="font-bold mb-4">{t('footer.product')}</h4>
+                    <ul>
+                        <li><Link href="#" className="hover:underline">{t('nav.templates')}</Link></li>
+                        <li><Link href="#" className="hover:underline">{t('nav.pricing')}</Link></li>
+                        <li><Link href="#" className="hover:underline">{t('footer.features')}</Link></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-bold mb-4">{t('footer.company')}</h4>
+                    <ul>
+                        <li><Link href="#" className="hover:underline">{t('footer.about')}</Link></li>
+                        <li><Link href="#" className="hover:underline">{t('nav.blog')}</Link></li>
+                        <li><Link href="#" className="hover:underline">{t('nav.contact')}</Link></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-bold mb-4">{t('footer.legal')}</h4>
+                    <ul>
+                        <li><Link href="#" className="hover:underline">{t('footer.privacy')}</Link></li>
+                        <li><Link href="#" className="hover:underline">{t('footer.terms')}</Link></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-bold mb-4">{t('footer.follow_us')}</h4>
+                     <ul>
+                        <li><Link href="#" className="hover:underline">LinkedIn</Link></li>
+                        <li><Link href="#" className="hover:underline">Twitter</Link></li>
+                        <li><Link href="#" className="hover:underline">Facebook</Link></li>
+                    </ul>
+                </div>
+            </div>
+            <div className="text-center text-xs mt-12 pt-8 border-t border-primary-foreground/20">
+             <p>&copy; {new Date().getFullYear()} CV Craft. {t('footer.rights')}</p>
+            </div>
         </div>
       </footer>
     </div>
