@@ -29,7 +29,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
 import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle, Users, Download } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "@/context/language-context";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
