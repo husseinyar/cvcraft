@@ -1,5 +1,6 @@
 import type { CVData } from "@/types";
 import { Mail, Phone, Globe } from "lucide-react";
+import Image from "next/image";
 
 interface TemplateProps {
   data: CVData;
@@ -7,64 +8,74 @@ interface TemplateProps {
 
 export default function ProfessionalTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-[#1f2937] p-8 font-serif text-sm">
-      <header className="text-center border-b-2 border-gray-300 pb-4 mb-6">
-        <h1 className="text-4xl font-bold tracking-wider text-primary">{data.name}</h1>
-        <h2 className="text-xl font-medium text-gray-600 mt-1">{data.jobTitle}</h2>
-      </header>
+    <div className="w-full h-full bg-white text-gray-800 p-8 flex font-sans">
+      <div className="w-1/3 pr-8 border-r border-gray-200">
+        <div className="flex flex-col items-center text-center">
+            <Image 
+              src="https://placehold.co/150x150.png" 
+              alt={data.name} 
+              width={128} 
+              height={128} 
+              className="rounded-full mb-4"
+              data-ai-hint="person portrait"
+            />
+            <h1 className="text-2xl font-bold text-gray-800">{data.name}</h1>
+            <h2 className="text-md text-gray-600 mb-6">{data.jobTitle}</h2>
+        </div>
 
-      <div className="grid grid-cols-3 gap-8">
-        <aside className="col-span-1">
-          <section>
-            <h3 className="text-lg font-bold text-primary border-b border-gray-200 pb-1 mb-3 uppercase tracking-wider">Contact</h3>
-            <ul className="space-y-2 text-xs">
-              <li className="flex items-center gap-2"><Mail size={14} /><span>{data.contact.email}</span></li>
-              <li className="flex items-center gap-2"><Phone size={14} /><span>{data.contact.phone}</span></li>
-              <li className="flex items-center gap-2"><Globe size={14} /><span>{data.contact.website}</span></li>
-            </ul>
-          </section>
+        <section className="mb-6">
+            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Details</h3>
+             <div className="space-y-2 text-sm text-gray-600">
+                <p className="flex items-center gap-2"><Mail size={14}/> {data.contact.email}</p>
+                <p className="flex items-center gap-2"><Phone size={14}/> {data.contact.phone}</p>
+                <p className="flex items-center gap-2"><Globe size={14}/> {data.contact.website}</p>
+            </div>
+        </section>
 
-          <section className="mt-6">
-            <h3 className="text-lg font-bold text-primary border-b border-gray-200 pb-1 mb-3 uppercase tracking-wider">Education</h3>
+        <section className="mb-6">
+            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Skills</h3>
+            <div className="flex flex-wrap gap-2">
+                {data.skills.map(skill => (
+                    <span key={skill} className="bg-gray-100 text-gray-700 text-xs py-1 px-2 rounded-md">{skill}</span>
+                ))}
+            </div>
+        </section>
+
+         <section>
+          <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Education</h3>
+          <div className="space-y-4">
             {data.education.map(edu => (
-              <div key={edu.id} className="mb-3">
-                <h4 className="font-bold">{edu.degree}</h4>
-                <p className="font-medium text-gray-700">{edu.school}</p>
-                <p className="text-xs text-gray-500">{edu.dates}</p>
+              <div key={edu.id}>
+                <h4 className="font-semibold text-md">{edu.degree}</h4>
+                <p className="text-sm text-gray-600">{edu.school}</p>
+                <p className="text-xs text-gray-400 mt-1">{edu.dates}</p>
               </div>
             ))}
-          </section>
-          
-          <section className="mt-6">
-            <h3 className="text-lg font-bold text-primary border-b border-gray-200 pb-1 mb-3 uppercase tracking-wider">Skills</h3>
-            <ul className="flex flex-wrap gap-2 text-xs">
-              {data.skills.map(skill => (
-                <li key={skill} className="bg-gray-200 text-gray-800 py-1 px-2 rounded">{skill}</li>
-              ))}
-            </ul>
-          </section>
-        </aside>
+          </div>
+        </section>
 
-        <main className="col-span-2">
-          <section>
-            <h3 className="text-lg font-bold text-primary border-b border-gray-200 pb-1 mb-3 uppercase tracking-wider">Summary</h3>
-            <p className="text-gray-700 leading-relaxed text-sm">{data.summary}</p>
-          </section>
+      </div>
+      <div className="w-2/3 pl-8">
+        <section className="mb-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">Profile</h3>
+          <p className="text-sm leading-relaxed text-gray-700">{data.summary}</p>
+        </section>
 
-          <section className="mt-6">
-            <h3 className="text-lg font-bold text-primary border-b border-gray-200 pb-1 mb-3 uppercase tracking-wider">Experience</h3>
+        <section>
+          <h3 className="text-xl font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">Experience</h3>
+          <div className="space-y-6">
             {data.experience.map(exp => (
-              <div key={exp.id} className="mb-4">
+              <div key={exp.id}>
                 <div className="flex justify-between items-baseline">
-                  <h4 className="text-md font-bold">{exp.role}</h4>
-                  <p className="text-xs text-gray-500">{exp.dates}</p>
+                    <h4 className="text-lg font-semibold">{exp.role}</h4>
+                    <p className="text-xs text-gray-500">{exp.dates}</p>
                 </div>
-                <p className="font-medium text-gray-700">{exp.company}</p>
-                <p className="text-sm text-gray-600 mt-1 leading-normal">{exp.description}</p>
+                <p className="font-medium text-gray-600 mb-1">{exp.company}</p>
+                <p className="text-sm text-gray-700 leading-normal">{exp.description}</p>
               </div>
             ))}
-          </section>
-        </main>
+          </div>
+        </section>
       </div>
     </div>
   );
