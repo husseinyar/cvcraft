@@ -143,5 +143,36 @@
         "title": "AI-förslag",
         "description": "Här är några förslag för att förbättra din CV-sektion."
     }
+  },
+  "blog": {
+    "title": "CV Craft Blogg",
+    "subtitle": "Tips, tricks och insikter som hjälper dig att få ditt drömjobb.",
+    "read_more": "Läs mer",
+    "posts": {
+      "one": {
+        "title": "Hur man skriver ett grymt CV som blir uppmärksammat",
+        "excerpt": "Lär dig grunderna i att skapa ett övertygande CV som sticker ut för rekryterare och anställningschefer."
+      },
+      "two": {
+        "title": "5 vanliga CV-misstag och hur man undviker dem",
+        "excerpt": "Låt inte dessa enkla fel kosta dig en intervju. Vi går igenom de vanligaste fallgroparna."
+      },
+      "three": {
+        "title": "Anpassa ditt CV för varje jobbansökan",
+        "excerpt": "Ett CV som passar alla är ett recept för avslag. Upptäck hur du anpassar ditt CV för varje roll."
+      },
+      "four": {
+        "title": "Vikten av nyckelord i ditt CV",
+        "excerpt": "Förstå hur ansökningsspårningssystem (ATS) fungerar och hur du optimerar ditt CV med rätt nyckelord."
+      },
+      "five": {
+        "title": "Kreativa vs. professionella CV-mallar: Vilken är rätt för dig?",
+        "excerpt": "Rätt utseende kan göra stor skillnad. Vi hjälper dig att bestämma vilken mall som bäst passar din bransch och personlighet."
+      },
+      "six": {
+        "title": "Hur du kvantifierar dina prestationer i ditt CV",
+        "excerpt": "Siffror talar högre än ord. Lär dig hur du omvandlar dina ansvarsområden till mätbara prestationer."
+      }
+    }
   }
 }

@@ -5,17 +5,55 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
 
-export default function TemplatesPage() {
+export default function BlogPage() {
   const { t } = useTranslation();
 
-  const templates = [
-    { name: 'professional', hint: 'resume professional' },
-    { name: 'creative', hint: 'resume creative' },
-    { name: 'minimal', hint: 'resume minimal' },
-    { name: 'modern', hint: 'resume modern' },
-    { name: 'elegant', hint: 'resume elegant' },
-    { name: 'bold', hint: 'resume bold' },
+  const blogPosts = [
+    {
+      slug: 'how-to-write-a-killer-cv',
+      title: 'blog.posts.one.title',
+      excerpt: 'blog.posts.one.excerpt',
+      image: 'https://placehold.co/600x400.png',
+      hint: 'writing desk'
+    },
+    {
+      slug: '5-common-cv-mistakes-to-avoid',
+      title: 'blog.posts.two.title',
+      excerpt: 'blog.posts.two.excerpt',
+      image: 'https://placehold.co/600x400.png',
+      hint: 'red pen'
+    },
+    {
+      slug: 'tailoring-your-cv-for-each-application',
+      title: 'blog.posts.three.title',
+      excerpt: 'blog.posts.three.excerpt',
+      image: 'https://placehold.co/600x400.png',
+      hint: 'sewing tailor'
+    },
+    {
+        slug: 'the-importance-of-keywords-in-your-cv',
+        title: 'blog.posts.four.title',
+        excerpt: 'blog.posts.four.excerpt',
+        image: 'https://placehold.co/600x400.png',
+        hint: 'magnifying glass'
+    },
+    {
+        slug: 'creative-vs-professional-cv-templates',
+        title: 'blog.posts.five.title',
+        excerpt: 'blog.posts.five.excerpt',
+        image: 'https://placehold.co/600x400.png',
+        hint: 'design art'
+    },
+    {
+        slug: 'how-to-quantify-your-achievements',
+        title: 'blog.posts.six.title',
+        excerpt: 'blog.posts.six.excerpt',
+        image: 'https://placehold.co/600x400.png',
+        hint: 'graph chart'
+    }
   ];
 
   return (
@@ -24,8 +62,8 @@ export default function TemplatesPage() {
         <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
         <nav className="hidden md:flex gap-6 items-center">
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
-          <Link href="/templates" className="text-sm font-medium text-primary hover:text-primary">{t('nav.templates')}</Link>
-          <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
+          <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
+          <Link href="/blog" className="text-sm font-medium text-primary hover:text-primary">{t('nav.blog')}</Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
           <Button variant="outline">{t('nav.login')}</Button>
@@ -39,25 +77,36 @@ export default function TemplatesPage() {
 
       <main className="flex-grow">
         <section className="py-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-4xl font-bold mb-4">{t('templates.title')}</h2>
-                <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">{t('templates.subtitle')}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {templates.map(template => (
-                        <div key={template.name} className="p-4 border rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300">
-                          <Image 
-                            src={`https://placehold.co/400x550.png`} 
-                            width={400} 
-                            height={550} 
-                            alt={`${t(`templates.${template.name}` as any)} Template`} 
-                            className="rounded-md w-full" 
-                            data-ai-hint={template.hint}
-                          />
-                          <p className="mt-4 font-semibold text-lg">{t(`templates.${template.name}` as any)}</p>
-                           <Link href="/editor" className="mt-2 inline-block">
-                                <Button variant="link">{t('templates.use_template')}</Button>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl font-bold mb-4">{t('blog.title')}</h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('blog.subtitle')}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {blogPosts.map(post => (
+                        <Card key={post.slug} className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                           <Link href={`/blog/${post.slug}`}>
+                                <Image 
+                                    src={post.image}
+                                    alt={t(post.title as any)}
+                                    width={600}
+                                    height={400}
+                                    className="w-full object-cover"
+                                    data-ai-hint={post.hint}
+                                />
                             </Link>
-                        </div>
+                            <CardContent className="p-6">
+                                <h3 className="text-xl font-semibold mb-2 h-14">
+                                   <Link href={`/blog/${post.slug}`}>{t(post.title as any)}</Link>
+                                </h3>
+                                <p className="text-muted-foreground text-sm mb-4 h-20">{t(post.excerpt as any)}</p>
+                                <Link href={`/blog/${post.slug}`}>
+                                    <Button variant="link" className="p-0">
+                                        {t('blog.read_more')} <ArrowRight className="ml-2" />
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
             </div>
@@ -107,3 +156,4 @@ export default function TemplatesPage() {
     </div>
   );
 }
+

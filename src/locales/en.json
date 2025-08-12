@@ -143,5 +143,36 @@
         "title": "AI Suggestions",
         "description": "Here are some suggestions to improve your CV section."
     }
+  },
+   "blog": {
+    "title": "CV Craft Blog",
+    "subtitle": "Tips, tricks, and insights to help you land your dream job.",
+    "read_more": "Read More",
+    "posts": {
+      "one": {
+        "title": "How to Write a Killer CV That Gets Noticed",
+        "excerpt": "Learn the fundamentals of crafting a compelling CV that stands out to recruiters and hiring managers."
+      },
+      "two": {
+        "title": "5 Common CV Mistakes and How to Avoid Them",
+        "excerpt": "Don't let these simple errors cost you an interview. We break down the most common pitfalls."
+      },
+      "three": {
+        "title": "Tailoring Your CV for Each Job Application",
+        "excerpt": "A one-size-fits-all CV is a recipe for rejection. Discover how to customize your CV for every role."
+      },
+      "four": {
+        "title": "The Importance of Keywords in Your CV",
+        "excerpt": "Understand how Applicant Tracking Systems (ATS) work and how to optimize your CV with the right keywords."
+      },
+      "five": {
+        "title": "Creative vs. Professional: Which CV Template is Right for You?",
+        "excerpt": "The right look can make a big impact. We'll help you decide which template best suits your industry and personality."
+      },
+      "six": {
+        "title": "How to Quantify Your Achievements on Your CV",
+        "excerpt": "Numbers speak louder than words. Learn how to turn your responsibilities into measurable achievements."
+      }
+    }
   }
 }

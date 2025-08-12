@@ -18,7 +18,7 @@ export default function LandingPage() {
         <nav className="hidden md:flex gap-6 items-center">
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
           <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
-          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
+          <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
           <Button variant="outline">{t('nav.login')}</Button>
@@ -170,7 +170,7 @@ export default function LandingPage() {
                     <h4 className="font-bold mb-4">{t('footer.company')}</h4>
                     <ul>
                         <li><Link href="#" className="hover:underline">{t('footer.about')}</Link></li>
-                        <li><Link href="#" className="hover:underline">{t('nav.blog')}</Link></li>
+                        <li><Link href="/blog" className="hover:underline">{t('nav.blog')}</Link></li>
                         <li><Link href="#" className="hover:underline">{t('nav.contact')}</Link></li>
                     </ul>
                 </div>
