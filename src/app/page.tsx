@@ -19,7 +19,7 @@ export default function LandingPage() {
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
           <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
           <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
-          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
+          <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
           <Button variant="outline">{t('nav.login')}</Button>
           <LanguageSwitcher />
@@ -49,7 +49,7 @@ export default function LandingPage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 bg-muted/40">
+        <section className="py-16 bg-muted/40" id="features">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h3 className="text-3xl font-bold">{t('features.title')}</h3>
@@ -162,8 +162,8 @@ export default function LandingPage() {
                     <h4 className="font-bold mb-4">{t('footer.product')}</h4>
                     <ul>
                         <li><Link href="/templates" className="hover:underline">{t('nav.templates')}</Link></li>
-                        <li><Link href="#" className="hover:underline">{t('nav.pricing')}</Link></li>
-                        <li><Link href="#" className="hover:underline">{t('footer.features')}</Link></li>
+                        <li><Link href="/pricing" className="hover:underline">{t('nav.pricing')}</Link></li>
+                        <li><Link href="/features" className="hover:underline">{t('footer.features')}</Link></li>
                     </ul>
                 </div>
                 <div>

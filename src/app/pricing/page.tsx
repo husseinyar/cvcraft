@@ -3,15 +3,50 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-export default function ContactPage() {
+export default function PricingPage() {
   const { t } = useTranslation();
+
+  const pricingTiers = [
+    {
+      name: "pricing_page.free.name",
+      price: "pricing_page.free.price",
+      description: "pricing_page.free.description",
+      features: [
+        "pricing_page.free.features.one",
+        "pricing_page.free.features.two",
+        "pricing_page.free.features.three"
+      ],
+      cta: "pricing_page.free.cta"
+    },
+    {
+      name: "pricing_page.pro.name",
+      price: "pricing_page.pro.price",
+      description: "pricing_page.pro.description",
+      features: [
+        "pricing_page.pro.features.one",
+        "pricing_page.pro.features.two",
+        "pricing_page.pro.features.three",
+        "pricing_page.pro.features.four"
+      ],
+      cta: "pricing_page.pro.cta"
+    },
+    {
+      name: "pricing_page.business.name",
+      price: "pricing_page.business.price",
+      description: "pricing_page.business.description",
+      features: [
+        "pricing_page.business.features.one",
+        "pricing_page.business.features.two",
+        "pricing_page.business.features.three",
+        "pricing_page.business.features.four"
+      ],
+      cta: "pricing_page.business.cta"
+    }
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -21,8 +56,8 @@ export default function ContactPage() {
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
           <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
           <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
-          <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
-          <Link href="/contact" className="text-sm font-medium text-primary hover:text-primary">{t('nav.contact')}</Link>
+          <Link href="/pricing" className="text-sm font-medium text-primary hover:text-primary">{t('nav.pricing')}</Link>
+          <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
           <Button variant="outline">{t('nav.login')}</Button>
           <LanguageSwitcher />
         </nav>
@@ -36,65 +71,33 @@ export default function ContactPage() {
         <section className="py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">{t('contact_page.title')}</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('contact_page.subtitle')}</p>
+              <h2 className="text-4xl font-bold mb-4">{t('pricing_page.title')}</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('pricing_page.subtitle')}</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t('contact_page.form_title')}</CardTitle>
-                  <CardDescription>{t('contact_page.form_description')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">{t('contact_page.name_label')}</Label>
-                      <Input id="name" placeholder={t('contact_page.name_placeholder')} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">{t('contact_page.email_label')}</Label>
-                      <Input id="email" type="email" placeholder={t('contact_page.email_placeholder')} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="message">{t('contact_page.message_label')}</Label>
-                      <Textarea id="message" placeholder={t('contact_page.message_placeholder')} rows={5} />
-                    </div>
-                    <Button type="submit" className="w-full">{t('contact_page.submit_button')}</Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-8">
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>{t('contact_page.info_title')}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4 text-sm">
-                          <div className="flex items-center gap-4">
-                              <Mail className="h-6 w-6 text-primary" />
-                              <div>
-                                  <h4 className="font-semibold">{t('contact_page.email')}</h4>
-                                  <a href="mailto:contact@cvcraft.com" className="text-muted-foreground hover:text-primary">contact@cvcraft.com</a>
-                              </div>
-                          </div>
-                           <div className="flex items-center gap-4">
-                              <Phone className="h-6 w-6 text-primary" />
-                              <div>
-                                  <h4 className="font-semibold">{t('contact_page.phone')}</h4>
-                                  <p className="text-muted-foreground">+46 123 456 789</p>
-                              </div>
-                          </div>
-                           <div className="flex items-center gap-4">
-                              <MapPin className="h-6 w-6 text-primary" />
-                              <div>
-                                  <h4 className="font-semibold">{t('contact_page.address')}</h4>
-                                  <p className="text-muted-foreground">123 CV Craft St, Stockholm, Sweden</p>
-                              </div>
-                          </div>
-                      </CardContent>
-                  </Card>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {pricingTiers.map((tier) => (
+                <Card key={tier.name} className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle>{t(tier.name as any)}</CardTitle>
+                    <CardDescription>{t(tier.description as any)}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow space-y-6">
+                    <p className="text-4xl font-bold">{t(tier.price as any)}</p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {tier.features.map(feature => (
+                        <li key={feature} className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-green-500" />
+                          {t(feature as any)}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <div className="p-6">
+                    <Button className="w-full">{t(tier.cta as any)}</Button>
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
         </section>

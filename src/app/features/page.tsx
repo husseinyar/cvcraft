@@ -2,20 +2,46 @@
 "use client"
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
+import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
+import { Bot, Palette, FileText, CheckCircle, Clock, Share2 } from 'lucide-react';
+import Image from 'next/image';
 
-export default function TemplatesPage() {
+export default function FeaturesPage() {
   const { t } = useTranslation();
 
-  const templates = [
-    { name: 'professional', hint: 'resume professional' },
-    { name: 'creative', hint: 'resume creative' },
-    { name: 'minimal', hint: 'resume minimal' },
-    { name: 'modern', hint: 'resume modern' },
-    { name: 'elegant', hint: 'resume elegant' },
-    { name: 'bold', hint: 'resume bold' },
+  const featureList = [
+    {
+      icon: Bot,
+      title: "features_page.list.ai.title",
+      description: "features_page.list.ai.description"
+    },
+    {
+      icon: Palette,
+      title: "features_page.list.templates.title",
+      description: "features_page.list.templates.description"
+    },
+    {
+      icon: FileText,
+      title: "features_page.list.preview.title",
+      description: "features_page.list.preview.description"
+    },
+     {
+      icon: CheckCircle,
+      title: "features_page.list.ats.title",
+      description: "features_page.list.ats.description"
+    },
+     {
+      icon: Clock,
+      title: "features_page.list.save.title",
+      description: "features_page.list.save.description"
+    },
+    {
+      icon: Share2,
+      title: "features_page.list.export.title",
+      description: "features_page.list.export.description"
+    }
   ];
 
   return (
@@ -24,7 +50,7 @@ export default function TemplatesPage() {
         <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
         <nav className="hidden md:flex gap-6 items-center">
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
-          <Link href="/templates" className="text-sm font-medium text-primary hover:text-primary">{t('nav.templates')}</Link>
+          <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
           <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
           <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
@@ -39,26 +65,28 @@ export default function TemplatesPage() {
 
       <main className="flex-grow">
         <section className="py-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-4xl font-bold mb-4">{t('templates.title')}</h2>
-                <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">{t('templates.subtitle')}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {templates.map(template => (
-                        <div key={template.name} className="p-4 border rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300">
-                          <Image 
-                            src={`https://placehold.co/400x550.png`} 
-                            width={400} 
-                            height={550} 
-                            alt={`${t(`templates.${template.name}` as any)} Template`} 
-                            className="rounded-md w-full" 
-                            data-ai-hint={template.hint}
-                          />
-                          <p className="mt-4 font-semibold text-lg">{t(`templates.${template.name}` as any)}</p>
-                           <Link href="/editor" className="mt-2 inline-block">
-                                <Button variant="link">{t('templates.use_template')}</Button>
-                            </Link>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-16">
+                    <h2 className="text-4xl font-bold mb-4">{t('features_page.title')}</h2>
+                    <p className="text-lg text-muted-foreground max-w-3xl mx-auto">{t('features_page.subtitle')}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    {featureList.map((feature, index) => (
+                        <div key={index} className="flex gap-4">
+                            <feature.icon className="h-10 w-10 text-primary flex-shrink-0 mt-1" />
+                            <div>
+                                <h3 className="text-xl font-semibold mb-2">{t(feature.title as any)}</h3>
+                                <p className="text-muted-foreground">{t(feature.description as any)}</p>
+                            </div>
                         </div>
                     ))}
+                </div>
+
+                <div className="mt-20 text-center">
+                    <Link href="/editor">
+                        <Button size="lg">{t('hero.cta')}</Button>
+                    </Link>
                 </div>
             </div>
         </section>

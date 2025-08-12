@@ -64,7 +64,7 @@ export default function BlogPage() {
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
           <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
           <Link href="/blog" className="text-sm font-medium text-primary hover:text-primary">{t('nav.blog')}</Link>
-          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
+          <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
           <Button variant="outline">{t('nav.login')}</Button>
           <LanguageSwitcher />
@@ -120,8 +120,8 @@ export default function BlogPage() {
                     <h4 className="font-bold mb-4">{t('footer.product')}</h4>
                     <ul>
                         <li><Link href="/templates" className="hover:underline">{t('nav.templates')}</Link></li>
-                        <li><Link href="#" className="hover:underline">{t('nav.pricing')}</Link></li>
-                        <li><Link href="#" className="hover:underline">{t('footer.features')}</Link></li>
+                        <li><Link href="/pricing" className="hover:underline">{t('nav.pricing')}</Link></li>
+                        <li><Link href="/features" className="hover:underline">{t('footer.features')}</Link></li>
                     </ul>
                 </div>
                 <div>

@@ -191,5 +191,74 @@
     "email": "E-post",
     "phone": "Telefon",
     "address": "Adress"
+  },
+   "pricing_page": {
+    "title": "Enkel, transparent prissättning",
+    "subtitle": "Välj den plan som passar dig och börja bygga ditt dröm-CV idag.",
+    "free": {
+      "name": "Gratis",
+      "price": "0 kr / månad",
+      "description": "För att komma igång.",
+      "features": {
+        "one": "1 CV",
+        "two": "3 mallar",
+        "three": "PDF-export"
+      },
+      "cta": "Börja gratis"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "99 kr / månad",
+      "description": "För proffs.",
+      "features": {
+        "one": "Obegränsat antal CV:n",
+        "two": "Alla mallar",
+        "three": "AI-förslag",
+        "four": "Ta bort varumärke"
+      },
+      "cta": "Bli Pro"
+    },
+    "business": {
+      "name": "Företag",
+      "price": "Kontakta oss",
+      "description": "För team och organisationer.",
+      "features": {
+        "one": "Alla Pro-funktioner",
+        "two": "Teamhantering",
+        "three": "Prioriterad support",
+        "four": "Anpassat varumärke"
+      },
+      "cta": "Kontakta säljavdelningen"
+    }
+  },
+    "features_page": {
+    "title": "Allt du behöver för att lyckas",
+    "subtitle": "CV Craft är fullmatat med kraftfulla funktioner som hjälper dig att skapa ett CV som öppnar dörrar.",
+    "list": {
+      "ai": {
+        "title": "AI-drivet innehåll",
+        "description": "Använd AI för att skriva övertygande sammanfattningar och erfarenhetsavsnitt anpassade för specifika jobb."
+      },
+      "templates": {
+        "title": "Professionella mallar",
+        "description": "Välj från ett brett utbud av professionellt designade mallar som garanterat kommer att imponera."
+      },
+      "preview": {
+        "title": "Live-förhandsvisning",
+        "description": "Se direkt hur ditt CV ser ut när du gör ändringar. Inga fler gissningar."
+      },
+      "ats": {
+        "title": "ATS-optimerad",
+        "description": "Våra mallar är utformade för att enkelt kunna tolkas av ansökningsspårningssystem."
+      },
+      "save": {
+        "title": "Spara i realtid",
+        "description": "Dina framsteg sparas automatiskt, så att du kan fortsätta precis där du slutade."
+      },
+      "export": {
+        "title": "Enkel PDF-export",
+        "description": "Ladda ner en pixelperfekt PDF av ditt CV, redo att skickas till arbetsgivare."
+      }
+    }
   }
 }

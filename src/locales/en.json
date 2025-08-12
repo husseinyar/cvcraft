@@ -191,5 +191,74 @@
     "email": "Email",
     "phone": "Phone",
     "address": "Address"
+  },
+   "pricing_page": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the plan that's right for you and start building your dream CV today.",
+    "free": {
+      "name": "Free",
+      "price": "$0 / month",
+      "description": "For getting started.",
+      "features": {
+        "one": "1 CV",
+        "two": "3 templates",
+        "three": "PDF export"
+      },
+      "cta": "Start for Free"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "$9 / month",
+      "description": "For professionals.",
+      "features": {
+        "one": "Unlimited CVs",
+        "two": "All templates",
+        "three": "AI suggestions",
+        "four": "Remove branding"
+      },
+      "cta": "Go Pro"
+    },
+    "business": {
+      "name": "Business",
+      "price": "Contact Us",
+      "description": "For teams and organizations.",
+      "features": {
+        "one": "All Pro features",
+        "two": "Team management",
+        "three": "Priority support",
+        "four": "Custom branding"
+      },
+      "cta": "Contact Sales"
+    }
+  },
+  "features_page": {
+    "title": "Everything You Need to Succeed",
+    "subtitle": "CV Craft is packed with powerful features to help you create a CV that opens doors.",
+    "list": {
+      "ai": {
+        "title": "AI-Powered Content",
+        "description": "Leverage AI to write compelling summary and experience sections tailored to specific jobs."
+      },
+      "templates": {
+        "title": "Professional Templates",
+        "description": "Choose from a wide variety of professionally designed templates that are proven to impress."
+      },
+      "preview": {
+        "title": "Live Preview",
+        "description": "Instantly see how your CV looks as you make changes. No more guessing."
+      },
+      "ats": {
+        "title": "ATS-Optimized",
+        "description": "Our templates are designed to be easily parsed by Applicant Tracking Systems."
+      },
+      "save": {
+        "title": "Real-time Saving",
+        "description": "Your progress is saved automatically, so you can pick up right where you left off."
+      },
+      "export": {
+        "title": "Easy PDF Export",
+        "description": "Download a pixel-perfect PDF of your CV, ready to be sent to employers."
+      }
+    }
   }
 }
