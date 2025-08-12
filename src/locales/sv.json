@@ -142,7 +142,8 @@
     "suggestions_modal": {
         "title": "AI-förslag",
         "description": "Här är några förslag för att förbättra din CV-sektion."
-    }
+    },
+    "download_pdf": "Ladda ner PDF"
   },
   "blog": {
     "title": "CV Craft Blogg",

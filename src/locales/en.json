@@ -142,7 +142,8 @@
     "suggestions_modal": {
         "title": "AI Suggestions",
         "description": "Here are some suggestions to improve your CV section."
-    }
+    },
+    "download_pdf": "Download PDF"
   },
    "blog": {
     "title": "CV Craft Blog",

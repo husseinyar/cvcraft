@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { CVData, TemplateOption, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,18 +28,22 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle, Users } from "lucide-react";
+import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle, Users, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useTranslation } from "@/context/language-context";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
 
 interface CvEditorProps {
   cvData: CVData;
   setCvData: React.Dispatch<React.SetStateAction<CVData>>;
   onTemplateChange: (template: TemplateOption) => void;
   allUsers: CVData[];
+  cvPreviewRef: React.RefObject<HTMLDivElement>;
 }
 
-export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData, onTemplateChange, allUsers }: CvEditorProps) {
+export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData, onTemplateChange, allUsers, cvPreviewRef }: CvEditorProps) {
   const { toast } = useToast();
   const [cvData, setCvData] = useState(initialCvData);
   const [jobDescription, setJobDescription] = useState("");
@@ -145,6 +149,26 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
       setCvData(userToEdit);
     }
   }
+  
+  const handleDownloadPdf = () => {
+    const input = cvPreviewRef.current;
+    if (input) {
+      html2canvas(input, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
+        const imgWidth = canvasWidth * ratio;
+        const imgHeight = canvasHeight * ratio;
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
+      });
+    }
+  };
+
 
   return (
     <Card className="shadow-lg">
@@ -276,6 +300,12 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        
+        <Button onClick={handleDownloadPdf} className="w-full mt-6">
+          <Download className="mr-2" />
+          {t('editor.download_pdf')}
+        </Button>
+
 
         <Dialog open={isSuggestionModalOpen} onOpenChange={setIsSuggestionModalOpen}>
             <DialogContent className="max-w-md">

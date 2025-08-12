@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { CVData } from '@/types';
 import { allUsers, dummyCvData } from '@/lib/dummy-data';
 import CvEditor from '@/components/cv-editor';
@@ -15,6 +15,8 @@ export default function EditorPage() {
   const [currentUser, setCurrentUser] = useState<CVData>(allUsers[0]);
   const [cvData, setCvData] = useState<CVData>(allUsers[0]);
   const { t } = useTranslation();
+  const cvPreviewRef = useRef<HTMLDivElement>(null);
+
 
   const handleTemplateChange = (template: 'professional' | 'creative' | 'minimal') => {
     setCvData(prev => ({ ...prev, template }));
@@ -76,10 +78,11 @@ export default function EditorPage() {
               setCvData={setCvData}
               onTemplateChange={handleTemplateChange}
               allUsers={visibleUsers}
+              cvPreviewRef={cvPreviewRef}
             />
           </div>
           <div className="lg:col-span-7 xl:col-span-8 sticky top-10">
-            <TemplatePreview cvData={cvData} />
+            <TemplatePreview cvData={cvData} ref={cvPreviewRef} />
           </div>
         </div>
       </div>
