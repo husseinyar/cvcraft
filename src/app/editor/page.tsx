@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -8,10 +9,12 @@ import TemplatePreview from '@/components/template-preview';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/context/language-context';
 
 export default function EditorPage() {
   const [currentUser, setCurrentUser] = useState<CVData>(allUsers[0]);
   const [cvData, setCvData] = useState<CVData>(allUsers[0]);
+  const { t } = useTranslation();
 
   const handleTemplateChange = (template: 'professional' | 'creative' | 'minimal') => {
     setCvData(prev => ({ ...prev, template }));
@@ -32,7 +35,7 @@ export default function EditorPage() {
       <div className="container mx-auto py-10 px-4">
         <header className="text-center mb-4">
           <h1 className="text-4xl font-bold text-primary font-headline">CV Craft</h1>
-          <p className="text-muted-foreground mt-2">Build your perfect CV with ease and a touch of AI.</p>
+          <p className="text-muted-foreground mt-2">{t('editor.header.subtitle')}</p>
         </header>
 
         <Card className="p-4 mb-8 max-w-sm mx-auto">
@@ -42,11 +45,11 @@ export default function EditorPage() {
             </Avatar>
             <div className="flex-grow">
               <label htmlFor="user-select" className="text-sm font-medium text-muted-foreground">
-                Current User
+                {t('editor.user_switcher.label')}
               </label>
               <Select value={currentUser.id} onValueChange={handleUserChange}>
                 <SelectTrigger id="user-select" className="w-full">
-                  <SelectValue placeholder="Select user" />
+                  <SelectValue placeholder={t('editor.user_switcher.placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {allUsers.map((user) => (
@@ -54,7 +57,7 @@ export default function EditorPage() {
                       <div className="flex items-center gap-2">
                         <span>{user.name}</span>
                         {user.role === 'admin' && (
-                          <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5">Admin</span>
+                          <span className="text-xs bg-primary text-primary-foreground rounded-full px-2 py-0.5">{t('editor.user_switcher.admin_badge')}</span>
                         )}
                       </div>
                     </SelectItem>

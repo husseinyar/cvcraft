@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -29,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
 import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle, Users } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { useTranslation } from "@/context/language-context";
 
 interface CvEditorProps {
   cvData: CVData;
@@ -45,6 +47,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
+  const { t } = useTranslation();
   
   const isEditingAdmin = allUsers.find(u => u.id === cvData.id)?.role === 'admin';
 
@@ -98,8 +101,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const handleGetSuggestions = async (cvSection: string) => {
     if (!jobDescription.trim()) {
       toast({
-        title: "Job Description Missing",
-        description: "Please provide a job description for AI suggestions.",
+        title: t('editor.toast.job_description_missing.title'),
+        description: t('editor.toast.job_description_missing.description'),
         variant: "destructive",
       });
       return;
@@ -113,8 +116,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     } catch (error) {
       console.error("Failed to get suggestions:", error);
       toast({
-        title: "Error",
-        description: "Failed to get suggestions from AI.",
+        title: t('editor.toast.ai_error.title'),
+        description: t('editor.toast.ai_error.description'),
         variant: "destructive",
       });
     } finally {
@@ -147,17 +150,17 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     <Card className="shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>CV Editor</span>
-          {isEditingAdmin && <Badge variant="secondary">Admin View</Badge>}
+          <span>{t('editor.title')}</span>
+          {isEditingAdmin && <Badge variant="secondary">{t('editor.admin_view_badge')}</Badge>}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {isEditingAdmin && (
            <div className="space-y-2">
-            <h3 className="text-lg font-semibold flex items-center"><Users className="mr-2"/>Manage Users</h3>
+            <h3 className="text-lg font-semibold flex items-center"><Users className="mr-2"/>{t('editor.manage_users.title')}</h3>
              <Select onValueChange={handleUserSelectionForEditing} defaultValue={cvData.id}>
                <SelectTrigger>
-                 <SelectValue placeholder="Select a user to edit" />
+                 <SelectValue placeholder={t('editor.manage_users.placeholder')} />
                </SelectTrigger>
                <SelectContent>
                  {allUsers.map(user => (
@@ -168,25 +171,25 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
            </div>
         )}
         <div>
-          <h3 className="text-lg font-semibold mb-2">Template</h3>
+          <h3 className="text-lg font-semibold mb-2">{t('editor.template.title')}</h3>
           <Tabs defaultValue={cvData.template} onValueChange={(value) => onTemplateChange(value as TemplateOption)}>
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="professional"><Briefcase className="mr-2" />Professional</TabsTrigger>
-              <TabsTrigger value="creative"><Paintbrush className="mr-2" />Creative</TabsTrigger>
-              <TabsTrigger value="minimal"><MinusSquare className="mr-2" />Minimal</TabsTrigger>
+              <TabsTrigger value="professional"><Briefcase className="mr-2" />{t('templates.professional')}</TabsTrigger>
+              <TabsTrigger value="creative"><Paintbrush className="mr-2" />{t('templates.creative')}</TabsTrigger>
+              <TabsTrigger value="minimal"><MinusSquare className="mr-2" />{t('templates.minimal')}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
 
         <Accordion type="single" collapsible className="w-full" defaultValue="ai-assist">
           <AccordionItem value="ai-assist">
-            <AccordionTrigger className="text-lg font-semibold">AI Assistant</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">{t('editor.ai_assistant.title')}</AccordionTrigger>
             <AccordionContent className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                Enter a job description to get AI-powered suggestions for your work experience.
+                {t('editor.ai_assistant.description')}
               </p>
               <Textarea
-                placeholder="Paste job description here..."
+                placeholder={t('editor.ai_assistant.placeholder')}
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={4}
@@ -194,23 +197,23 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="personal-details">
-            <AccordionTrigger className="text-lg font-semibold">Personal Details</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">{t('editor.personal_details.title')}</AccordionTrigger>
             <AccordionContent className="space-y-4">
-              <Input name="name" value={cvData.name} onChange={handleInputChange} placeholder="Full Name" />
-              <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder="Job Title" />
-              <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder="Email" type="email" />
-              <Input name="contact.phone" value={cvData.contact.phone} onChange={handleInputChange} placeholder="Phone" />
-              <Input name="contact.website" value={cvData.contact.website} onChange={handleInputChange} placeholder="Website/Portfolio" />
+              <Input name="name" value={cvData.name} onChange={handleInputChange} placeholder={t('editor.personal_details.full_name')} />
+              <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder={t('editor.personal_details.job_title')} />
+              <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder={t('editor.personal_details.email')} type="email" />
+              <Input name="contact.phone" value={cvData.contact.phone} onChange={handleInputChange} placeholder={t('editor.personal_details.phone')} />
+              <Input name="contact.website" value={cvData.contact.website} onChange={handleInputChange} placeholder={t('editor.personal_details.website')} />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="summary">
-            <AccordionTrigger className="text-lg font-semibold">Summary</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">{t('editor.summary.title')}</AccordionTrigger>
             <AccordionContent>
-              <Textarea name="summary" value={cvData.summary} onChange={handleInputChange} placeholder="Professional Summary" rows={5} />
+              <Textarea name="summary" value={cvData.summary} onChange={handleInputChange} placeholder={t('editor.summary.placeholder')} rows={5} />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="experience">
-            <AccordionTrigger className="text-lg font-semibold">Work Experience</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">{t('editor.experience.title')}</AccordionTrigger>
             <AccordionContent className="space-y-4">
               {cvData.experience.map((exp, index) => (
                 <Card key={exp.id} className="bg-card/50">
@@ -218,22 +221,22 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                     <div className="flex justify-end">
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem('experience', index)}><X className="h-4 w-4" /></Button>
                     </div>
-                    <Input placeholder="Role" value={exp.role} onChange={(e) => handleDynamicChange('experience', index, 'role', e.target.value)} />
-                    <Input placeholder="Company" value={exp.company} onChange={(e) => handleDynamicChange('experience', index, 'company', e.target.value)} />
-                    <Input placeholder="Dates (e.g., Jan 2020 - Present)" value={exp.dates} onChange={(e) => handleDynamicChange('experience', index, 'dates', e.target.value)} />
-                    <Textarea placeholder="Description" rows={4} value={exp.description} onChange={(e) => handleDynamicChange('experience', index, 'description', e.target.value)} />
+                    <Input placeholder={t('editor.experience.role')} value={exp.role} onChange={(e) => handleDynamicChange('experience', index, 'role', e.target.value)} />
+                    <Input placeholder={t('editor.experience.company')} value={exp.company} onChange={(e) => handleDynamicChange('experience', index, 'company', e.target.value)} />
+                    <Input placeholder={t('editor.experience.dates')} value={exp.dates} onChange={(e) => handleDynamicChange('experience', index, 'dates', e.target.value)} />
+                    <Textarea placeholder={t('editor.experience.description')} rows={4} value={exp.description} onChange={(e) => handleDynamicChange('experience', index, 'description', e.target.value)} />
                     <Button onClick={() => handleGetSuggestions(exp.description)} disabled={isSuggesting || !jobDescription.trim()} size="sm">
                       <Wand2 className="mr-2 h-4 w-4" />
-                      {isSuggesting ? 'Thinking...' : 'Get Suggestions'}
+                      {isSuggesting ? t('editor.experience.thinking') : t('editor.experience.get_suggestions')}
                     </Button>
                   </CardContent>
                 </Card>
               ))}
-              <Button onClick={() => addDynamicItem('experience')} variant="outline" className="w-full"><PlusCircle className="mr-2" />Add Experience</Button>
+              <Button onClick={() => addDynamicItem('experience')} variant="outline" className="w-full"><PlusCircle className="mr-2" />{t('editor.experience.add_experience')}</Button>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="education">
-            <AccordionTrigger className="text-lg font-semibold">Education</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">{t('editor.education.title')}</AccordionTrigger>
             <AccordionContent className="space-y-4">
               {cvData.education.map((edu, index) => (
                 <Card key={edu.id} className="bg-card/50">
@@ -241,21 +244,21 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                     <div className="flex justify-end">
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem('education', index)}><X className="h-4 w-4" /></Button>
                     </div>
-                    <Input placeholder="School/University" value={edu.school} onChange={(e) => handleDynamicChange('education', index, 'school', e.target.value)} />
-                    <Input placeholder="Degree/Field of Study" value={edu.degree} onChange={(e) => handleDynamicChange('education', index, 'degree', e.target.value)} />
-                    <Input placeholder="Dates (e.g., 2016 - 2020)" value={edu.dates} onChange={(e) => handleDynamicChange('education', index, 'dates', e.target.value)} />
-                    <Textarea placeholder="Description" rows={2} value={edu.description} onChange={(e) => handleDynamicChange('education', index, 'description', e.target.value)} />
+                    <Input placeholder={t('editor.education.school')} value={edu.school} onChange={(e) => handleDynamicChange('education', index, 'school', e.target.value)} />
+                    <Input placeholder={t('editor.education.degree')} value={edu.degree} onChange={(e) => handleDynamicChange('education', index, 'degree', e.target.value)} />
+                    <Input placeholder={t('editor.education.dates')} value={edu.dates} onChange={(e) => handleDynamicChange('education', index, 'dates', e.target.value)} />
+                    <Textarea placeholder={t('editor.education.description')} rows={2} value={edu.description} onChange={(e) => handleDynamicChange('education', index, 'description', e.target.value)} />
                   </CardContent>
                 </Card>
               ))}
-              <Button onClick={() => addDynamicItem('education')} variant="outline" className="w-full"><PlusCircle className="mr-2"/>Add Education</Button>
+              <Button onClick={() => addDynamicItem('education')} variant="outline" className="w-full"><PlusCircle className="mr-2"/>{t('editor.education.add_education')}</Button>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="skills">
-            <AccordionTrigger className="text-lg font-semibold">Skills</AccordionTrigger>
+            <AccordionTrigger className="text-lg font-semibold">{t('editor.skills.title')}</AccordionTrigger>
             <AccordionContent>
               <Input 
-                placeholder="Add a skill and press Enter" 
+                placeholder={t('editor.skills.placeholder')}
                 value={skillsInput}
                 onChange={(e) => setSkillsInput(e.target.value)}
                 onKeyDown={handleSkillsKeyDown}
@@ -277,9 +280,9 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         <Dialog open={isSuggestionModalOpen} onOpenChange={setIsSuggestionModalOpen}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>AI Suggestions</DialogTitle>
+                    <DialogTitle>{t('editor.suggestions_modal.title')}</DialogTitle>
                     <DialogDescription>
-                        Here are some suggestions to improve your CV section.
+                        {t('editor.suggestions_modal.description')}
                     </DialogDescription>
                 </DialogHeader>
                 <ul className="space-y-2 list-disc list-inside max-h-[60vh] overflow-y-auto p-2">

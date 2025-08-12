@@ -1,0 +1,115 @@
+
+{
+  "nav": {
+    "create_cv": "Skapa CV",
+    "templates": "Mallar",
+    "blog": "Blogg",
+    "pricing": "Prissättning",
+    "contact": "Kontakt",
+    "login": "Logga in",
+    "menu": "Meny"
+  },
+  "hero": {
+    "title": "Bygg ditt professionella CV, utan ansträngning",
+    "subtitle": "Skapa ett fantastiskt, ATS-vänligt CV på några minuter. Vår AI-drivna plattform hjälper dig att lyfta fram dina färdigheter och erfarenheter för att få ditt drömjobb.",
+    "cta": "Skapa ditt CV nu"
+  },
+  "features": {
+    "title": "Varför välja CV Craft?",
+    "subtitle": "Allt du behöver för att skapa det perfekta CV:t.",
+    "ai": {
+      "title": "AI-drivna förslag",
+      "description": "Få intelligenta, kontextmedvetna förslag för att förbättra ditt CV-innehåll baserat på arbetsbeskrivningar."
+    },
+    "templates": {
+      "title": "Vackra mallar",
+      "description": "Välj från ett urval av professionella, kreativa och minimalistiska mallar som matchar din stil."
+    },
+    "preview": {
+      "title": "Förhandsgranskning i realtid",
+      "description": "Se dina ändringar direkt med en liveförhandsvisning av ditt CV medan du skriver."
+    }
+  },
+  "templates": {
+    "title": "Hitta din perfekta look",
+    "subtitle": "Professionellt designade mallar för att få dig att sticka ut.",
+    "professional": "Professionell",
+    "creative": "Kreativ",
+    "minimal": "Minimalistisk"
+  },
+  "footer": {
+    "rights": "Alla rättigheter förbehållna."
+  },
+  "editor": {
+    "header": {
+      "subtitle": "Bygg ditt perfekta CV med lätthet och en touch av AI."
+    },
+     "user_switcher": {
+      "label": "Nuvarande användare",
+      "placeholder": "Välj användare",
+      "admin_badge": "Admin"
+    },
+    "title": "CV-redigerare",
+    "admin_view_badge": "Adminvy",
+    "manage_users": {
+        "title": "Hantera användare",
+        "placeholder": "Välj en användare att redigera"
+    },
+    "template": {
+        "title": "Mall"
+    },
+    "ai_assistant": {
+        "title": "AI-assistent",
+        "description": "Ange en arbetsbeskrivning för att få AI-drivna förslag för din arbetslivserfarenhet.",
+        "placeholder": "Klistra in arbetsbeskrivning här..."
+    },
+    "personal_details": {
+        "title": "Personuppgifter",
+        "full_name": "Fullständigt namn",
+        "job_title": "Jobbtitel",
+        "email": "E-post",
+        "phone": "Telefon",
+        "website": "Webbplats/Portfolio"
+    },
+    "summary": {
+        "title": "Sammanfattning",
+        "placeholder": "Professionell sammanfattning"
+    },
+    "experience": {
+        "title": "Arbetslivserfarenhet",
+        "role": "Roll",
+        "company": "Företag",
+        "dates": "Datum (t.ex. jan 2020 - nu)",
+        "description": "Beskrivning",
+        "get_suggestions": "Få förslag",
+        "thinking": "Tänker...",
+        "add_experience": "Lägg till erfarenhet"
+    },
+    "education": {
+        "title": "Utbildning",
+        "school": "Skola/Universitet",
+        "degree": "Examen/Studieområde",
+        "dates": "Datum (t.ex. 2016 - 2020)",
+        "description": "Beskrivning",
+        "add_education": "Lägg till utbildning"
+    },
+    "skills": {
+        "title": "Färdigheter",
+        "placeholder": "Lägg till en färdighet och tryck på Enter"
+    },
+    "toast": {
+        "job_description_missing": {
+            "title": "Arbetsbeskrivning saknas",
+            "description": "Vänligen ange en arbetsbeskrivning för AI-förslag."
+        },
+        "ai_error": {
+            "title": "Fel",
+            "description": "Det gick inte att hämta förslag från AI."
+        }
+    },
+    "suggestions_modal": {
+        "title": "AI-förslag",
+        "description": "Här är några förslag för att förbättra din CV-sektion."
+    }
+  }
+}

@@ -1,0 +1,115 @@
+
+{
+  "nav": {
+    "create_cv": "Create CV",
+    "templates": "Templates",
+    "blog": "Blog",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "login": "Log in",
+    "menu": "Menu"
+  },
+  "hero": {
+    "title": "Build Your Professional CV, Effortlessly",
+    "subtitle": "Create a stunning, ATS-friendly CV in minutes. Our AI-powered platform helps you highlight your skills and experience to land your dream job.",
+    "cta": "Create Your CV Now"
+  },
+  "features": {
+    "title": "Why Choose CV Craft?",
+    "subtitle": "Everything you need to create the perfect CV.",
+    "ai": {
+      "title": "AI-Powered Suggestions",
+      "description": "Get intelligent, context-aware suggestions to improve your CV content based on job descriptions."
+    },
+    "templates": {
+      "title": "Beautiful Templates",
+      "description": "Choose from a selection of professional, creative, and minimal templates to match your style."
+    },
+    "preview": {
+      "title": "Real-time Preview",
+      "description": "See your changes instantly with a live preview of your CV as you type."
+    }
+  },
+  "templates": {
+    "title": "Find Your Perfect Look",
+    "subtitle": "Professionally designed templates to make you stand out.",
+    "professional": "Professional",
+    "creative": "Creative",
+    "minimal": "Minimal"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "editor": {
+    "header": {
+      "subtitle": "Build your perfect CV with ease and a touch of AI."
+    },
+    "user_switcher": {
+      "label": "Current User",
+      "placeholder": "Select user",
+      "admin_badge": "Admin"
+    },
+    "title": "CV Editor",
+    "admin_view_badge": "Admin View",
+    "manage_users": {
+        "title": "Manage Users",
+        "placeholder": "Select a user to edit"
+    },
+    "template": {
+        "title": "Template"
+    },
+    "ai_assistant": {
+        "title": "AI Assistant",
+        "description": "Enter a job description to get AI-powered suggestions for your work experience.",
+        "placeholder": "Paste job description here..."
+    },
+    "personal_details": {
+        "title": "Personal Details",
+        "full_name": "Full Name",
+        "job_title": "Job Title",
+        "email": "Email",
+        "phone": "Phone",
+        "website": "Website/Portfolio"
+    },
+    "summary": {
+        "title": "Summary",
+        "placeholder": "Professional Summary"
+    },
+    "experience": {
+        "title": "Work Experience",
+        "role": "Role",
+        "company": "Company",
+        "dates": "Dates (e.g., Jan 2020 - Present)",
+        "description": "Description",
+        "get_suggestions": "Get Suggestions",
+        "thinking": "Thinking...",
+        "add_experience": "Add Experience"
+    },
+    "education": {
+        "title": "Education",
+        "school": "School/University",
+        "degree": "Degree/Field of Study",
+        "dates": "Dates (e.g., 2016 - 2020)",
+        "description": "Description",
+        "add_education": "Add Education"
+    },
+    "skills": {
+        "title": "Skills",
+        "placeholder": "Add a skill and press Enter"
+    },
+    "toast": {
+        "job_description_missing": {
+            "title": "Job Description Missing",
+            "description": "Please provide a job description for AI suggestions."
+        },
+        "ai_error": {
+            "title": "Error",
+            "description": "Failed to get suggestions from AI."
+        }
+    },
+    "suggestions_modal": {
+        "title": "AI Suggestions",
+        "description": "Here are some suggestions to improve your CV section."
+    }
+  }
+}
