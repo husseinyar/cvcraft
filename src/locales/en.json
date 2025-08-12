@@ -174,5 +174,22 @@
         "excerpt": "Numbers speak louder than words. Learn how to turn your responsibilities into measurable achievements."
       }
     }
+  },
+  "contact_page": {
+    "title": "Get In Touch",
+    "subtitle": "Have a question or feedback? We'd love to hear from you. Fill out the form below and we'll get back to you as soon as possible.",
+    "form_title": "Send us a Message",
+    "form_description": "Let us know how we can help.",
+    "name_label": "Name",
+    "name_placeholder": "Your Name",
+    "email_label": "Email",
+    "email_placeholder": "your.email@example.com",
+    "message_label": "Message",
+    "message_placeholder": "Your message...",
+    "submit_button": "Send Message",
+    "info_title": "Contact Information",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address"
   }
 }

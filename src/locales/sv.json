@@ -174,5 +174,22 @@
         "excerpt": "Siffror talar högre än ord. Lär dig hur du omvandlar dina ansvarsområden till mätbara prestationer."
       }
     }
+  },
+   "contact_page": {
+    "title": "Kontakta oss",
+    "subtitle": "Har du en fråga eller feedback? Vi vill gärna höra från dig. Fyll i formuläret nedan så återkommer vi till dig så snart som möjligt.",
+    "form_title": "Skicka ett meddelande",
+    "form_description": "Låt oss veta hur vi kan hjälpa till.",
+    "name_label": "Namn",
+    "name_placeholder": "Ditt namn",
+    "email_label": "E-post",
+    "email_placeholder": "din.epost@exempel.com",
+    "message_label": "Meddelande",
+    "message_placeholder": "Ditt meddelande...",
+    "submit_button": "Skicka meddelande",
+    "info_title": "Kontaktinformation",
+    "email": "E-post",
+    "phone": "Telefon",
+    "address": "Adress"
   }
 }
