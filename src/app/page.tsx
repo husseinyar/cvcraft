@@ -11,11 +11,15 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-primary">CV Craft</h1>
-        <nav>
-          <Link href="/editor">
-            <Button variant="outline">Go to Editor</Button>
-          </Link>
+        <nav className="hidden md:flex gap-6 items-center">
+          <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">Skapa CV</Link>
+          <Link href="#templates" className="text-sm font-medium text-muted-foreground hover:text-primary">Mallar</Link>
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">Blogg</Link>
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">Prissättning</Link>
+          <Link href="#" className="text-sm font-medium text-muted-foreground hover:text-primary">Kontakt</Link>
+          <Button variant="outline">Logga in</Button>
         </nav>
+        <Button className="md:hidden" variant="outline">Menu</Button>
       </header>
 
       <main className="flex-grow">
@@ -76,7 +80,7 @@ export default function LandingPage() {
         </section>
         
         {/* Template Preview Section */}
-        <section className="py-20">
+        <section id="templates" className="py-20">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h3 className="text-3xl font-bold">Find Your Perfect Look</h3>
                 <p className="text-muted-foreground mt-2 mb-8">Professionally designed templates to make you stand out.</p>
