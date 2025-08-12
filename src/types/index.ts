@@ -7,7 +7,7 @@ export type Experience = {
 };
 
 export type Education = {
-  id: string;
+  id:string;
   school: string;
   degree: string;
   dates: string;
@@ -28,6 +28,7 @@ export type CVData = {
   education: Education[];
   skills: string[];
   template: 'professional' | 'creative' | 'minimal';
+  role: 'admin' | 'user';
 };
 
 export type TemplateOption = 'professional' | 'creative' | 'minimal';

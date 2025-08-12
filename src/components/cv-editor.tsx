@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { CVData, TemplateOption, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,21 +27,34 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle } from "lucide-react";
+import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle, Users } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 interface CvEditorProps {
   cvData: CVData;
   setCvData: React.Dispatch<React.SetStateAction<CVData>>;
   onTemplateChange: (template: TemplateOption) => void;
+  allUsers: CVData[];
 }
 
-export default function CvEditor({ cvData, setCvData, onTemplateChange }: CvEditorProps) {
+export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData, onTemplateChange, allUsers }: CvEditorProps) {
   const { toast } = useToast();
+  const [cvData, setCvData] = useState(initialCvData);
   const [jobDescription, setJobDescription] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
+  
+  const isEditingAdmin = allUsers.find(u => u.id === cvData.id)?.role === 'admin';
+
+  useEffect(() => {
+    setCvData(initialCvData);
+  }, [initialCvData]);
+
+  useEffect(() => {
+    setGlobalCvData(cvData);
+  }, [cvData, setGlobalCvData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -123,12 +136,37 @@ export default function CvEditor({ cvData, setCvData, onTemplateChange }: CvEdit
     setCvData(prev => ({ ...prev, skills: prev.skills.filter(skill => skill !== skillToRemove) }));
   };
 
+  const handleUserSelectionForEditing = (userId: string) => {
+    const userToEdit = allUsers.find(u => u.id === userId);
+    if(userToEdit) {
+      setCvData(userToEdit);
+    }
+  }
+
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>CV Editor</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <span>CV Editor</span>
+          {isEditingAdmin && <Badge variant="secondary">Admin View</Badge>}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {isEditingAdmin && (
+           <div className="space-y-2">
+            <h3 className="text-lg font-semibold flex items-center"><Users className="mr-2"/>Manage Users</h3>
+             <Select onValueChange={handleUserSelectionForEditing} defaultValue={cvData.id}>
+               <SelectTrigger>
+                 <SelectValue placeholder="Select a user to edit" />
+               </SelectTrigger>
+               <SelectContent>
+                 {allUsers.map(user => (
+                   <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+           </div>
+        )}
         <div>
           <h3 className="text-lg font-semibold mb-2">Template</h3>
           <Tabs defaultValue={cvData.template} onValueChange={(value) => onTemplateChange(value as TemplateOption)}>
