@@ -1,25 +1,18 @@
 
 "use client";
 
-import { useState, useEffect, useRef, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import type { CVData, TemplateOption, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Select as ShadcnSelect,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -30,22 +23,17 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, PlusCircle, Users, Download, Save } from "lucide-react";
+import { Wand2, X, PlusCircle, Save } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { updateCvAction } from "@/app/editor/actions";
 
 
 interface CvEditorProps {
   cvData: CVData;
-  setCvData: React.Dispatch<React.SetStateAction<CVData | null>>;
-  onTemplateChange: (template: TemplateOption) => void;
-  allUsers: CVData[];
-  cvPreviewRef: React.RefObject<HTMLDivElement>;
+  setCvData: React.Dispatch<React.SetStateAction<CVData>>;
 }
 
-export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData, onTemplateChange, allUsers, cvPreviewRef }: CvEditorProps) {
+export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData }: CvEditorProps) {
   const { toast } = useToast();
   const [cvData, setCvData] = useState(initialCvData);
   const [jobDescription, setJobDescription] = useState("");
@@ -55,8 +43,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [skillsInput, setSkillsInput] = useState("");
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
-  
-  const isEditingAdmin = allUsers.find(u => u.id === cvData.id)?.role === 'admin';
 
   useEffect(() => {
     setCvData(initialCvData);
@@ -165,38 +151,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     setCvData(newCvData);
     setGlobalCvData(newCvData);
   };
-
-  const handleUserSelectionForEditing = (userId: string) => {
-    const userToEdit = allUsers.find(u => u.id === userId);
-    if(userToEdit) {
-      setCvData(userToEdit);
-      setGlobalCvData(userToEdit);
-      toast({
-        title: "Switched User",
-        description: `Now editing ${userToEdit.name}'s CV.`,
-      });
-    }
-  }
   
-  const handleDownloadPdf = () => {
-    const input = cvPreviewRef.current;
-    if (input) {
-      html2canvas(input, { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
-        const imgWidth = canvasWidth * ratio;
-        const imgHeight = canvasHeight * ratio;
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
-      });
-    }
-  };
-
   const handleSaveChanges = () => {
     startTransition(() => {
         updateCvAction(cvData).then((res) => {
@@ -216,47 +171,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     });
   };
 
-
-  const templateOptions: TemplateOption[] = ['auckland', 'edinburgh', 'princeton', 'otago', 'berkeley', 'harvard'];
-
   return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>{t('editor.title')}</span>
-          {isEditingAdmin && <Badge variant="secondary">{t('editor.admin_view_badge')}</Badge>}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {isEditingAdmin && (
-           <div className="space-y-2">
-            <h3 className="text-lg font-semibold flex items-center"><Users className="mr-2"/>{t('editor.manage_users.title')}</h3>
-             <ShadcnSelect onValueChange={handleUserSelectionForEditing} defaultValue={cvData.id}>
-               <SelectTrigger>
-                 <SelectValue placeholder={t('editor.manage_users.placeholder')} />
-               </SelectTrigger>
-               <SelectContent>
-                 {allUsers.map(user => (
-                   <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
-                 ))}
-               </SelectContent>
-             </ShadcnSelect>
-           </div>
-        )}
-        <div>
-          <h3 className="text-lg font-semibold mb-2">{t('editor.template.title')}</h3>
-           <ShadcnSelect onValueChange={(value) => onTemplateChange(value as TemplateOption)} defaultValue={cvData.template}>
-             <SelectTrigger>
-               <SelectValue placeholder={t('editor.template.placeholder')} />
-             </SelectTrigger>
-             <SelectContent>
-                {templateOptions.map(template => (
-                  <SelectItem key={template} value={template}>{t(`templates.${template}` as any)}</SelectItem>
-                ))}
-             </SelectContent>
-           </ShadcnSelect>
-        </div>
-
+    <div className="space-y-6">
         <Accordion type="single" collapsible className="w-full" defaultValue="ai-assist">
           <AccordionItem value="ai-assist">
             <AccordionTrigger className="text-lg font-semibold">{t('editor.ai_assistant.title')}</AccordionTrigger>
@@ -358,10 +274,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                 <Save className="mr-2" />
                 {isPending ? "Saving..." : "Save Changes"}
             </Button>
-            <Button onClick={handleDownloadPdf} className="w-full">
-              <Download className="mr-2" />
-              {t('editor.download_pdf')}
-            </Button>
         </div>
 
 
@@ -378,7 +290,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                 </ul>
             </DialogContent>
         </Dialog>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

@@ -4,7 +4,7 @@
 import { Suspense } from 'react';
 import type { CVData } from '@/types';
 import EditorClient from './editor-client';
-import { getAllUsers, getCvDataForUser } from '@/services/cv-service';
+import { getCvDataForUser } from '@/services/cv-service';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const createDefaultCv = (): CVData => ({
@@ -17,33 +17,25 @@ const createDefaultCv = (): CVData => ({
     website: 'alexdoe.com',
   },
   summary: 'A passionate software developer with experience in building web applications.',
-  experience: [],
-  education: [],
-  skills: [],
+  experience: [
+    { id: 'exp1', role: 'Frontend Developer', company: 'Tech Solutions', dates: '2020 - Present', description: 'Developed and maintained user-facing features for a large-scale web application using React and TypeScript.' },
+  ],
+  education: [
+     { id: 'edu1', school: 'University of Technology', degree: 'B.Sc. in Computer Science', dates: '2016 - 2020', description: '' },
+  ],
+  skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
   template: 'otago',
   role: 'user',
 });
 
 async function EditorPageContent() {
-  let allUsers = await getAllUsers();
-  let initialCv: CVData | null = null;
+  let initialCv = await getCvDataForUser('user1');
 
-  if (allUsers.length > 0) {
-    // If users exist, load the first one
-    initialCv = await getCvDataForUser(allUsers[0].id);
-  }
-
-  // If no users exist or fetching the first user fails, create a default CV
   if (!initialCv) {
     initialCv = createDefaultCv();
-    // If the database was empty, this default user is the only one for now
-    if (allUsers.length === 0) {
-      allUsers = [initialCv];
-    }
   }
 
-
-  return <EditorClient allUsers={allUsers} initialCv={initialCv} />;
+  return <EditorClient initialCv={initialCv} />;
 }
 
 export default async function EditorPage() {
@@ -56,24 +48,22 @@ export default async function EditorPage() {
 
 function EditorPageSkeleton() {
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <div className="container mx-auto py-10 px-4">
-        <header className="text-center mb-4">
-          <Skeleton className="h-10 w-48 mx-auto" />
-          <Skeleton className="h-4 w-64 mx-auto mt-4" />
-        </header>
-        <div className="max-w-sm mx-auto mb-8">
-          <Skeleton className="h-16 w-full" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-5 xl:col-span-4 space-y-4">
-            <Skeleton className="h-screen w-full" />
-          </div>
-          <div className="lg:col-span-7 xl:col-span-8 sticky top-10">
+     <div className="flex h-screen bg-muted/40">
+      {/* Sidebar Skeleton */}
+      <aside className="w-20 bg-background border-r p-4 flex flex-col items-center gap-8">
+         <Skeleton className="h-8 w-8 rounded-full" />
+         <div className="space-y-6">
+            <Skeleton className="h-10 w-10" />
+            <Skeleton className="h-10 w-10" />
+            <Skeleton className="h-10 w-10" />
+         </div>
+      </aside>
+      {/* Main Content Skeleton */}
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+         <div className="max-w-4xl mx-auto">
             <Skeleton className="aspect-[8.5/11] w-full" />
-          </div>
-        </div>
-      </div>
-    </main>
+         </div>
+      </main>
+    </div>
   );
 }
