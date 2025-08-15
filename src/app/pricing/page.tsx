@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
-import { Check } from 'lucide-react';
+import { Check, Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export default function PricingPage() {
   const { t } = useTranslation();
@@ -63,15 +64,32 @@ export default function PricingPage() {
         </nav>
         <div className="md:hidden flex items-center gap-2">
            <LanguageSwitcher />
-           <Button variant="outline">{t('nav.menu')}</Button>
+           <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Menu />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <nav className="flex flex-col gap-6 pt-12">
+                <Link href="/editor" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
+                <Link href="/templates" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
+                <Link href="/blog" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
+                <Link href="/pricing" className="text-lg font-medium text-primary hover:text-primary">{t('nav.pricing')}</Link>
+                <Link href="/contact" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
+                <Button variant="outline" className="w-full">{t('nav.login')}</Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
       <main className="flex-grow">
-        <section className="py-20">
+        <section className="py-12 md:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">{t('pricing_page.title')}</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('pricing_page.title')}</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('pricing_page.subtitle')}</p>
             </div>
             
