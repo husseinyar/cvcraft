@@ -63,10 +63,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   };
 
 
-  if (!isClient) {
-    return null;
-  }
-
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
