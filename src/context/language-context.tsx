@@ -27,27 +27,24 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Locale>('en');
-  const [isClient, setIsClient] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
     const savedLanguage = localStorage.getItem('language') as Locale;
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'sv')) {
       setLanguage(savedLanguage);
     }
+    setIsMounted(true);
   }, []);
 
   const handleSetLanguage = (lang: Locale) => {
     setLanguage(lang);
-    if (isClient) {
-      localStorage.setItem('language', lang);
-    }
+    localStorage.setItem('language', lang);
   };
   
   const t = (key: TranslationKey): string => {
-    const currentLanguage = isClient ? language : 'en'; // Default to 'en' on server and initial client render
     const keys = key.split('.');
-    let result: any = translations[currentLanguage];
+    let result: any = translations[language];
     for (const k of keys) {
         result = result?.[k];
         if (result === undefined) {
@@ -62,6 +59,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return result || key;
   };
 
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
