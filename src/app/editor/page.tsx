@@ -7,27 +7,41 @@ import EditorClient from './editor-client';
 import { getAllUsers, getCvDataForUser } from '@/services/cv-service';
 import { Skeleton } from '@/components/ui/skeleton';
 
-async function EditorPageContent() {
-  const allUsers = await getAllUsers();
-  // We'll default to loading 'user1' or the first user found.
-  // In a real app with authentication, you would get the logged-in user's ID.
-  const initialCv = await getCvDataForUser(allUsers[0]?.id || 'user1');
+const createDefaultCv = (): CVData => ({
+  id: 'user1',
+  name: 'Alex Doe',
+  jobTitle: 'Software Developer',
+  contact: {
+    email: 'alex.doe@example.com',
+    phone: '123-456-7890',
+    website: 'alexdoe.com',
+  },
+  summary: 'A passionate software developer with experience in building web applications.',
+  experience: [],
+  education: [],
+  skills: [],
+  template: 'otago',
+  role: 'user',
+});
 
-  if (!initialCv) {
-    return (
-      <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
-        <div className="text-center p-8">
-          <h1 className="text-2xl font-bold">Could Not Load CV Data</h1>
-          <p className="text-muted-foreground mt-2">
-            This might be because the database is empty or there is a connection issue.
-          </p>
-          <p className="text-sm mt-4">
-            Please ensure you have added a user with the ID 'user1' to your Firestore 'users' collection.
-          </p>
-        </div>
-      </main>
-    );
+async function EditorPageContent() {
+  let allUsers = await getAllUsers();
+  let initialCv: CVData | null = null;
+
+  if (allUsers.length > 0) {
+    // If users exist, load the first one
+    initialCv = await getCvDataForUser(allUsers[0].id);
   }
+
+  // If no users exist or fetching the first user fails, create a default CV
+  if (!initialCv) {
+    initialCv = createDefaultCv();
+    // If the database was empty, this default user is the only one for now
+    if (allUsers.length === 0) {
+      allUsers = [initialCv];
+    }
+  }
+
 
   return <EditorClient allUsers={allUsers} initialCv={initialCv} />;
 }

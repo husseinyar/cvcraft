@@ -63,7 +63,7 @@ export default function EditorClient({ allUsers, initialCv }: EditorClientProps)
                   <SelectValue placeholder={t('editor.user_switcher.placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {allUsers.map((user) => (
+                  {allUsers && allUsers.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       <div className="flex items-center gap-2">
                         <span>{user.name}</span>
