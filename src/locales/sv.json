@@ -33,12 +33,12 @@
   "templates": {
     "title": "Hitta din perfekta look",
     "subtitle": "Professionellt designade mallar för att få dig att sticka ut.",
-    "professional": "Professionell",
-    "creative": "Kreativ",
-    "minimal": "Minimalistisk",
-    "modern": "Modern",
-    "elegant": "Elegant",
-    "bold": "Djärv",
+    "auckland": "Auckland",
+    "edinburgh": "Edinburgh",
+    "princeton": "Princeton",
+    "otago": "Otago",
+    "berkeley": "Berkeley",
+    "harvard": "Harvard",
     "view_all": "Visa alla mallar",
     "use_template": "Använd den här mallen"
   },
@@ -88,7 +88,8 @@
         "placeholder": "Välj en användare att redigera"
     },
     "template": {
-        "title": "Mall"
+        "title": "Mall",
+        "placeholder": "Välj en mall"
     },
     "ai_assistant": {
         "title": "AI-assistent",

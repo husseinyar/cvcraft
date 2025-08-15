@@ -33,12 +33,12 @@
   "templates": {
     "title": "Find Your Perfect Look",
     "subtitle": "Professionally designed templates to make you stand out.",
-    "professional": "Professional",
-    "creative": "Creative",
-    "minimal": "Minimal",
-    "modern": "Modern",
-    "elegant": "Elegant",
-    "bold": "Bold",
+    "auckland": "Auckland",
+    "edinburgh": "Edinburgh",
+    "princeton": "Princeton",
+    "otago": "Otago",
+    "berkeley": "Berkeley",
+    "harvard": "Harvard",
     "view_all": "View All Templates",
     "use_template": "Use This Template"
   },
@@ -88,7 +88,8 @@
         "placeholder": "Select a user to edit"
     },
     "template": {
-        "title": "Template"
+        "title": "Template",
+        "placeholder": "Select a template"
     },
     "ai_assistant": {
         "title": "AI Assistant",

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import type { CVData } from '@/types';
+import type { CVData, TemplateOption } from '@/types';
 import { allUsers, dummyCvData } from '@/lib/dummy-data';
 import CvEditor from '@/components/cv-editor';
 import TemplatePreview from '@/components/template-preview';
@@ -18,7 +18,7 @@ export default function EditorPage() {
   const cvPreviewRef = useRef<HTMLDivElement>(null);
 
 
-  const handleTemplateChange = (template: 'professional' | 'creative' | 'minimal') => {
+  const handleTemplateChange = (template: TemplateOption) => {
     setCvData(prev => ({ ...prev, template }));
   };
 

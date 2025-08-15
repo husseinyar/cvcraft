@@ -5,17 +5,18 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
+import type { TemplateOption } from '@/types';
 
 export default function TemplatesPage() {
   const { t } = useTranslation();
 
-  const templates = [
-    { name: 'professional', hint: 'resume professional' },
-    { name: 'creative', hint: 'resume creative' },
-    { name: 'minimal', hint: 'resume minimal' },
-    { name: 'modern', hint: 'resume modern' },
-    { name: 'elegant', hint: 'resume elegant' },
-    { name: 'bold', hint: 'resume bold' },
+  const templates: { name: TemplateOption, hint: string }[] = [
+    { name: 'otago', hint: 'resume otago' },
+    { name: 'harvard', hint: 'resume harvard' },
+    { name: 'princeton', hint: 'resume princeton' },
+    { name: 'auckland', hint: 'resume auckland' },
+    { name: 'edinburgh', hint: 'resume edinburgh' },
+    { name: 'berkeley', hint: 'resume berkeley' },
   ];
 
   return (

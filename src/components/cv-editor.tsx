@@ -14,10 +14,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+  Select as ShadcnSelect,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -28,8 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, Briefcase, Paintbrush, MinusSquare, PlusCircle, Users, Download } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Wand2, X, PlusCircle, Users, Download } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -170,6 +171,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   };
 
 
+  const templateOptions: TemplateOption[] = ['auckland', 'edinburgh', 'princeton', 'otago', 'berkeley', 'harvard'];
+
   return (
     <Card className="shadow-lg">
       <CardHeader>
@@ -182,7 +185,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         {isEditingAdmin && (
            <div className="space-y-2">
             <h3 className="text-lg font-semibold flex items-center"><Users className="mr-2"/>{t('editor.manage_users.title')}</h3>
-             <Select onValueChange={handleUserSelectionForEditing} defaultValue={cvData.id}>
+             <ShadcnSelect onValueChange={handleUserSelectionForEditing} defaultValue={cvData.id}>
                <SelectTrigger>
                  <SelectValue placeholder={t('editor.manage_users.placeholder')} />
                </SelectTrigger>
@@ -191,18 +194,21 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                    <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
                  ))}
                </SelectContent>
-             </Select>
+             </ShadcnSelect>
            </div>
         )}
         <div>
           <h3 className="text-lg font-semibold mb-2">{t('editor.template.title')}</h3>
-          <Tabs defaultValue={cvData.template} onValueChange={(value) => onTemplateChange(value as TemplateOption)}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="professional"><Briefcase className="mr-2" />{t('templates.professional')}</TabsTrigger>
-              <TabsTrigger value="creative"><Paintbrush className="mr-2" />{t('templates.creative')}</TabsTrigger>
-              <TabsTrigger value="minimal"><MinusSquare className="mr-2" />{t('templates.minimal')}</TabsTrigger>
-            </TabsList>
-          </Tabs>
+           <ShadcnSelect onValueChange={(value) => onTemplateChange(value as TemplateOption)} defaultValue={cvData.template}>
+             <SelectTrigger>
+               <SelectValue placeholder={t('editor.template.placeholder')} />
+             </SelectTrigger>
+             <SelectContent>
+                {templateOptions.map(template => (
+                  <SelectItem key={template} value={template}>{t(`templates.${template}` as any)}</SelectItem>
+                ))}
+             </SelectContent>
+           </ShadcnSelect>
         </div>
 
         <Accordion type="single" collapsible className="w-full" defaultValue="ai-assist">

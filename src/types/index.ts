@@ -27,8 +27,8 @@ export type CVData = {
   experience: Experience[];
   education: Education[];
   skills: string[];
-  template: 'professional' | 'creative' | 'minimal';
+  template: TemplateOption;
   role: 'admin' | 'user';
 };
 
-export type TemplateOption = 'professional' | 'creative' | 'minimal';
+export type TemplateOption = 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';

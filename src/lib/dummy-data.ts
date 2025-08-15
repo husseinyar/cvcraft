@@ -46,7 +46,7 @@ export const dummyCvData: CVData = {
     },
   ],
   skills: ['JavaScript (ES6+)', 'TypeScript', 'React', 'Node.js', 'Express', 'GraphQL', 'AWS', 'Docker', 'CI/CD', 'Agile Methodologies'],
-  template: 'professional',
+  template: 'otago',
   role: 'user',
 };
 
@@ -65,7 +65,7 @@ export const allUsers: CVData[] = [
     experience: [],
     education: [],
     skills: ['Management', 'Hiring', 'React'],
-    template: 'professional',
+    template: 'otago',
     role: 'admin',
   },
   dummyCvData,
@@ -98,7 +98,7 @@ export const allUsers: CVData[] = [
       },
     ],
     skills: ['Figma', 'Sketch', 'Adobe XD', 'User Research', 'Prototyping'],
-    template: 'creative',
+    template: 'harvard',
     role: 'user',
   },
   {
@@ -130,7 +130,7 @@ export const allUsers: CVData[] = [
       },
     ],
     skills: ['SEO', 'SEM', 'Content Marketing', 'Email Marketing', 'Google Analytics'],
-    template: 'minimal',
+    template: 'princeton',
     role: 'user',
   },
 ];

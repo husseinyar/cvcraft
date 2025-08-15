@@ -94,16 +94,16 @@ export default function LandingPage() {
                 <p className="text-muted-foreground mt-2 mb-8">{t('templates.subtitle')}</p>
                 <div className="grid lg:grid-cols-3 gap-8">
                     <div className="p-4 border rounded-lg shadow-sm">
-                      <Image src="https://placehold.co/400x550.png" width={400} height={550} alt="Professional Template" className="rounded-md w-full" data-ai-hint="resume professional" />
-                      <p className="mt-4 font-semibold">{t('templates.professional')}</p>
+                      <Image src="https://placehold.co/400x550.png" width={400} height={550} alt="Otago Template" className="rounded-md w-full" data-ai-hint="resume otago" />
+                      <p className="mt-4 font-semibold">{t('templates.otago')}</p>
                     </div>
                      <div className="p-4 border rounded-lg shadow-sm">
-                      <Image src="https://placehold.co/400x550.png" width={400} height={550} alt="Creative Template" className="rounded-md w-full" data-ai-hint="resume creative" />
-                      <p className="mt-4 font-semibold">{t('templates.creative')}</p>
+                      <Image src="https://placehold.co/400x550.png" width={400} height={550} alt="Harvard Template" className="rounded-md w-full" data-ai-hint="resume harvard" />
+                      <p className="mt-4 font-semibold">{t('templates.harvard')}</p>
                     </div>
                      <div className="p-4 border rounded-lg shadow-sm">
-                      <Image src="https://placehold.co/400x550.png" width={400} height={550} alt="Minimal Template" className="rounded-md w-full" data-ai-hint="resume minimal" />
-                      <p className="mt-4 font-semibold">{t('templates.minimal')}</p>
+                      <Image src="https://placehold.co/400x550.png" width={400} height={550} alt="Princeton Template" className="rounded-md w-full" data-ai-hint="resume princeton" />
+                      <p className="mt-4 font-semibold">{t('templates.princeton')}</p>
                     </div>
                 </div>
                  <Link href="/templates" className="inline-block mt-8">

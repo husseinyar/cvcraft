@@ -1,9 +1,9 @@
 "use client";
 
 import type { CVData } from "@/types";
-import ProfessionalTemplate from "./templates/professional";
-import CreativeTemplate from "./templates/creative";
-import MinimalTemplate from "./templates/minimal";
+import OtagoTemplate from "./templates/otago";
+import HarvardTemplate from "./templates/harvard";
+import PrincetonTemplate from "./templates/princeton";
 import { Card, CardContent } from "@/components/ui/card";
 import React from "react";
 
@@ -15,14 +15,19 @@ interface TemplatePreviewProps {
 const TemplatePreview = React.forwardRef<HTMLDivElement, TemplatePreviewProps>(({ cvData }, ref) => {
   const renderTemplate = () => {
     switch (cvData.template) {
-      case "professional":
-        return <ProfessionalTemplate data={cvData} />;
-      case "creative":
-        return <CreativeTemplate data={cvData} />;
-      case "minimal":
-        return <MinimalTemplate data={cvData} />;
+      case "otago":
+        return <OtagoTemplate data={cvData} />;
+      case "harvard":
+        return <HarvardTemplate data={cvData} />;
+      case "princeton":
+        return <PrincetonTemplate data={cvData} />;
+      case "auckland":
+      case "edinburgh":
+      case "berkeley":
+         // Fallback to a default template for new names
+        return <OtagoTemplate data={cvData} />;
       default:
-        return <ProfessionalTemplate data={cvData} />;
+        return <OtagoTemplate data={cvData} />;
     }
   };
 
