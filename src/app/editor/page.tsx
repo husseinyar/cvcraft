@@ -1,9 +1,8 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
-import type { CVData, TemplateOption } from '@/types';
-import { allUsers, dummyCvData } from '@/lib/dummy-data';
+import { useState, useRef, useEffect } from 'react';
+import type { CVData } from '@/types';
 import CvEditor from '@/components/cv-editor';
 import TemplatePreview from '@/components/template-preview';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,15 +10,29 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-context';
 
+// This is a placeholder for the data that will be fetched from Firestore
+const initialUsers: CVData[] = [];
+const initialCv: CVData | null = null;
+
 export default function EditorPage() {
-  const [currentUser, setCurrentUser] = useState<CVData>(allUsers[0]);
-  const [cvData, setCvData] = useState<CVData>(allUsers[0]);
+  const [allUsers, setAllUsers] = useState<CVData[]>(initialUsers);
+  const [currentUser, setCurrentUser] = useState<CVData | null>(initialCv);
+  const [cvData, setCvData] = useState<CVData | null>(initialCv);
   const { t } = useTranslation();
   const cvPreviewRef = useRef<HTMLDivElement>(null);
 
+  // NOTE: In a real application, you would fetch this data from a server.
+  // The server-side fetching has been removed to simplify this into a client-only component.
+  useEffect(() => {
+    // Here you would typically fetch `allUsers` and `initialCv`
+    // For now, we rely on the editor to manage state.
+  }, []);
 
-  const handleTemplateChange = (template: TemplateOption) => {
-    setCvData(prev => ({ ...prev, template }));
+
+  const handleTemplateChange = (template: CVData['template']) => {
+    if (cvData) {
+      setCvData(prev => prev ? { ...prev, template } : null);
+    }
   };
 
   const handleUserChange = (userId: string) => {
@@ -29,6 +42,17 @@ export default function EditorPage() {
       setCvData(selectedUser);
     }
   };
+  
+  if (!cvData || !currentUser) {
+    return (
+        <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
+            <div className="text-center">
+                <h1 className="text-2xl font-bold">Loading CV Data...</h1>
+                <p className="text-muted-foreground">If this takes too long, please ensure your database is configured correctly.</p>
+            </div>
+        </main>
+    );
+  }
 
   const visibleUsers = currentUser.role === 'admin' ? allUsers : [currentUser];
 
@@ -49,7 +73,7 @@ export default function EditorPage() {
               <label htmlFor="user-select" className="text-sm font-medium text-muted-foreground">
                 {t('editor.user_switcher.label')}
               </label>
-              <Select value={currentUser.id} onValueChange={handleUserChange}>
+              <Select value={currentUser.id} onValueChange={handleUserChange} disabled={currentUser.role !== 'admin'}>
                 <SelectTrigger id="user-select" className="w-full">
                   <SelectValue placeholder={t('editor.user_switcher.placeholder')} />
                 </SelectTrigger>

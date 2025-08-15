@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import type { CVData, TemplateOption, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,15 +30,16 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, PlusCircle, Users, Download } from "lucide-react";
+import { Wand2, X, PlusCircle, Users, Download, Save } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { updateCvAction } from "@/app/editor/actions";
 
 
 interface CvEditorProps {
   cvData: CVData;
-  setCvData: React.Dispatch<React.SetStateAction<CVData>>;
+  setCvData: React.Dispatch<React.SetStateAction<CVData | null>>;
   onTemplateChange: (template: TemplateOption) => void;
   allUsers: CVData[];
   cvPreviewRef: React.RefObject<HTMLDivElement>;
@@ -53,6 +54,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
   const { t } = useTranslation();
+  const [isPending, startTransition] = useTransition();
   
   const isEditingAdmin = allUsers.find(u => u.id === cvData.id)?.role === 'admin';
 
@@ -60,47 +62,61 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     setCvData(initialCvData);
   }, [initialCvData]);
 
+  // Debounce saving
   useEffect(() => {
-    setGlobalCvData(cvData);
-  }, [cvData, setGlobalCvData]);
+    const handler = setTimeout(() => {
+      if (JSON.stringify(initialCvData) !== JSON.stringify(cvData)) {
+        startTransition(() => {
+          updateCvAction(cvData);
+        });
+      }
+    }, 1000); // 1 second debounce delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [cvData, initialCvData]);
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     const keys = name.split('.');
     
-    setCvData(prev => {
-      const newState = { ...prev };
-      let current: any = newState;
-      for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]];
-      }
-      current[keys[keys.length - 1]] = value;
-      return newState;
-    });
+    const newCvData = { ...cvData };
+    let current: any = newCvData;
+    for (let i = 0; i < keys.length - 1; i++) {
+      current = current[keys[i]];
+    }
+    current[keys[keys.length - 1]] = value;
+    setCvData(newCvData);
+    setGlobalCvData(newCvData);
   };
 
   const handleDynamicChange = <T extends Experience | Education>(section: 'experience' | 'education', index: number, field: keyof T, value: string) => {
-    setCvData(prev => {
-      const newSection = [...prev[section]];
-      (newSection[index] as any)[field] = value;
-      return { ...prev, [section]: newSection };
-    });
+    const newSection = [...cvData[section]];
+    (newSection[index] as any)[field] = value;
+    const newCvData = { ...cvData, [section]: newSection };
+    setCvData(newCvData);
+    setGlobalCvData(newCvData);
   };
 
    const addDynamicItem = (section: 'experience' | 'education') => {
-    setCvData(prev => {
-      const newItem = section === 'experience'
-        ? { id: `exp${Date.now()}`, role: '', company: '', dates: '', description: '' }
-        : { id: `edu${Date.now()}`, school: '', degree: '', dates: '', description: '' };
-      return { ...prev, [section]: [...prev[section], newItem] };
-    });
+    const newItem = section === 'experience'
+      ? { id: `exp${Date.now()}`, role: '', company: '', dates: '', description: '' }
+      : { id: `edu${Date.now()}`, school: '', degree: '', dates: '', description: '' };
+    
+    const newCvData = { ...cvData, [section]: [...cvData[section], newItem] };
+    setCvData(newCvData);
+    setGlobalCvData(newCvData);
   };
 
   const removeDynamicItem = (section: 'experience' | 'education', index: number) => {
-    setCvData(prev => ({
-      ...prev,
-      [section]: prev[section].filter((_, i) => i !== index),
-    }));
+    const newCvData = {
+      ...cvData,
+      [section]: cvData[section].filter((_, i) => i !== index),
+    };
+    setCvData(newCvData);
+    setGlobalCvData(newCvData);
   };
 
   const handleGetSuggestions = async (cvSection: string) => {
@@ -134,20 +150,27 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     if (e.key === 'Enter' && skillsInput.trim()) {
       e.preventDefault();
       if (!cvData.skills.includes(skillsInput.trim())) {
-        setCvData(prev => ({ ...prev, skills: [...prev.skills, skillsInput.trim()] }));
+        const newSkills = [...cvData.skills, skillsInput.trim()];
+        const newCvData = { ...cvData, skills: newSkills };
+        setCvData(newCvData);
+        setGlobalCvData(newCvData);
       }
       setSkillsInput("");
     }
   };
   
   const removeSkill = (skillToRemove: string) => {
-    setCvData(prev => ({ ...prev, skills: prev.skills.filter(skill => skill !== skillToRemove) }));
+    const newSkills = cvData.skills.filter(skill => skill !== skillToRemove);
+    const newCvData = { ...cvData, skills: newSkills };
+    setCvData(newCvData);
+    setGlobalCvData(newCvData);
   };
 
   const handleUserSelectionForEditing = (userId: string) => {
     const userToEdit = allUsers.find(u => u.id === userId);
     if(userToEdit) {
       setCvData(userToEdit);
+      setGlobalCvData(userToEdit);
       toast({
         title: "Switched User",
         description: `Now editing ${userToEdit.name}'s CV.`,
@@ -172,6 +195,25 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
       });
     }
+  };
+
+  const handleSaveChanges = () => {
+    startTransition(() => {
+        updateCvAction(cvData).then((res) => {
+            if (res.success) {
+                toast({
+                    title: "CV Saved",
+                    description: "Your changes have been saved to the database.",
+                });
+            } else {
+                 toast({
+                    title: "Error",
+                    description: "Could not save changes to the database.",
+                    variant: "destructive"
+                });
+            }
+        })
+    });
   };
 
 
@@ -311,10 +353,16 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
           </AccordionItem>
         </Accordion>
         
-        <Button onClick={handleDownloadPdf} className="w-full mt-6">
-          <Download className="mr-2" />
-          {t('editor.download_pdf')}
-        </Button>
+        <div className="flex items-center gap-4 mt-6">
+            <Button onClick={handleSaveChanges} className="w-full" disabled={isPending}>
+                <Save className="mr-2" />
+                {isPending ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button onClick={handleDownloadPdf} className="w-full">
+              <Download className="mr-2" />
+              {t('editor.download_pdf')}
+            </Button>
+        </div>
 
 
         <Dialog open={isSuggestionModalOpen} onOpenChange={setIsSuggestionModalOpen}>
