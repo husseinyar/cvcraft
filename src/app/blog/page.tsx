@@ -67,7 +67,9 @@ export default function BlogPage() {
           <Link href="/blog" className="text-sm font-medium text-primary hover:text-primary">{t('nav.blog')}</Link>
           <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
-          <Button variant="outline">{t('nav.login')}</Button>
+          <Link href="/editor">
+            <Button variant="outline">{t('nav.login')}</Button>
+          </Link>
           <LanguageSwitcher />
         </nav>
         <div className="md:hidden flex items-center gap-2">
@@ -86,7 +88,9 @@ export default function BlogPage() {
                 <Link href="/blog" className="text-lg font-medium text-primary hover:text-primary">{t('nav.blog')}</Link>
                 <Link href="/pricing" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
                 <Link href="/contact" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
-                <Button variant="outline" className="w-full">{t('nav.login')}</Button>
+                <Link href="/editor">
+                  <Button variant="outline" className="w-full">{t('nav.login')}</Button>
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
