@@ -148,6 +148,10 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     const userToEdit = allUsers.find(u => u.id === userId);
     if(userToEdit) {
       setCvData(userToEdit);
+      toast({
+        title: "Switched User",
+        description: `Now editing ${userToEdit.name}'s CV.`,
+      });
     }
   }
   
