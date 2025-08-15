@@ -32,7 +32,7 @@ async function EditorPageContent() {
   return <EditorClient allUsers={allUsers} initialCv={initialCv} />;
 }
 
-export default function EditorPage() {
+export default async function EditorPage() {
   return (
     <Suspense fallback={<EditorPageSkeleton />}>
       <EditorPageContent />
