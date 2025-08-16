@@ -79,6 +79,9 @@ const parseCvFlow = ai.defineFlow(
     outputSchema: ParseCvOutputSchema,
   },
   async input => {
+    // Log the beginning of the data URI to confirm it's being received.
+    console.log('Parsing resume. Data URI starts with:', input.resumeDataUri.substring(0, 100));
+
     const { output } = await ai.generate({
         model: googleAI.model('gemini-pro-vision'),
         prompt: [{
