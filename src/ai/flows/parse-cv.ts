@@ -81,7 +81,7 @@ const parseCvFlow = ai.defineFlow(
   async input => {
     const llmResponse = await ai.generate({
         model: googleAI.model('gemini-pro-vision'),
-        prompt: prompt.template,
+        prompt,
         input,
         output: {
             format: 'json',
