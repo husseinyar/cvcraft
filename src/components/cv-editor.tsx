@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import type { CVData, TemplateOption, Experience, Education } from "@/types";
+import type { CVData, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, PlusCircle, Save } from "lucide-react";
+import { Wand2, X, PlusCircle, Save, Trash2 } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
 
@@ -48,20 +48,18 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     setCvData(initialCvData);
   }, [initialCvData]);
 
-  // Debounce saving
+  // Debounce updates to global state
   useEffect(() => {
     const handler = setTimeout(() => {
       if (JSON.stringify(initialCvData) !== JSON.stringify(cvData)) {
-        startTransition(() => {
-          updateCvAction(cvData);
-        });
+         setGlobalCvData(cvData);
       }
-    }, 1000); // 1 second debounce delay
+    }, 500); // 0.5 second debounce
 
     return () => {
       clearTimeout(handler);
     };
-  }, [cvData, initialCvData]);
+  }, [cvData, initialCvData, setGlobalCvData]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -75,7 +73,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     }
     current[keys[keys.length - 1]] = value;
     setCvData(newCvData);
-    setGlobalCvData(newCvData);
   };
 
   const handleDynamicChange = <T extends Experience | Education>(section: 'experience' | 'education', index: number, field: keyof T, value: string) => {
@@ -83,7 +80,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     (newSection[index] as any)[field] = value;
     const newCvData = { ...cvData, [section]: newSection };
     setCvData(newCvData);
-    setGlobalCvData(newCvData);
   };
 
    const addDynamicItem = (section: 'experience' | 'education') => {
@@ -93,7 +89,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     
     const newCvData = { ...cvData, [section]: [...cvData[section], newItem] };
     setCvData(newCvData);
-    setGlobalCvData(newCvData);
   };
 
   const removeDynamicItem = (section: 'experience' | 'education', index: number) => {
@@ -102,7 +97,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
       [section]: cvData[section].filter((_, i) => i !== index),
     };
     setCvData(newCvData);
-    setGlobalCvData(newCvData);
   };
 
   const handleGetSuggestions = async (cvSection: string) => {
@@ -139,7 +133,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         const newSkills = [...cvData.skills, skillsInput.trim()];
         const newCvData = { ...cvData, skills: newSkills };
         setCvData(newCvData);
-        setGlobalCvData(newCvData);
       }
       setSkillsInput("");
     }
@@ -149,12 +142,12 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     const newSkills = cvData.skills.filter(skill => skill !== skillToRemove);
     const newCvData = { ...cvData, skills: newSkills };
     setCvData(newCvData);
-    setGlobalCvData(newCvData);
   };
   
   const handleSaveChanges = () => {
     startTransition(() => {
-        updateCvAction(cvData).then((res) => {
+        // Here we save the global state, which has been debounced
+        updateCvAction(initialCvData).then((res) => {
             if (res.success) {
                 toast({
                     title: "CV Saved",
@@ -173,7 +166,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
 
   return (
     <div className="space-y-6">
-        <Accordion type="single" collapsible className="w-full" defaultValue="ai-assist">
+        <h2 className="text-2xl font-bold text-primary">CV Editor</h2>
+        <Accordion type="multiple" className="w-full" defaultValue={['ai-assist', 'personal-details']}>
           <AccordionItem value="ai-assist">
             <AccordionTrigger className="text-lg font-semibold">{t('editor.ai_assistant.title')}</AccordionTrigger>
             <AccordionContent className="space-y-2">
@@ -211,7 +205,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                 <Card key={exp.id} className="bg-card/50">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex justify-end">
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem('experience', index)}><X className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem('experience', index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </div>
                     <Input placeholder={t('editor.experience.role')} value={exp.role} onChange={(e) => handleDynamicChange('experience', index, 'role', e.target.value)} />
                     <Input placeholder={t('editor.experience.company')} value={exp.company} onChange={(e) => handleDynamicChange('experience', index, 'company', e.target.value)} />
@@ -234,7 +228,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                 <Card key={edu.id} className="bg-card/50">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex justify-end">
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem('education', index)}><X className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem('education', index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </div>
                     <Input placeholder={t('editor.education.school')} value={edu.school} onChange={(e) => handleDynamicChange('education', index, 'school', e.target.value)} />
                     <Input placeholder={t('editor.education.degree')} value={edu.degree} onChange={(e) => handleDynamicChange('education', index, 'degree', e.target.value)} />
@@ -272,7 +266,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         <div className="flex items-center gap-4 mt-6">
             <Button onClick={handleSaveChanges} className="w-full" disabled={isPending}>
                 <Save className="mr-2" />
-                {isPending ? "Saving..." : "Save Changes"}
+                {isPending ? "Saving..." : "Save to Cloud"}
             </Button>
         </div>
 

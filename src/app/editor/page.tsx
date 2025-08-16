@@ -8,7 +8,7 @@ import { getCvDataForUser } from '@/services/cv-service';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const createDefaultCv = (): CVData => ({
-  id: 'user1',
+  id: `user_${Date.now()}`,
   name: 'Alex Doe',
   jobTitle: 'Software Developer',
   contact: {
@@ -16,7 +16,7 @@ const createDefaultCv = (): CVData => ({
     phone: '123-456-7890',
     website: 'alexdoe.com',
   },
-  summary: 'A passionate software developer with experience in building web applications.',
+  summary: 'A passionate software developer with experience in building web applications. Start by editing this text!',
   experience: [
     { id: 'exp1', role: 'Frontend Developer', company: 'Tech Solutions', dates: '2020 - Present', description: 'Developed and maintained user-facing features for a large-scale web application using React and TypeScript.' },
   ],
@@ -28,14 +28,18 @@ const createDefaultCv = (): CVData => ({
   role: 'user',
 });
 
+// This part runs on the server
 async function EditorPageContent() {
+  // In a real app, you might get a user ID from session. For this example, we use a default.
+  // We prioritize getting the user from a real DB. If not found, we create a default one.
+  // The client will then check sessionStorage and overwrite if needed.
   let initialCv = await getCvDataForUser('user1');
 
   if (!initialCv) {
     initialCv = createDefaultCv();
   }
 
-  return <EditorClient initialCv={initialCv} />;
+  return <EditorClient serverCv={initialCv} />;
 }
 
 export default async function EditorPage() {
@@ -49,16 +53,14 @@ export default async function EditorPage() {
 function EditorPageSkeleton() {
   return (
      <div className="flex h-screen bg-muted/40">
-      {/* Sidebar Skeleton */}
-      <aside className="w-20 bg-background border-r p-4 flex flex-col items-center gap-8">
-         <Skeleton className="h-8 w-8 rounded-full" />
-         <div className="space-y-6">
-            <Skeleton className="h-10 w-10" />
-            <Skeleton className="h-10 w-10" />
-            <Skeleton className="h-10 w-10" />
-         </div>
+      <aside className="w-80 bg-background border-r p-4 lg:p-6 overflow-y-auto">
+        <Skeleton className="h-10 w-3/4 mb-6" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
       </aside>
-      {/* Main Content Skeleton */}
       <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
          <div className="max-w-4xl mx-auto">
             <Skeleton className="aspect-[8.5/11] w-full" />
