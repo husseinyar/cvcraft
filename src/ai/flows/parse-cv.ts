@@ -9,6 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/googleai';
 import {z} from 'genkit';
 import type { CVData, Experience, Education } from '@/types';
 
@@ -60,6 +61,7 @@ export async function parseCv(input: ParseCvInput): Promise<ParseCvOutput> {
 
 const prompt = ai.definePrompt({
   name: 'parseCvPrompt',
+  model: googleAI.model('gemini-pro-vision'),
   input: {schema: ParseCvInputSchema},
   output: {schema: ParseCvOutputSchema},
   prompt: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
