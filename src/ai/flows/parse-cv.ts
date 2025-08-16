@@ -61,7 +61,6 @@ export async function parseCv(input: ParseCvInput): Promise<ParseCvOutput> {
 
 const prompt = ai.definePrompt({
   name: 'parseCvPrompt',
-  model: googleAI.model('gemini-pro-vision'),
   input: {schema: ParseCvInputSchema},
   output: {schema: ParseCvOutputSchema},
   prompt: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
@@ -80,7 +79,17 @@ const parseCvFlow = ai.defineFlow(
     outputSchema: ParseCvOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const llmResponse = await ai.generate({
+        model: googleAI.model('gemini-pro-vision'),
+        prompt: prompt.template,
+        input,
+        output: {
+            format: 'json',
+            schema: ParseCvOutputSchema,
+        },
+    });
+
+    const output = llmResponse.output();
     if (!output) {
       throw new Error("The AI model failed to parse the CV and returned no output.");
     }
