@@ -76,7 +76,10 @@ export default function UploadPage() {
 
         } catch (err) {
             console.error(err);
-            setError("We couldn’t read your resume. The AI might be busy or the file format is unsupported. Want to start fresh instead?");
+            const errorMessage = (err instanceof Error && err.message.includes("image-based"))
+                ? "We couldn’t read your resume. It may be scanned as an image or use a format we don’t support yet. Please try a text-based PDF or DOCX file."
+                : "We couldn’t read your resume. The AI might be busy or the file format is unsupported. Want to start fresh instead?";
+            setError(errorMessage);
             setIsLoading(false);
             setProgress(0);
         }
@@ -101,9 +104,11 @@ export default function UploadPage() {
               <AlertTitle>Parsing Failed</AlertTitle>
               <AlertDescription>
                 {error}
-                <Button variant="link" className="p-0 h-auto ml-1" onClick={() => router.push('/editor')}>
-                    Start Fresh
-                </Button>
+                {error.includes("Want to start fresh instead?") && (
+                  <Button variant="link" className="p-0 h-auto ml-1" onClick={() => router.push('/editor')}>
+                      Start Fresh
+                  </Button>
+                )}
               </AlertDescription>
             </Alert>
           )}

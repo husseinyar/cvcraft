@@ -91,8 +91,9 @@ const parseCvFlow = ai.defineFlow(
 
     const output = llmResponse.output();
     if (!output) {
-      throw new Error("The AI model failed to parse the CV and returned no output.");
+      throw new Error("The AI model failed to parse the CV and returned no output. The document might be image-based or in an unsupported format.");
     }
     return output;
   }
 );
+
