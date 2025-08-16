@@ -79,21 +79,26 @@ const parseCvFlow = ai.defineFlow(
     outputSchema: ParseCvOutputSchema,
   },
   async input => {
-    const llmResponse = await ai.generate({
+    const { output } = await ai.generate({
         model: googleAI.model('gemini-pro-vision'),
-        prompt: prompt.prompt, // Use the prompt template string
-        input,
+        prompt: [{
+          text: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
+The user's resume is provided in the following data URI.
+
+Carefully analyze the resume content and extract the following information in the specified JSON format.
+If a particular piece of information (like a website) is not found, omit the field or return an empty string.
+For dates, try to keep the format as it appears in the resume.
+`},
+        {media: { url: input.resumeDataUri }}],
         output: {
             format: 'json',
             schema: ParseCvOutputSchema,
         },
     });
 
-    const output = llmResponse.output();
     if (!output) {
       throw new Error("The AI model failed to parse the CV and returned no output. The document might be image-based or in an unsupported format.");
     }
     return output;
   }
 );
-
