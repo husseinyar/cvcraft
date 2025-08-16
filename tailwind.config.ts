@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -41,6 +42,10 @@ export default {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
         },
+        'accent-gold': {
+          DEFAULT: 'hsl(var(--accent-gold))',
+          foreground: 'hsl(var(--accent-gold-foreground))',
+        },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
@@ -65,6 +70,10 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+      },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)))',
+        'gradient-accent': 'linear-gradient(to right, hsl(var(--accent-gold)), hsl(var(--accent)))',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -97,3 +106,5 @@ export default {
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+
+    

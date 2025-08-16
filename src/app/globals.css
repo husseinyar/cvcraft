@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,6 +30,9 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+
+    --accent-gold: 43 74% 49%;
+    --accent-gold-foreground: 210 40% 98%;
   }
   .dark {
     --background: 211 25% 10%;
@@ -55,6 +59,9 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    --accent-gold: 43 74% 49%;
+    --accent-gold-foreground: 210 40% 98%;
   }
 }
 
@@ -66,3 +73,46 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .heading-xl {
+    @apply text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl;
+  }
+  .heading-lg {
+    @apply text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl;
+  }
+  .btn-hero {
+    @apply h-12 px-8 text-lg font-semibold;
+  }
+  .btn-outline {
+    @apply h-12 px-8 text-lg font-semibold border-2;
+  }
+  .gradient-text-animated {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+    animation: gradient-animation 4s ease infinite;
+    background-size: 200% 200%;
+  }
+  .bg-gradient-subtle {
+    @apply bg-gradient-to-b from-background to-secondary/20;
+  }
+  .shadow-strong {
+    @apply shadow-2xl shadow-primary/20;
+  }
+  .hover-lift {
+    @apply transition-transform duration-300 ease-in-out hover:-translate-y-2;
+  }
+  .glow-on-hover {
+    @apply transition-all duration-300;
+  }
+  .glow-on-hover:hover {
+    box-shadow: 0 0 15px 2px hsl(var(--primary) / 0.5);
+  }
+}
+
+@keyframes gradient-animation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+    
