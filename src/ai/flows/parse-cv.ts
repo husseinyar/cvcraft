@@ -59,19 +59,6 @@ export async function parseCv(input: ParseCvInput): Promise<ParseCvOutput> {
   return parseCvFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'parseCvPrompt',
-  input: {schema: ParseCvInputSchema},
-  output: {schema: ParseCvOutputSchema},
-  prompt: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
-The user's resume is provided in the following data URI: {{{media url=resumeDataUri}}}
-
-Carefully analyze the resume content and extract the following information in the specified JSON format.
-If a particular piece of information (like a website) is not found, omit the field or return an empty string.
-For dates, try to keep the format as it appears in the resume.
-`,
-});
-
 const parseCvFlow = ai.defineFlow(
   {
     name: 'parseCvFlow',
@@ -86,12 +73,10 @@ const parseCvFlow = ai.defineFlow(
         model: googleAI.model('gemini-pro-vision'),
         prompt: [{
           text: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
-The user's resume is provided in the following data URI.
-
 Carefully analyze the resume content and extract the following information in the specified JSON format.
 If a particular piece of information (like a website) is not found, omit the field or return an empty string.
-For dates, try to keep the format as it appears in the resume.
-`},
+For dates, try to keep the format as it appears in the resume.`
+        },
         {media: { url: input.resumeDataUri }}],
         output: {
             format: 'json',
