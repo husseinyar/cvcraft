@@ -6,7 +6,7 @@ interface TemplateProps {
   data: CVData;
 }
 
-export default function HarvardTemplate({ data }: TemplateProps) {
+export default function CreativeTemplate({ data }: TemplateProps) {
   return (
     <div className="w-full h-full bg-white text-gray-800 flex font-sans">
       {/* Left Sidebar */}
@@ -20,27 +20,25 @@ export default function HarvardTemplate({ data }: TemplateProps) {
             className="rounded-full border-4 border-white/50 shadow-lg mb-6"
             data-ai-hint="person portrait"
           />
-          <h1 className="text-4xl font-bold tracking-tight">{data.name.split(' ')[0]}<br/>{data.name.split(' ').slice(1).join(' ')}</h1>
-          <h2 className="text-lg font-light text-primary-foreground/80 mt-2 pb-6 border-b-2 border-primary-foreground/20">{data.jobTitle}</h2>
-          
-          <div className="mt-8 space-y-4 text-sm">
-             <div className="flex items-center gap-3">
-                <Mail size={16} className="shrink-0" />
+          <h3 className="text-xl font-semibold uppercase tracking-wider mb-4 border-b pb-2">Personal Details</h3>
+          <div className="mt-4 space-y-4 text-sm">
+             <div className="flex items-start gap-3">
+                <Mail size={16} className="shrink-0 mt-1" />
                 <span>{data.contact.email}</span>
              </div>
-             <div className="flex items-center gap-3">
-                <Phone size={16} className="shrink-0" />
+             <div className="flex items-start gap-3">
+                <Phone size={16} className="shrink-0 mt-1" />
                 <span>{data.contact.phone}</span>
              </div>
-             <div className="flex items-center gap-3">
-                <Globe size={16} className="shrink-0" />
+             <div className="flex items-start gap-3">
+                <Globe size={16} className="shrink-0 mt-1" />
                 <span>{data.contact.website}</span>
              </div>
           </div>
         </div>
 
         <div>
-            <h3 className="text-xl font-semibold uppercase tracking-wider mb-4">Skills</h3>
+            <h3 className="text-xl font-semibold uppercase tracking-wider mb-4 border-b pb-2">Skills</h3>
             <div className="flex flex-col gap-2 text-sm">
                 {data.skills.map(skill => (
                     <span key={skill}>{skill}</span>
@@ -52,16 +50,20 @@ export default function HarvardTemplate({ data }: TemplateProps) {
 
       {/* Main Content */}
       <main className="w-2/3 p-10 overflow-y-auto">
+        <header className="mb-10">
+          <h1 className="text-5xl font-bold tracking-tight text-primary">{data.name}</h1>
+          <h2 className="text-xl font-light text-gray-600 mt-2">{data.jobTitle}</h2>
+        </header>
+
         <section className="mb-10">
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-4">Profile</h3>
-          <p className="text-sm leading-relaxed text-gray-600">{data.summary}</p>
+          <p className="text-sm leading-relaxed text-gray-600 border-l-4 border-primary pl-4">{data.summary}</p>
         </section>
 
         <section className="mb-10">
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Experience</h3>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Work Experience</h3>
           <div className="space-y-6">
             {data.experience.map(exp => (
-              <div key={exp.id}>
+              <div key={exp.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
                 <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{exp.dates}</p>
                 <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
                 <p className="font-medium text-gray-600">{exp.company}</p>
@@ -75,7 +77,7 @@ export default function HarvardTemplate({ data }: TemplateProps) {
           <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Education</h3>
           <div className="space-y-5">
             {data.education.map(edu => (
-              <div key={edu.id}>
+              <div key={edu.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
                  <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{edu.dates}</p>
                 <h4 className="text-lg font-semibold">{edu.degree}</h4>
                 <p className="font-medium text-gray-600">{edu.school}</p>

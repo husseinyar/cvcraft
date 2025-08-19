@@ -31,4 +31,4 @@ export type CVData = {
   role: 'admin' | 'user';
 };
 
-export type TemplateOption = 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
+export type TemplateOption = 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
