@@ -75,6 +75,7 @@ export default function UploadPage() {
             }
 
             const parsedData: ParseCvOutput = await parseCvText({ resumeText: extractedText });
+            console.log('Extracted CV Data:', parsedData);
 
             setProgress(80);
 
