@@ -4,3 +4,4 @@ config();
 
 import '@/ai/flows/suggest-improvements.ts';
 import '@/ai/flows/parse-cv.ts';
+import '@/ai/flows/parse-cv-text.ts';

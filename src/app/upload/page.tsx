@@ -8,9 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { parseCv, type ParseCvOutput } from '@/ai/flows/parse-cv';
+import { parseCvText, type ParseCvOutput } from '@/ai/flows/parse-cv-text';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Configure the worker script for pdfjs-dist
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
 
 export default function UploadPage() {
   const router = useRouter();
@@ -35,7 +40,8 @@ export default function UploadPage() {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      // DOCX processing would require another library like mammoth.js
+      // 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxFiles: 1,
   });
@@ -45,16 +51,30 @@ export default function UploadPage() {
 
     setIsLoading(true);
     setError(null);
-    setProgress(20);
+    setProgress(10);
 
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file);
     reader.onload = async () => {
         try {
-            const base64File = reader.result as string;
-            setProgress(50);
+            const arrayBuffer = reader.result as ArrayBuffer;
+            setProgress(30);
+
+            // Extract text from PDF
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            let extractedText = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                extractedText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
+            }
+            setProgress(60);
             
-            const parsedData: ParseCvOutput = await parseCv({ resumeDataUri: base64File });
+            if (!extractedText.trim()) {
+                throw new Error("The PDF appears to be image-based or empty, we couldn't extract any text.");
+            }
+
+            const parsedData: ParseCvOutput = await parseCvText({ resumeText: extractedText });
 
             setProgress(80);
 
@@ -82,9 +102,9 @@ export default function UploadPage() {
 
         } catch (err) {
             console.error(err);
-            const errorMessage = (err instanceof Error && err.message.includes("image-based"))
-                ? "We couldn’t read your resume. It may be scanned as an image or use a format we don’t support yet. Please try a text-based PDF or DOCX file."
-                : "We couldn’t read your resume. The AI might be busy or the file format is unsupported. Want to start fresh instead?";
+            const errorMessage = (err instanceof Error && (err.message.includes("image-based") || err.message.includes("Invalid PDF")))
+                ? "We couldn’t read your resume. It may be scanned as an image or use a format we don’t support yet. Please try a text-based PDF file."
+                : "We couldn’t read your resume. The AI might be busy or the file is unsupported. Want to start fresh instead?";
             setError(errorMessage);
             setIsLoading(false);
             setProgress(0);
@@ -102,7 +122,7 @@ export default function UploadPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>Upload a .pdf or .docx file and we'll transform it into a stunning CV.</CardDescription>
+          <CardDescription>Upload a .pdf file and we'll extract the text and transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
