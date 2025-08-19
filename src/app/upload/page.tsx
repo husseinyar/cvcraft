@@ -1,6 +1,6 @@
 
 "use client";
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { parseCv, type ParseCvOutput } from '@/ai/flows/parse-cv';
 import type { CVData } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function UploadPage() {
   const router = useRouter();
@@ -17,6 +18,11 @@ export default function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -113,7 +119,14 @@ export default function UploadPage() {
             </Alert>
           )}
 
-          {!file ? (
+          {!isMounted ? (
+            <div className="p-10 border-2 border-dashed rounded-lg">
+              <Skeleton className="h-12 w-12 rounded-full mx-auto mb-4" />
+              <Skeleton className="h-5 w-3/4 mx-auto mb-2" />
+              <Skeleton className="h-4 w-1/4 mx-auto mb-2" />
+              <Skeleton className="h-9 w-1/3 mx-auto mt-2" />
+            </div>
+          ) : !file ? (
             <div {...getRootProps()} className={`p-10 border-2 border-dashed rounded-lg text-center cursor-pointer ${isDragActive ? 'border-primary bg-primary/10' : 'border-border'}`}>
               <input {...getInputProps()} />
               <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
