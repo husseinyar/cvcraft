@@ -48,35 +48,29 @@ const templateOptions: { name: TemplateOption, hint: string }[] = [
 ];
 
 export default function EditorClient({ serverCv }: EditorClientProps) {
-  const [cvData, setCvData] = useState<CVData>(serverCv);
+  // Initialize state from sessionStorage first, then fallback to other sources.
+  const [cvData, setCvData] = useState<CVData>(() => {
+    if (typeof window !== 'undefined') {
+      const storedCvData = sessionStorage.getItem('cv-craft-data');
+      if (storedCvData) {
+        try {
+          // Clear it so it doesn't persist across refreshes after the initial load
+          sessionStorage.removeItem('cv-craft-data');
+          return JSON.parse(storedCvData);
+        } catch (e) {
+          console.error("Failed to parse CV data from session storage", e);
+        }
+      }
+      const localCvData = localStorage.getItem('cv-craft-local-data');
+      if (localCvData) {
+        return JSON.parse(localCvData);
+      }
+    }
+    return serverCv;
+  });
+
   const { t } = useTranslation();
   const cvPreviewRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // On component mount, check sessionStorage for data from upload flow
-    const storedCvData = sessionStorage.getItem('cv-craft-data');
-    if (storedCvData) {
-      try {
-        const parsedData = JSON.parse(storedCvData);
-        setCvData(parsedData);
-        // Clear it so it doesn't persist across sessions
-        sessionStorage.removeItem('cv-craft-data');
-      } catch (e) {
-        console.error("Failed to parse CV data from session storage", e);
-        // If there's an issue, fall back to default or server-provided data
-        setCvData(createDefaultCv());
-      }
-    } else {
-        // If no session data, check localStorage for ongoing edits
-        const localCvData = localStorage.getItem('cv-craft-local-data');
-        if (localCvData) {
-            setCvData(JSON.parse(localCvData));
-        } else {
-            // Otherwise use the server-provided CV (or a default)
-            setCvData(serverCv);
-        }
-    }
-  }, [serverCv]);
 
   // Auto-save to localStorage on change
   useEffect(() => {
