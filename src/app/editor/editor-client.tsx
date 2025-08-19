@@ -42,12 +42,9 @@ const createDefaultCv = (): CVData => ({
 
 
 const templateOptions: { name: TemplateOption, hint: string }[] = [
-    { name: 'otago', hint: 'resume otago' },
-    { name: 'harvard', hint: 'resume harvard' },
-    { name: 'princeton', hint: 'resume princeton' },
-    { name: 'auckland', hint: 'resume auckland' },
-    { name: 'edinburgh', hint: 'resume edinburgh' },
-    { name: 'berkeley', hint: 'resume berkeley' },
+    { name: 'professional', hint: 'resume professional' },
+    { name: 'creative', hint: 'resume creative' },
+    { name: 'minimal', hint: 'resume minimal' },
 ];
 
 export default function EditorClient({ serverCv }: EditorClientProps) {
