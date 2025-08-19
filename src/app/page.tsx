@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { FilePlus2, UploadCloud, ArrowRight } from "lucide-react";
+import { FilePlus2, CloudUpload, ArrowRight } from "lucide-react";
 
 export default function EntryScreen() {
   return (
@@ -45,7 +45,7 @@ export default function EntryScreen() {
           <CardHeader>
             <div className="flex items-center gap-4">
               <div className="p-3 bg-accent/10 rounded-full">
-                <UploadCloud className="h-8 w-8 text-accent" />
+                <CloudUpload className="h-8 w-8 text-accent" />
               </div>
               <div>
                 <CardTitle className="text-2xl">Use Your Resume</CardTitle>
