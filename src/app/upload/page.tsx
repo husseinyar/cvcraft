@@ -73,7 +73,18 @@ export default function UploadPage() {
             if (!extractedText.trim()) {
                 throw new Error("The PDF appears to be image-based or empty, we couldn't extract any text.");
             }
+            
+            // Log extracted text and stop before calling the AI
+            console.log("--- Extracted Resume Text ---");
+            console.log(extractedText);
+            console.log("--- End of Extracted Text ---");
+            alert("Extracted text has been logged to your browser's developer console. The AI call has been temporarily disabled for debugging.");
+            setIsLoading(false);
+            setProgress(0);
+            return; // Stop execution here
 
+            /*
+            // This part is temporarily disabled
             const parsedData: ParseCvOutput = await parseCvText({ resumeText: extractedText });
             console.log('Extracted CV Data:', parsedData);
 
@@ -100,6 +111,7 @@ export default function UploadPage() {
             sessionStorage.setItem('cv-craft-data', JSON.stringify(newCvData));
             setProgress(100);
             router.push('/editor');
+            */
 
         } catch (err) {
             console.error(err);
