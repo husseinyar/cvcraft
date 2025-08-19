@@ -11,89 +11,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import * as pdfjsLib from 'pdfjs-dist';
+import { parseCvText } from '@/ai/flows/parse-cv-text';
 
 // Configure the worker script for pdfjs-dist
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-
-// Client-side text parsing function
-function parseResumeText(text: string): Omit<CVData, 'id' | 'template' | 'role'> {
-  const lines = text.split('\n').filter(line => line.trim() !== '');
-
-  // Very basic parsing using regex - this can be improved
-  const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-  const phoneRegex = /(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/;
-  const websiteRegex = /(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}/;
-
-  let name = lines[0] || 'Your Name';
-  let jobTitle = lines[1] || 'Your Job Title';
-  let email = text.match(emailRegex)?.[0] || '';
-  let phone = text.match(phoneRegex)?.[0] || '';
-  let website = text.match(websiteRegex)?.[0] || '';
-  
-  // Find section headers
-  const experienceIndex = lines.findIndex(line => /experience/i.test(line));
-  const educationIndex = lines.findIndex(line => /education/i.test(line));
-  const skillsIndex = lines.findIndex(line => /skills/i.test(line));
-  const summaryIndex = lines.findIndex(line => /summary|profile/i.test(line));
-
-  let summary = "A professional summary about you.";
-  if (summaryIndex !== -1) {
-    const nextSectionIndex = [experienceIndex, educationIndex, skillsIndex].filter(i => i > summaryIndex).sort((a,b)=> a-b)[0] || lines.length;
-    summary = lines.slice(summaryIndex + 1, nextSectionIndex).join(' ');
-  }
-
-  // A very simplified experience parser
-  const experience = [];
-  if (experienceIndex !== -1) {
-      const nextSectionIndex = [educationIndex, skillsIndex].filter(i => i > experienceIndex).sort((a,b)=> a-b)[0] || lines.length;
-      const experienceLines = lines.slice(experienceIndex + 1, nextSectionIndex);
-      // This simple logic assumes role, company, dates are on consecutive lines.
-      for (let i = 0; i < experienceLines.length; i += 4) {
-          if (experienceLines[i] && experienceLines[i+1] && experienceLines[i+2]) {
-            experience.push({
-                id: `exp${i}`,
-                role: experienceLines[i],
-                company: experienceLines[i+1],
-                dates: experienceLines[i+2],
-                description: experienceLines[i+3] || ''
-            });
-          }
-      }
-  }
-
-  const education = [];
-  if (educationIndex !== -1) {
-      const nextSectionIndex = [skillsIndex].filter(i => i > educationIndex).sort((a,b)=> a-b)[0] || lines.length;
-      const educationLines = lines.slice(educationIndex + 1, nextSectionIndex);
-      for (let i = 0; i < educationLines.length; i += 3) {
-          if(educationLines[i] && educationLines[i+1]) {
-            education.push({
-                id: `edu${i}`,
-                school: educationLines[i+1],
-                degree: educationLines[i],
-                dates: educationLines[i+2] || '',
-                description: ''
-            });
-          }
-      }
-  }
-
-  const skills = [];
-  if (skillsIndex !== -1) {
-      const skillsText = lines.slice(skillsIndex + 1).join(' ');
-      skills.push(...skillsText.split(/, | \/ | - /).map(s => s.trim()).filter(Boolean));
-  }
-
-  return {
-    name,
-    jobTitle,
-    contact: { email, phone, website },
-    summary,
-    experience,
-    education,
-    skills,
-  };
-}
 
 
 export default function UploadPage() {
@@ -150,13 +71,10 @@ export default function UploadPage() {
             if (!extractedText.trim()) {
                 throw new Error("The PDF appears to be image-based or empty, we couldn't extract any text.");
             }
-
-            console.log("--- Extracted Resume Text ---");
-            console.log(extractedText);
             
-            // Parse text on the client-side
-            const parsedData = parseResumeText(extractedText);
-            console.log('--- Client-side Parsed Data ---', parsedData);
+            // Send extracted text to the AI flow for parsing
+            const parsedData = await parseCvText({ resumeText: extractedText });
+            console.log('--- AI Parsed Data ---', parsedData);
 
             setProgress(80);
 
@@ -176,7 +94,7 @@ export default function UploadPage() {
             console.error(err);
             const errorMessage = (err instanceof Error && (err.message.includes("image-based") || err.message.includes("Invalid PDF")))
                 ? "We couldn’t read your resume. It may be scanned as an image. Please try a text-based PDF file."
-                : "We couldn’t process this file. Please try a different one or start fresh.";
+                : "We couldn’t process this file. The AI might be busy or the file format is unsupported. Please try again or start fresh.";
             setError(errorMessage);
             setIsLoading(false);
             setProgress(0);
