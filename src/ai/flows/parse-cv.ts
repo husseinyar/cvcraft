@@ -11,7 +11,6 @@
 import {ai} from '@/ai/genkit';
 import {googleAI} from '@genkit-ai/googleai';
 import {z} from 'genkit';
-import type { CVData, Experience, Education } from '@/types';
 
 const ParseCvInputSchema = z.object({
   resumeDataUri: z
@@ -82,6 +81,9 @@ For dates, try to keep the format as it appears in the resume.`
             format: 'json',
             schema: ParseCvOutputSchema,
         },
+        config: {
+          timeout: 30000, // 30 second timeout
+        }
     });
 
     if (!output) {
