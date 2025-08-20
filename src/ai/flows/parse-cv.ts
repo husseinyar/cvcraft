@@ -69,7 +69,7 @@ const parseCvFlow = ai.defineFlow(
     console.log('Parsing resume. Data URI starts with:', input.resumeDataUri.substring(0, 100));
 
     const { output } = await ai.generate({
-        model: googleAI.model('gemini-pro-vision'),
+        model: googleAI.model('gemini-1.5-flash-latest'),
         prompt: [{
           text: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
 Carefully analyze the resume content and extract the following information in the specified JSON format.
