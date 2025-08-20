@@ -22,7 +22,6 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<{ message: string, link?: string } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -32,7 +31,6 @@ export default function UploadPage() {
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
-      setError(null);
       setErrorDetails(null);
       setFile(acceptedFiles[0]);
     }
@@ -63,7 +61,6 @@ export default function UploadPage() {
     if (!file) return;
 
     setIsLoading(true);
-    setError(null);
     setErrorDetails(null);
     setProgress(10);
 
@@ -109,7 +106,7 @@ export default function UploadPage() {
                 errorMessage = "The Generative Language API is not enabled for your project. Please click the link below to activate it, wait a few minutes, then try again.";
             }
         } else if (err.message && err.message.includes("timeout")) {
-            errorMessage = "The AI model took too long to respond. It might be busy. Please try again in a moment.";
+            errorMessage = "The AI model took too long to respond. It might be busy or you may have hit the free plan's rate limit. Please try again in a moment.";
         }
         
         setErrorDetails({ message: errorMessage, link: errorLink });
