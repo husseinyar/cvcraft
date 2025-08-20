@@ -10,23 +10,7 @@ import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { parseCvText } from '@/ai/flows/parse-cv-text';
-import * as pdfjsLib from 'pdfjs-dist/build/pdf';
-
-// Set up the worker source for pdfjs-dist
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-
-async function extractTextFromPdf(file: File): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-  let fullText = '';
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const textContent = await page.getTextContent();
-    fullText += textContent.items.map(item => ('str' in item ? item.str : '')).join(' ') + '\n';
-  }
-  return fullText;
-}
+import { parseCv } from '@/ai/flows/parse-cv';
 
 
 export default function UploadPage() {
@@ -52,8 +36,7 @@ export default function UploadPage() {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
-      // Note: Client-side DOCX parsing would require another library like mammoth.js
-      // 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxFiles: 1,
   });
@@ -66,22 +49,16 @@ export default function UploadPage() {
     setProgress(10);
 
     try {
-        let resumeText = '';
-        if (file.type === 'application/pdf') {
-            resumeText = await extractTextFromPdf(file);
-        } else {
-            // Placeholder for other file types like .docx
-            // For now, we'll just throw an error if it's not a PDF.
-            throw new Error("Currently, only PDF files are supported for text extraction.");
-        }
+        const fileBuffer = await file.arrayBuffer();
+        const dataUri = `data:${file.type};base64,${Buffer.from(fileBuffer).toString('base64')}`;
         
-        console.log('--- Extracted Resume Text ---');
-        console.log(resumeText.substring(0, 500) + '...'); // Log first 500 chars
+        console.log('--- Sending this Data URI to the AI (first 100 chars) ---');
+        console.log(dataUri.substring(0, 100));
 
         setProgress(30);
 
-        // Send extracted text to the text-based AI flow for parsing
-        const parsedData = await parseCvText({ resumeText });
+        // Send file data URI to the vision-based AI flow for parsing
+        const parsedData = await parseCv({ resumeDataUri: dataUri });
         
         console.log('--- AI Parsed Data ---', parsedData);
 
@@ -116,7 +93,7 @@ export default function UploadPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>Upload a .pdf file and we'll transform it into a stunning CV.</CardDescription>
+          <CardDescription>Upload a .pdf or .docx file and we'll transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
