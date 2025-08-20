@@ -99,13 +99,17 @@ export default function UploadPage() {
         let errorMessage = "We couldn’t process this file. The AI might be busy, the file format is unsupported, or it contains only images. Please try again or start fresh.";
         let errorLink;
 
-        if (err.message && err.message.includes("SERVICE_DISABLED")) {
+        const errString = err.toString().toLowerCase();
+
+        if (errString.includes("service_disabled")) {
             const match = err.message.match(/https?:\/\/[^\s]+/);
             if (match) {
                 errorLink = match[0];
                 errorMessage = "The Generative Language API is not enabled for your project. Please click the link below to activate it, wait a few minutes, then try again.";
             }
-        } else if (err.message && err.message.includes("timeout")) {
+        } else if (errString.includes("rate limit") || errString.includes("429")) {
+            errorMessage = "You've reached the free plan's rate limit. Please wait a few moments before trying again.";
+        } else if (errString.includes("timeout")) {
             errorMessage = "The AI model took too long to respond. It might be busy or you may have hit the free plan's rate limit. Please try again in a moment.";
         }
         
