@@ -30,44 +30,58 @@ export default function EditorClient() {
   const cvPreviewRef = useRef<HTMLDivElement>(null);
 
   const handleTemplateChange = (template: CVData['template']) => {
-    if (setCvData) {
-        setCvData(prev => ({ ...prev, template }));
+    if (setCvData && cvData) {
+        setCvData(prev => ({ ...prev!, template }));
     }
   };
 
   const handleDownloadPdf = () => {
     const input = cvPreviewRef.current;
-    if (input) {
-       const pages = input.querySelectorAll('.cv-page');
-       const pdf = new jsPDF('p', 'mm', 'a4');
-       const pdfWidth = pdf.internal.pageSize.getWidth();
-       const pdfHeight = pdf.internal.pageSize.getHeight();
+    if (input && cvData) {
+        // Use the direct child of the ref for capture, which is the template itself.
+        const elementToCapture = input.firstChild as HTMLElement;
+        if (!elementToCapture) {
+            console.error("CV preview element to capture not found.");
+            return;
+        }
 
-       if (pages.length === 0 || !cvData) {
-        console.error("No pages found to render for PDF or CV data is missing.");
-        return;
-       }
+        html2canvas(elementToCapture, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true,
+            // Allow tainting to handle cross-origin images if any
+            allowTaint: true, 
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            
+            // Create a new PDF in A4 size
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            
+            // Calculate the aspect ratio to fit the image to the PDF page
+            const canvasAspectRatio = canvas.width / canvas.height;
+            const pageAspectRatio = pdfWidth / pdfHeight;
 
-       const processPage = (pageIndex: number) => {
-            if (pageIndex >= pages.length) {
-                pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
-                return;
+            let imgWidth = pdfWidth;
+            let imgHeight = pdfHeight;
+            
+            if (canvasAspectRatio > pageAspectRatio) {
+                // Canvas is wider than page
+                imgHeight = pdfWidth / canvasAspectRatio;
+            } else {
+                // Canvas is taller than page
+                imgWidth = pdfHeight * canvasAspectRatio;
             }
-            if (pageIndex > 0) {
-                pdf.addPage();
-            }
-            const page = pages[pageIndex] as HTMLElement;
-            html2canvas(page, { 
-              scale: 2, 
-              backgroundColor: '#121417', // Explicitly set background for dark theme
-              useCORS: true, 
-            }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                processPage(pageIndex + 1);
-            });
-       };
-       processPage(0);
+
+            // Center the image on the page (optional)
+            const xOffset = (pdfWidth - imgWidth) / 2;
+            const yOffset = (pdfHeight - imgHeight) / 2;
+
+            pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+            pdf.save(`${cvData.name.replace(/\s+/g, '_')}_CV.pdf`);
+        });
+    } else {
+        console.error("CV preview ref or CV data is not available.");
     }
   };
   
