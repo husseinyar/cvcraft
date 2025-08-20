@@ -10,7 +10,11 @@ import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { parseCv } from '@/ai/flows/parse-cv';
+import { parseCvText } from '@/ai/flows/parse-cv-text';
+import * as pdfjs from 'pdfjs-dist';
+
+// Required for pdfjs-dist to work
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 
 export default function UploadPage() {
@@ -36,10 +40,22 @@ export default function UploadPage() {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxFiles: 1,
   });
+
+  const extractTextFromPdf = async (file: File): Promise<string> => {
+    const fileBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjs.getDocument(fileBuffer);
+    const pdf = await loadingTask.promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        text += textContent.items.map(item => (item as any).str).join(' ');
+    }
+    return text;
+  };
   
   const handleUploadAndParse = async () => {
     if (!file) return;
@@ -49,16 +65,21 @@ export default function UploadPage() {
     setProgress(10);
 
     try {
-        const fileBuffer = await file.arrayBuffer();
-        const dataUri = `data:${file.type};base64,${Buffer.from(fileBuffer).toString('base64')}`;
-        
-        console.log('--- Sending this Data URI to the AI (first 100 chars) ---');
-        console.log(dataUri.substring(0, 100));
+        let resumeText = '';
+        // For now, we only support PDF, but DOCX could be added here
+        if (file.type === 'application/pdf') {
+            resumeText = await extractTextFromPdf(file);
+        } else {
+            throw new Error('Unsupported file type.');
+        }
 
         setProgress(30);
 
-        // Send file data URI to the vision-based AI flow for parsing
-        const parsedData = await parseCv({ resumeDataUri: dataUri });
+        console.log('--- Extracted Resume Text ---');
+        console.log(resumeText);
+        
+        // Send extracted text to the text-based AI flow for parsing
+        const parsedData = await parseCvText({ resumeText });
         
         console.log('--- AI Parsed Data ---', parsedData);
 
@@ -93,7 +114,7 @@ export default function UploadPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>Upload a .pdf or .docx file and we'll transform it into a stunning CV.</CardDescription>
+          <CardDescription>Upload a .pdf file and we'll transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
