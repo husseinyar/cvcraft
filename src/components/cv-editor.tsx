@@ -19,7 +19,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements } from "@/ai/flows/suggest-improvements";
@@ -196,6 +196,10 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
             <AccordionTrigger className="text-lg font-semibold">{t('editor.summary.title')}</AccordionTrigger>
             <AccordionContent>
               <Textarea name="summary" value={cvData.summary} onChange={handleInputChange} placeholder={t('editor.summary.placeholder')} rows={5} />
+              <Button onClick={() => handleGetSuggestions(cvData.summary)} disabled={isSuggesting || !jobDescription.trim()} size="sm" className="mt-2">
+                <Wand2 className="mr-2 h-4 w-4" />
+                {isSuggesting ? t('editor.experience.thinking') : t('editor.experience.get_suggestions')}
+              </Button>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="experience">
@@ -233,7 +237,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                     <Input placeholder={t('editor.education.school')} value={edu.school} onChange={(e) => handleDynamicChange('education', index, 'school', e.target.value)} />
                     <Input placeholder={t('editor.education.degree')} value={edu.degree} onChange={(e) => handleDynamicChange('education', index, 'degree', e.target.value)} />
                     <Input placeholder={t('editor.education.dates')} value={edu.dates} onChange={(e) => handleDynamicChange('education', index, 'dates', e.target.value)} />
-                    <Textarea placeholder={t('editor.education.description')} rows={2} value={edu.description} onChange={(e) => handleDynamicChange('education', index, 'description', e.target.value)} />
+                    <Textarea placeholder={t('editor.education.description')} rows={2} value={edu.description || ''} onChange={(e) => handleDynamicChange('education', index, 'description', e.target.value)} />
                   </CardContent>
                 </Card>
               ))}
