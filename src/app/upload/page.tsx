@@ -23,6 +23,7 @@ export default function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<{ message: string, link?: string } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export default function UploadPage() {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       setError(null);
+      setErrorDetails(null);
       setFile(acceptedFiles[0]);
     }
   }, []);
@@ -62,11 +64,11 @@ export default function UploadPage() {
 
     setIsLoading(true);
     setError(null);
+    setErrorDetails(null);
     setProgress(10);
 
     try {
         let resumeText = '';
-        // For now, we only support PDF, but DOCX could be added here
         if (file.type === 'application/pdf') {
             resumeText = await extractTextFromPdf(file);
         } else {
@@ -76,9 +78,8 @@ export default function UploadPage() {
         setProgress(30);
 
         console.log('--- Extracted Resume Text ---');
-        console.log(resumeText);
+        console.log(resumeText.substring(0, 500)); // Log first 500 chars
         
-        // Send extracted text to the text-based AI flow for parsing
         const parsedData = await parseCvText({ resumeText });
         
         console.log('--- AI Parsed Data ---', parsedData);
@@ -87,22 +88,31 @@ export default function UploadPage() {
 
         const newCvData: CVData = {
           id: `user_${Date.now()}`,
-          template: 'otago',
+          template: 'onyx', // Default to the new Onyx template
           role: 'user',
           ...parsedData
         };
 
-        // Store in sessionStorage and redirect
         sessionStorage.setItem('cv-craft-data', JSON.stringify(newCvData));
         setProgress(100);
         router.push('/editor');
 
-    } catch (err) {
+    } catch (err: any) {
         console.error(err);
-        const errorMessage = (err instanceof Error && err.message.includes("timeout"))
-            ? "The AI model took too long to respond. It might be busy. Please try again in a moment."
-            : "We couldn’t process this file. The AI might be busy, the file format is unsupported, or it contains only images. Please try again or start fresh.";
-        setError(errorMessage);
+        let errorMessage = "We couldn’t process this file. The AI might be busy, the file format is unsupported, or it contains only images. Please try again or start fresh.";
+        let errorLink;
+
+        if (err.message && err.message.includes("SERVICE_DISABLED")) {
+            const match = err.message.match(/https?:\/\/[^\s]+/);
+            if (match) {
+                errorLink = match[0];
+                errorMessage = "The Generative Language API is not enabled for your project. Please click the link below to activate it, wait a few minutes, then try again.";
+            }
+        } else if (err.message && err.message.includes("timeout")) {
+            errorMessage = "The AI model took too long to respond. It might be busy. Please try again in a moment.";
+        }
+        
+        setErrorDetails({ message: errorMessage, link: errorLink });
         setIsLoading(false);
         setProgress(0);
     }
@@ -117,13 +127,18 @@ export default function UploadPage() {
           <CardDescription>Upload a .pdf file and we'll transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
-          {error && (
+          {errorDetails && (
             <Alert variant="destructive" className="mb-4">
               <AlertTitle>Parsing Failed</AlertTitle>
               <AlertDescription>
-                {error}
-                <Button variant="link" className="p-0 h-auto ml-1" onClick={() => router.push('/editor')}>
-                    Start Fresh
+                {errorDetails.message}
+                {errorDetails.link && (
+                    <a href={errorDetails.link} target="_blank" rel="noopener noreferrer" className="font-bold underline text-white mt-2 block">
+                       Enable API
+                    </a>
+                )}
+                <Button variant="link" className="p-0 h-auto ml-1 text-white/80" onClick={() => router.push('/editor')}>
+                    Or Start Fresh
                 </Button>
               </AlertDescription>
             </Alert>
