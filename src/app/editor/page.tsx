@@ -4,7 +4,6 @@
 import { Suspense } from 'react';
 import type { CVData } from '@/types';
 import EditorClient from './editor-client';
-import { getCvDataForUser } from '@/services/cv-service';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const createDefaultCv = (): CVData => ({
@@ -28,23 +27,10 @@ const createDefaultCv = (): CVData => ({
   role: 'user',
 });
 
-// This part runs on the server
+// This part runs on the server and passes a default CV to the client.
+// The client is now responsible for loading data from localStorage or other sources.
 async function EditorPageContent() {
-  let initialCv: CVData | null = null;
-  try {
-    // In a real app, you might get a user ID from session. For this example, we use a default.
-    // We prioritize getting the user from a real DB. If not found, we create a default one.
-    // The client will then check sessionStorage and overwrite if needed.
-    initialCv = await getCvDataForUser('user1');
-  } catch (error) {
-    console.error("Failed to fetch from Firestore, proceeding with default CV:", error);
-    // This catch block handles the disabled API or other connection errors gracefully.
-  }
-
-  if (!initialCv) {
-    initialCv = createDefaultCv();
-  }
-
+  const initialCv = createDefaultCv();
   return <EditorClient serverCv={initialCv} />;
 }
 

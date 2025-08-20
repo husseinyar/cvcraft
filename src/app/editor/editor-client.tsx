@@ -16,30 +16,8 @@ import jsPDF from 'jspdf';
 import Image from 'next/image';
 
 interface EditorClientProps {
-  serverCv: CVData;
+  serverCv: CVData; // This is now just the default/initial CV
 }
-
-const createDefaultCv = (): CVData => ({
-  id: `user_${Date.now()}`,
-  name: 'Alex Doe',
-  jobTitle: 'Software Developer',
-  contact: {
-    email: 'alex.doe@example.com',
-    phone: '123-456-7890',
-    website: 'alexdoe.com',
-  },
-  summary: 'A passionate software developer with experience in building web applications. Start by editing this text!',
-  experience: [
-    { id: 'exp1', role: 'Frontend Developer', company: 'Tech Solutions', dates: '2020 - Present', description: 'Developed and maintained user-facing features for a large-scale web application using React and TypeScript.' },
-  ],
-  education: [
-     { id: 'edu1', school: 'University of Technology', degree: 'B.Sc. in Computer Science', dates: '2016 - 2020', description: '' },
-  ],
-  skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
-  template: 'onyx',
-  role: 'user',
-});
-
 
 const templateOptions: { name: TemplateOption, hint: string }[] = [
     { name: 'onyx', hint: 'resume modern dark' },
@@ -49,29 +27,32 @@ const templateOptions: { name: TemplateOption, hint: string }[] = [
 ];
 
 export default function EditorClient({ serverCv }: EditorClientProps) {
-  // Initialize state from sessionStorage first, then fallback to other sources.
-  const [cvData, setCvData] = useState<CVData>(() => {
-    if (typeof window !== 'undefined') {
-      const storedCvData = sessionStorage.getItem('cv-craft-data');
-      if (storedCvData) {
-        try {
-          // Clear it so it doesn't persist across refreshes after the initial load
-          sessionStorage.removeItem('cv-craft-data');
-          return JSON.parse(storedCvData);
-        } catch (e) {
-          console.error("Failed to parse CV data from session storage", e);
-        }
-      }
-      const localCvData = localStorage.getItem('cv-craft-local-data');
-      if (localCvData) {
-        return JSON.parse(localCvData);
-      }
-    }
-    return serverCv;
-  });
-
+  const [cvData, setCvData] = useState<CVData>(serverCv);
   const { t } = useTranslation();
   const cvPreviewRef = useRef<HTMLDivElement>(null);
+
+  // Load data from client-side storage on initial mount
+  useEffect(() => {
+    const storedCvData = sessionStorage.getItem('cv-craft-data');
+    if (storedCvData) {
+      try {
+        setCvData(JSON.parse(storedCvData));
+        // Clear it so it doesn't persist across refreshes after the initial load
+        sessionStorage.removeItem('cv-craft-data');
+      } catch (e) {
+        console.error("Failed to parse CV data from session storage", e);
+      }
+    } else {
+        const localCvData = localStorage.getItem('cv-craft-local-data');
+        if (localCvData) {
+            try {
+                setCvData(JSON.parse(localCvData));
+            } catch (e) {
+                console.error("Failed to parse CV data from local storage", e);
+            }
+        }
+    }
+  }, []);
 
   // Auto-save to localStorage on change
   useEffect(() => {
