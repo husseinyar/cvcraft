@@ -101,13 +101,13 @@ export default function OnyxTemplate({ data }: TemplateProps) {
             {pageIndex === 0 && headerAndSummary}
             
             {experienceForPage.length > 0 && (
-                <Section title="Experience">
+                <Section key="experience-section" title="Experience">
                     {experienceForPage.map(exp => <ExperienceItem key={exp.id} exp={exp} />)}
                 </Section>
             )}
 
             {educationForPage.length > 0 && (
-                 <Section title="Education">
+                 <Section key="education-section" title="Education">
                     {educationForPage.map(edu => <EducationItem key={edu.id} edu={edu} />)}
                 </Section>
             )}
@@ -115,7 +115,7 @@ export default function OnyxTemplate({ data }: TemplateProps) {
             {/* Render Skills on the last page */}
             {experienceLeft.length === 0 && educationLeft.length === 0 && (
                  <div className="absolute bottom-10 left-10 right-10">
-                    <Section title="Skills">
+                    <Section key="skills-section" title="Skills">
                         <p className="text-center text-white/60 text-xs">
                             {data.skills.join(' / ')}
                         </p>
@@ -133,7 +133,7 @@ export default function OnyxTemplate({ data }: TemplateProps) {
         <Page key={`page-0`}>
             {headerAndSummary}
              <div className="absolute bottom-10 left-10 right-10">
-                <Section title="Skills">
+                <Section key="skills-section" title="Skills">
                     <p className="text-center text-white/60 text-xs">
                         {data.skills.join(' / ')}
                     </p>
