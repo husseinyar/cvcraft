@@ -10,12 +10,7 @@ import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import * as pdfjsLib from 'pdfjs-dist';
-import { parseCvText } from '@/ai/flows/parse-cv-text';
-
-// Configure the worker script for pdfjs-dist
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-
+import { parseCv } from '@/ai/flows/parse-cv';
 
 export default function UploadPage() {
   const router = useRouter();
@@ -40,6 +35,7 @@ export default function UploadPage() {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxFiles: 1,
   });
@@ -52,30 +48,16 @@ export default function UploadPage() {
     setProgress(10);
 
     const reader = new FileReader();
-    reader.readAsArrayBuffer(file);
+    reader.readAsDataURL(file); // Read as Data URL for the vision model
     reader.onload = async () => {
         try {
-            const arrayBuffer = reader.result as ArrayBuffer;
+            const resumeDataUri = reader.result as string;
             setProgress(30);
 
-            // Extract text from PDF
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            let extractedText = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                extractedText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
-            }
-            setProgress(60);
-            
-            if (!extractedText.trim()) {
-                throw new Error("The PDF appears to be image-based or empty, we couldn't extract any text.");
-            }
-            
-            // Send extracted text to the AI flow for parsing
-            const parsedData = await parseCvText({ resumeText: extractedText });
+            // Send file data URI to the AI flow for parsing
+            const parsedData = await parseCv({ resumeDataUri });
             console.log('--- AI Parsed Data ---', parsedData);
-
+            
             setProgress(80);
 
             const newCvData: CVData = {
@@ -92,9 +74,9 @@ export default function UploadPage() {
 
         } catch (err) {
             console.error(err);
-            const errorMessage = (err instanceof Error && (err.message.includes("image-based") || err.message.includes("Invalid PDF")))
-                ? "We couldn’t read your resume. It may be scanned as an image. Please try a text-based PDF file."
-                : "We couldn’t process this file. The AI might be busy or the file format is unsupported. Please try again or start fresh.";
+            const errorMessage = (err instanceof Error && err.message.includes("timeout"))
+                ? "The AI model took too long to respond. It might be busy. Please try again in a moment."
+                : "We couldn’t process this file. The AI might be busy, the file format is unsupported, or it contains only images. Please try again or start fresh.";
             setError(errorMessage);
             setIsLoading(false);
             setProgress(0);
@@ -112,7 +94,7 @@ export default function UploadPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>Upload a .pdf file and we'll extract the text and transform it into a stunning CV.</CardDescription>
+          <CardDescription>Upload a .pdf or .docx file and we'll transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
