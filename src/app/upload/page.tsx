@@ -10,7 +10,24 @@ import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { parseCv } from '@/ai/flows/parse-cv';
+import { parseCvText } from '@/ai/flows/parse-cv-text';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf';
+
+// Set up the worker source for pdfjs-dist
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
+async function extractTextFromPdf(file: File): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    fullText += textContent.items.map(item => ('str' in item ? item.str : '')).join(' ') + '\n';
+  }
+  return fullText;
+}
+
 
 export default function UploadPage() {
   const router = useRouter();
@@ -35,7 +52,8 @@ export default function UploadPage() {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      // Note: Client-side DOCX parsing would require another library like mammoth.js
+      // 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxFiles: 1,
   });
@@ -47,44 +65,48 @@ export default function UploadPage() {
     setError(null);
     setProgress(10);
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file); // Read as Data URL for the vision model
-    reader.onload = async () => {
-        try {
-            const resumeDataUri = reader.result as string;
-            setProgress(30);
-
-            // Send file data URI to the AI flow for parsing
-            const parsedData = await parseCv({ resumeDataUri });
-            console.log('--- AI Parsed Data ---', parsedData);
-            
-            setProgress(80);
-
-            const newCvData: CVData = {
-              id: `user_${Date.now()}`,
-              template: 'otago',
-              role: 'user',
-              ...parsedData
-            };
-
-            // Store in sessionStorage and redirect
-            sessionStorage.setItem('cv-craft-data', JSON.stringify(newCvData));
-            setProgress(100);
-            router.push('/editor');
-
-        } catch (err) {
-            console.error(err);
-            const errorMessage = (err instanceof Error && err.message.includes("timeout"))
-                ? "The AI model took too long to respond. It might be busy. Please try again in a moment."
-                : "We couldn’t process this file. The AI might be busy, the file format is unsupported, or it contains only images. Please try again or start fresh.";
-            setError(errorMessage);
-            setIsLoading(false);
-            setProgress(0);
+    try {
+        let resumeText = '';
+        if (file.type === 'application/pdf') {
+            resumeText = await extractTextFromPdf(file);
+        } else {
+            // Placeholder for other file types like .docx
+            // For now, we'll just throw an error if it's not a PDF.
+            throw new Error("Currently, only PDF files are supported for text extraction.");
         }
-    };
-    reader.onerror = () => {
-        setError("Failed to read the file. Please try again.");
+        
+        console.log('--- Extracted Resume Text ---');
+        console.log(resumeText.substring(0, 500) + '...'); // Log first 500 chars
+
+        setProgress(30);
+
+        // Send extracted text to the text-based AI flow for parsing
+        const parsedData = await parseCvText({ resumeText });
+        
+        console.log('--- AI Parsed Data ---', parsedData);
+
+        setProgress(80);
+
+        const newCvData: CVData = {
+          id: `user_${Date.now()}`,
+          template: 'otago',
+          role: 'user',
+          ...parsedData
+        };
+
+        // Store in sessionStorage and redirect
+        sessionStorage.setItem('cv-craft-data', JSON.stringify(newCvData));
+        setProgress(100);
+        router.push('/editor');
+
+    } catch (err) {
+        console.error(err);
+        const errorMessage = (err instanceof Error && err.message.includes("timeout"))
+            ? "The AI model took too long to respond. It might be busy. Please try again in a moment."
+            : "We couldn’t process this file. The AI might be busy, the file format is unsupported, or it contains only images. Please try again or start fresh.";
+        setError(errorMessage);
         setIsLoading(false);
+        setProgress(0);
     }
   };
 
@@ -94,7 +116,7 @@ export default function UploadPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>Upload a .pdf or .docx file and we'll transform it into a stunning CV.</CardDescription>
+          <CardDescription>Upload a .pdf file and we'll transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
