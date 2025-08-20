@@ -33,12 +33,16 @@
   "templates": {
     "title": "Find Your Perfect Look",
     "subtitle": "Professionally designed templates to make you stand out.",
+    "onyx": "Onyx",
     "auckland": "Auckland",
     "edinburgh": "Edinburgh",
     "princeton": "Princeton",
     "otago": "Otago",
     "berkeley": "Berkeley",
     "harvard": "Harvard",
+    "professional": "Professional",
+    "creative": "Creative",
+    "minimal": "Minimal",
     "view_all": "View All Templates",
     "use_template": "Use This Template"
   },

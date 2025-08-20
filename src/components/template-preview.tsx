@@ -8,6 +8,7 @@ import MinimalTemplate from "./templates/minimal";
 import OtagoTemplate from "./templates/otago";
 import HarvardTemplate from "./templates/harvard";
 import PrincetonTemplate from "./templates/princeton";
+import OnyxTemplate from "./templates/onyx";
 import { Card, CardContent } from "@/components/ui/card";
 import React from "react";
 
@@ -19,6 +20,8 @@ interface TemplatePreviewProps {
 const TemplatePreview = React.forwardRef<HTMLDivElement, TemplatePreviewProps>(({ cvData }, ref) => {
   const renderTemplate = () => {
     switch (cvData.template) {
+      case "onyx":
+        return <OnyxTemplate data={cvData} />;
       case "professional":
         return <ProfessionalTemplate data={cvData} />;
       case "creative":
@@ -37,14 +40,14 @@ const TemplatePreview = React.forwardRef<HTMLDivElement, TemplatePreviewProps>((
          // Fallback to a default template for new names
         return <OtagoTemplate data={cvData} />;
       default:
-        return <OtagoTemplate data={cvData} />;
+        return <OnyxTemplate data={cvData} />;
     }
   };
 
   return (
     <Card className="shadow-2xl">
       <CardContent className="p-0">
-        <div ref={ref} className="aspect-[8.5/11] w-full bg-white transition-all duration-300 ease-in-out">
+        <div ref={ref} className="bg-white transition-all duration-300 ease-in-out">
           {renderTemplate()}
         </div>
       </CardContent>

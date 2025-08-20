@@ -33,12 +33,16 @@
   "templates": {
     "title": "Hitta din perfekta look",
     "subtitle": "Professionellt designade mallar för att få dig att sticka ut.",
+    "onyx": "Onyx",
     "auckland": "Auckland",
     "edinburgh": "Edinburgh",
     "princeton": "Princeton",
     "otago": "Otago",
     "berkeley": "Berkeley",
     "harvard": "Harvard",
+    "professional": "Professionell",
+    "creative": "Kreativ",
+    "minimal": "Minimalistisk",
     "view_all": "Visa alla mallar",
     "use_template": "Använd den här mallen"
   },

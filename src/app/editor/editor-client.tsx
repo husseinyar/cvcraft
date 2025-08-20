@@ -36,12 +36,13 @@ const createDefaultCv = (): CVData => ({
      { id: 'edu1', school: 'University of Technology', degree: 'B.Sc. in Computer Science', dates: '2016 - 2020', description: '' },
   ],
   skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
-  template: 'otago',
+  template: 'onyx',
   role: 'user',
 });
 
 
 const templateOptions: { name: TemplateOption, hint: string }[] = [
+    { name: 'onyx', hint: 'resume modern dark' },
     { name: 'professional', hint: 'resume professional' },
     { name: 'creative', hint: 'resume creative' },
     { name: 'minimal', hint: 'resume minimal' },
@@ -84,19 +85,27 @@ export default function EditorClient({ serverCv }: EditorClientProps) {
   const handleDownloadPdf = () => {
     const input = cvPreviewRef.current;
     if (input) {
-      html2canvas(input, { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const ratio = Math.min(pdfWidth / canvasWidth, pdfHeight / canvasHeight);
-        const imgWidth = canvasWidth * ratio;
-        const imgHeight = canvasHeight * ratio;
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
-      });
+       const pages = input.querySelectorAll('.cv-page');
+       const pdf = new jsPDF('p', 'mm', 'a4');
+       const pdfWidth = pdf.internal.pageSize.getWidth();
+       const pdfHeight = pdf.internal.pageSize.getHeight();
+
+       const processPage = (pageIndex: number) => {
+            if (pageIndex >= pages.length) {
+                pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
+                return;
+            }
+            if (pageIndex > 0) {
+                pdf.addPage();
+            }
+            const page = pages[pageIndex] as HTMLElement;
+            html2canvas(page, { scale: 2, backgroundColor: null }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                processPage(pageIndex + 1);
+            });
+       };
+       processPage(0);
     }
   };
   

@@ -1,3 +1,4 @@
+
 export type Experience = {
   id: string;
   role: string;
@@ -31,4 +32,4 @@ export type CVData = {
   role: 'admin' | 'user';
 };
 
-export type TemplateOption = 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
+export type TemplateOption = 'onyx' | 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
