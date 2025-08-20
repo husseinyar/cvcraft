@@ -77,6 +77,9 @@ ${resumeText}
             format: 'json',
             schema: ParseCvOutputSchema,
         },
+        config: {
+            maxOutputTokens: 2048,
+        },
         timeout: 30000, // 30 second timeout
     });
 
