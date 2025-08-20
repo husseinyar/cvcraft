@@ -12,6 +12,8 @@ import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { parseCvText } from '@/ai/flows/parse-cv-text';
 import * as pdfjs from 'pdfjs-dist';
+import { useCV } from '@/context/cv-context';
+
 
 // Required for pdfjs-dist to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -19,6 +21,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 export default function UploadPage() {
   const router = useRouter();
+  const { setCvData } = useCV();
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +61,7 @@ export default function UploadPage() {
   };
   
   const handleUploadAndParse = async () => {
-    if (!file) return;
+    if (!file || !setCvData) return;
 
     setIsLoading(true);
     setErrorDetails(null);
@@ -90,7 +93,7 @@ export default function UploadPage() {
           ...parsedData
         };
 
-        sessionStorage.setItem('cv-craft-data', JSON.stringify(newCvData));
+        setCvData(newCvData);
         setProgress(100);
         router.push('/editor');
 
@@ -100,7 +103,7 @@ export default function UploadPage() {
         let errorLink;
 
         const errString = err.toString().toLowerCase();
-
+        
         if (errString.includes("api_key_service_blocked")) {
             errorMessage = "Your API key is restricted. Please go to the Google Cloud Console, find your API key, and ensure that the 'Generative Language API' is included in its list of allowed services.";
         } else if (errString.includes("service_disabled")) {

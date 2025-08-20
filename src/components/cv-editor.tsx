@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useMemo } from "react";
 import type { CVData, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ import { suggestImprovements } from "@/ai/flows/suggest-improvements";
 import { Wand2, X, PlusCircle, Save, Trash2 } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
+import { useCV } from "@/context/cv-context";
 
 
 interface CvEditorProps {
@@ -35,6 +36,7 @@ interface CvEditorProps {
 
 export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData }: CvEditorProps) {
   const { toast } = useToast();
+  // Local state for immediate input changes
   const [cvData, setCvData] = useState(initialCvData);
   const [jobDescription, setJobDescription] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -44,6 +46,9 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
+  // Sync with global context
+  const { cvData: globalCvData } = useCV();
+
   useEffect(() => {
     setCvData(initialCvData);
   }, [initialCvData]);
@@ -51,6 +56,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   // Debounce updates to global state
   useEffect(() => {
     const handler = setTimeout(() => {
+      // Only update global state if local state is different
       if (JSON.stringify(initialCvData) !== JSON.stringify(cvData)) {
          setGlobalCvData(cvData);
       }
@@ -66,7 +72,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     const { name, value } = e.target;
     const keys = name.split('.');
     
-    const newCvData = { ...cvData };
+    // Create a deep copy to avoid direct mutation
+    const newCvData = JSON.parse(JSON.stringify(cvData));
     let current: any = newCvData;
     for (let i = 0; i < keys.length - 1; i++) {
       current = current[keys[i]];
@@ -76,9 +83,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   };
 
   const handleDynamicChange = <T extends Experience | Education>(section: 'experience' | 'education', index: number, field: keyof T, value: string) => {
-    const newSection = [...cvData[section]];
-    (newSection[index] as any)[field] = value;
-    const newCvData = { ...cvData, [section]: newSection };
+    const newCvData = JSON.parse(JSON.stringify(cvData));
+    (newCvData[section][index] as any)[field] = value;
     setCvData(newCvData);
   };
 
@@ -146,8 +152,9 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   
   const handleSaveChanges = () => {
     startTransition(() => {
-        // Here we save the global state, which has been debounced
-        updateCvAction(initialCvData).then((res) => {
+        // Use the memoized globalCvData for saving
+        if (!globalCvData) return;
+        updateCvAction(globalCvData).then((res) => {
             if (res.success) {
                 toast({
                     title: "CV Saved",
@@ -189,7 +196,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
               <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder={t('editor.personal_details.job_title')} />
               <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder={t('editor.personal_details.email')} type="email" />
               <Input name="contact.phone" value={cvData.contact.phone} onChange={handleInputChange} placeholder={t('editor.personal_details.phone')} />
-              <Input name="contact.website" value={cvData.contact.website} onChange={handleInputChange} placeholder={t('editor.personal_details.website')} />
+              <Input name="contact.website" value={cvData.contact.website || ''} onChange={handleInputChange} placeholder={t('editor.personal_details.website')} />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="summary">

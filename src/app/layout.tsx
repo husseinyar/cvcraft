@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/language-context';
+import { CVProvider } from '@/context/cv-context';
 
 export const metadata: Metadata = {
   title: 'CV Craft',
@@ -23,8 +24,10 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased" suppressHydrationWarning>
         <LanguageProvider>
-          {children}
-          <Toaster />
+          <CVProvider>
+            {children}
+            <Toaster />
+          </CVProvider>
         </LanguageProvider>
       </body>
     </html>

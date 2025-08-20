@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import type { CVData, TemplateOption } from '@/types';
 import CvEditor from '@/components/cv-editor';
 import TemplatePreview from '@/components/template-preview';
@@ -14,10 +14,8 @@ import { Download, Palette } from "lucide-react";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Image from 'next/image';
-
-interface EditorClientProps {
-  serverCv: CVData; // This is now just the default/initial CV
-}
+import { useCV } from '@/context/cv-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const templateOptions: { name: TemplateOption, hint: string }[] = [
     { name: 'onyx', hint: 'resume modern dark' },
@@ -26,41 +24,15 @@ const templateOptions: { name: TemplateOption, hint: string }[] = [
     { name: 'minimal', hint: 'resume minimal' },
 ];
 
-export default function EditorClient({ serverCv }: EditorClientProps) {
-  const [cvData, setCvData] = useState<CVData>(serverCv);
+export default function EditorClient() {
+  const { cvData, setCvData, isLoaded } = useCV();
   const { t } = useTranslation();
   const cvPreviewRef = useRef<HTMLDivElement>(null);
 
-  // Load data from client-side storage on initial mount
-  useEffect(() => {
-    const storedCvData = sessionStorage.getItem('cv-craft-data');
-    if (storedCvData) {
-      try {
-        setCvData(JSON.parse(storedCvData));
-        // Clear it so it doesn't persist across refreshes after the initial load
-        sessionStorage.removeItem('cv-craft-data');
-      } catch (e) {
-        console.error("Failed to parse CV data from session storage", e);
-      }
-    } else {
-        const localCvData = localStorage.getItem('cv-craft-local-data');
-        if (localCvData) {
-            try {
-                setCvData(JSON.parse(localCvData));
-            } catch (e) {
-                console.error("Failed to parse CV data from local storage", e);
-            }
-        }
-    }
-  }, []);
-
-  // Auto-save to localStorage on change
-  useEffect(() => {
-    localStorage.setItem('cv-craft-local-data', JSON.stringify(cvData));
-  }, [cvData]);
-
   const handleTemplateChange = (template: CVData['template']) => {
-    setCvData(prev => ({ ...prev, template }));
+    if (setCvData) {
+        setCvData(prev => ({ ...prev, template }));
+    }
   };
 
   const handleDownloadPdf = () => {
@@ -71,8 +43,8 @@ export default function EditorClient({ serverCv }: EditorClientProps) {
        const pdfWidth = pdf.internal.pageSize.getWidth();
        const pdfHeight = pdf.internal.pageSize.getHeight();
 
-       if (pages.length === 0) {
-        console.error("No pages found to render for PDF.");
+       if (pages.length === 0 || !cvData) {
+        console.error("No pages found to render for PDF or CV data is missing.");
         return;
        }
 
@@ -99,6 +71,10 @@ export default function EditorClient({ serverCv }: EditorClientProps) {
     }
   };
   
+  if (!isLoaded || !cvData || !setCvData) {
+    return <EditorPageSkeleton />;
+  }
+
   return (
     <div className="grid md:grid-cols-[400px_1fr] h-screen bg-muted/40">
       <aside className="bg-background border-r p-4 lg:p-6 overflow-y-auto">
@@ -148,6 +124,27 @@ export default function EditorClient({ serverCv }: EditorClientProps) {
                 <TemplatePreview cvData={cvData} ref={cvPreviewRef} />
              </div>
           </div>
+      </main>
+    </div>
+  );
+}
+
+
+function EditorPageSkeleton() {
+  return (
+     <div className="grid md:grid-cols-[400px_1fr] h-screen bg-muted/40">
+      <aside className="w-full bg-background border-r p-4 lg:p-6 overflow-y-auto">
+        <Skeleton className="h-10 w-3/4 mb-6" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-32 w-full" />
+        </div>
+      </aside>
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+         <div className="max-w-4xl mx-auto">
+            <Skeleton className="aspect-[8.5/11] w-full" />
+         </div>
       </main>
     </div>
   );
