@@ -63,7 +63,7 @@ const parseCvTextFlow = ai.defineFlow(
   async ({ resumeText }) => {
 
     const { output } = await ai.generate({
-        model: googleAI.model('gemini-pro'),
+        model: googleAI.model('gemini-1.5-flash-latest'),
         prompt: `You are an expert resume parser. Your task is to extract structured information from the provided text content of a resume.
 Carefully analyze the text and extract the following information in the specified JSON format.
 If a particular piece of information (like a website) is not found, omit the field or return an empty string.
