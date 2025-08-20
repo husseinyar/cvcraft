@@ -90,6 +90,11 @@ export default function EditorClient({ serverCv }: EditorClientProps) {
        const pdfWidth = pdf.internal.pageSize.getWidth();
        const pdfHeight = pdf.internal.pageSize.getHeight();
 
+       if (pages.length === 0) {
+        console.error("No pages found to render for PDF.");
+        return;
+       }
+
        const processPage = (pageIndex: number) => {
             if (pageIndex >= pages.length) {
                 pdf.save(`${cvData.name.replace(' ', '_')}_CV.pdf`);
@@ -99,7 +104,11 @@ export default function EditorClient({ serverCv }: EditorClientProps) {
                 pdf.addPage();
             }
             const page = pages[pageIndex] as HTMLElement;
-            html2canvas(page, { scale: 2, backgroundColor: null }).then(canvas => {
+            html2canvas(page, { 
+              scale: 2, 
+              backgroundColor: '#121417', // Explicitly set background for dark theme
+              useCORS: true, 
+            }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 processPage(pageIndex + 1);
