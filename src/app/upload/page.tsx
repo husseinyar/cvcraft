@@ -101,7 +101,9 @@ export default function UploadPage() {
 
         const errString = err.toString().toLowerCase();
 
-        if (errString.includes("service_disabled")) {
+        if (errString.includes("api_key_service_blocked")) {
+            errorMessage = "Your API key is restricted. Please go to the Google Cloud Console, find your API key, and ensure that the 'Generative Language API' is included in its list of allowed services.";
+        } else if (errString.includes("service_disabled")) {
             const match = err.message.match(/https?:\/\/[^\s]+/);
             if (match) {
                 errorLink = match[0];
