@@ -24,16 +24,22 @@ const createDefaultCv = (): CVData => ({
      { id: 'edu1', school: 'University of Technology', degree: 'B.Sc. in Computer Science', dates: '2016 - 2020', description: '' },
   ],
   skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
-  template: 'otago',
+  template: 'onyx',
   role: 'user',
 });
 
 // This part runs on the server
 async function EditorPageContent() {
-  // In a real app, you might get a user ID from session. For this example, we use a default.
-  // We prioritize getting the user from a real DB. If not found, we create a default one.
-  // The client will then check sessionStorage and overwrite if needed.
-  let initialCv = await getCvDataForUser('user1');
+  let initialCv: CVData | null = null;
+  try {
+    // In a real app, you might get a user ID from session. For this example, we use a default.
+    // We prioritize getting the user from a real DB. If not found, we create a default one.
+    // The client will then check sessionStorage and overwrite if needed.
+    initialCv = await getCvDataForUser('user1');
+  } catch (error) {
+    console.error("Failed to fetch from Firestore, proceeding with default CV:", error);
+    // This catch block handles the disabled API or other connection errors gracefully.
+  }
 
   if (!initialCv) {
     initialCv = createDefaultCv();
@@ -52,8 +58,8 @@ export default async function EditorPage() {
 
 function EditorPageSkeleton() {
   return (
-     <div className="flex h-screen bg-muted/40">
-      <aside className="w-80 bg-background border-r p-4 lg:p-6 overflow-y-auto">
+     <div className="grid md:grid-cols-[400px_1fr] h-screen bg-muted/40">
+      <aside className="w-full bg-background border-r p-4 lg:p-6 overflow-y-auto">
         <Skeleton className="h-10 w-3/4 mb-6" />
         <div className="space-y-4">
           <Skeleton className="h-12 w-full" />
