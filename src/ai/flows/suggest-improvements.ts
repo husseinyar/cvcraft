@@ -1,3 +1,4 @@
+
 // src/ai/flows/suggest-improvements.ts
 'use server';
 /**
@@ -9,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/googleai';
 import {z} from 'genkit';
 
 const SuggestImprovementsInputSchema = z.object({
@@ -32,27 +34,30 @@ export async function suggestImprovements(input: SuggestImprovementsInput): Prom
   return suggestImprovementsFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'suggestImprovementsPrompt',
-  input: {schema: SuggestImprovementsInputSchema},
-  output: {schema: SuggestImprovementsOutputSchema},
-  prompt: `You are a CV improvement expert. Given the job description and the CV section, you will provide suggestions to improve the CV section to better match the job description.
-
-Job Description: {{{jobDescription}}}
-
-CV Section: {{{cvSection}}}
-
-Please provide a list of suggestions to improve the CV section.`,
-});
-
 const suggestImprovementsFlow = ai.defineFlow(
   {
     name: 'suggestImprovementsFlow',
     inputSchema: SuggestImprovementsInputSchema,
     outputSchema: SuggestImprovementsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    const { output } = await ai.generate({
+      model: googleAI.model('gemini-1.5-flash-latest'),
+      prompt: `You are a CV improvement expert. Given the job description and the CV section, you will provide suggestions to improve the CV section to better match the job description.
+
+Job Description: ${input.jobDescription}
+
+CV Section: ${input.cvSection}
+
+Please provide a list of suggestions to improve the CV section.`,
+      output: {
+        format: 'json',
+        schema: SuggestImprovementsOutputSchema,
+      },
+    });
+    if (!output) {
+      throw new Error("The AI model failed to provide suggestions.");
+    }
+    return output;
   }
 );
