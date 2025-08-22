@@ -16,7 +16,9 @@ export type Education = {
 };
 
 export type CVData = {
-  id: string;
+  id: string; // Unique ID for the CV document
+  userId: string; // ID of the user who owns it
+  cvName: string; // User-defined name for the CV version
   name: string;
   jobTitle: string;
   contact: {
@@ -30,6 +32,8 @@ export type CVData = {
   skills: string[];
   template: TemplateOption;
   role: 'admin' | 'user';
+  createdAt: number; // Timestamp
+  updatedAt: number; // Timestamp
 };
 
 export type TemplateOption = 'onyx' | 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';

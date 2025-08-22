@@ -17,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function CoverLetterPage() {
   const { t } = useTranslation();
-  const { cvData, isLoaded } = useCV();
+  const { activeCv, isLoaded } = useCV();
   const { toast } = useToast();
 
   const [jobDescription, setJobDescription] = useState('');
@@ -26,10 +26,10 @@ export default function CoverLetterPage() {
   const [hasCopied, setHasCopied] = useState(false);
 
   const handleGenerate = async () => {
-    if (!jobDescription.trim() || !cvData) {
+    if (!jobDescription.trim() || !activeCv) {
         toast({
-            title: "Job Description Missing",
-            description: "Please paste a job description before generating.",
+            title: "Job Description or CV Missing",
+            description: "Please paste a job description and ensure you have an active CV.",
             variant: "destructive"
         });
         return;
@@ -37,7 +37,7 @@ export default function CoverLetterPage() {
     setIsLoading(true);
     setGeneratedLetter('');
     try {
-        const result = await generateCoverLetter({ jobDescription, cvData });
+        const result = await generateCoverLetter({ jobDescription, cvData: activeCv });
         setGeneratedLetter(result.coverLetterText);
     } catch (error) {
         console.error("Failed to generate cover letter:", error);

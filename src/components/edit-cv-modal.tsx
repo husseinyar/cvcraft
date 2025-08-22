@@ -11,7 +11,7 @@ interface EditCvModalProps {
   isOpen: boolean;
   onClose: () => void;
   cvData: CVData;
-  setCvData: React.Dispatch<React.SetStateAction<CVData>>;
+  setCvData: React.Dispatch<React.SetStateAction<CVData | null>>;
   cvPreviewRef: React.RefObject<HTMLDivElement>;
 }
 

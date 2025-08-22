@@ -35,7 +35,7 @@ import { useCV } from "@/context/cv-context";
 
 interface CvEditorProps {
   cvData: CVData;
-  setCvData: React.Dispatch<React.SetStateAction<CVData>>;
+  setCvData: React.Dispatch<React.SetStateAction<CVData | null>>;
 }
 
 export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData }: CvEditorProps) {
@@ -56,7 +56,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [isPending, startTransition] = useTransition();
 
   // Sync with global context
-  const { cvData: globalCvData } = useCV();
+  const { activeCv: globalCvData, user } = useCV();
 
   useEffect(() => {
     setCvData(initialCvData);
@@ -213,6 +213,14 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   };
   
   const handleSaveChanges = () => {
+    if (!user) {
+        toast({
+            title: "Not Logged In",
+            description: "Please log in to save your CV to the cloud.",
+            variant: "destructive"
+        });
+        return;
+    }
     startTransition(() => {
         // Use the memoized globalCvData for saving
         if (!globalCvData) return;
@@ -220,12 +228,12 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
             if (res.success) {
                 toast({
                     title: "CV Saved",
-                    description: "Your changes have been saved to the database.",
+                    description: "Your changes have been saved to the cloud.",
                 });
             } else {
                  toast({
                     title: "Error",
-                    description: "Could not save changes to the database.",
+                    description: "Could not save changes to the cloud.",
                     variant: "destructive"
                 });
             }
@@ -287,7 +295,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
 
   return (
     <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-primary">CV Editor</h2>
+        <h2 className="text-2xl font-bold text-primary">{cvData.cvName || "CV Editor"}</h2>
         <Accordion type="multiple" className="w-full" defaultValue={['ai-assist', 'personal-details']}>
           <AccordionItem value="ai-assist">
             <AccordionTrigger className="text-lg font-semibold">{t('editor.ai_assistant.title')}</AccordionTrigger>
@@ -362,6 +370,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
           <AccordionItem value="personal-details">
             <AccordionTrigger className="text-lg font-semibold">{t('editor.personal_details.title')}</AccordionTrigger>
             <AccordionContent className="space-y-4">
+              <Input name="cvName" value={cvData.cvName} onChange={handleInputChange} placeholder="CV Name (e.g. For Google)" />
               <Input name="name" value={cvData.name} onChange={handleInputChange} placeholder={t('editor.personal_details.full_name')} />
               <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder={t('editor.personal_details.job_title')} />
               <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder={t('editor.personal_details.email')} type="email" />
@@ -445,7 +454,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         </Accordion>
         
         <div className="flex items-center gap-4 mt-6">
-            <Button onClick={handleSaveChanges} className="w-full" disabled={isPending}>
+            <Button onClick={handleSaveChanges} className="w-full" disabled={isPending || !user}>
                 <Save className="mr-2" />
                 {isPending ? "Saving..." : "Save to Cloud"}
             </Button>

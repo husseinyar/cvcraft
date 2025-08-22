@@ -5,11 +5,10 @@ import React, { createContext, useState, useContext, useEffect, ReactNode, useCa
 import type { CVData } from '@/types';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getCvDataForUser, saveCvData } from '@/services/cv-service';
+import { getCvsForUser, createNewCv } from '@/services/cv-service';
 
 // Default CV structure
-const createDefaultCv = (userId?: string): CVData => ({
-  id: userId || `local_${Date.now()}`,
+const createDefaultCv = (userId?: string): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt' | 'updatedAt'> => ({
   name: 'Alex Doe',
   jobTitle: 'Software Developer',
   contact: {
@@ -31,10 +30,13 @@ const createDefaultCv = (userId?: string): CVData => ({
 
 // Define the shape of the context
 interface CVContextType {
-  cvData: CVData | null;
-  setCvData: React.Dispatch<React.SetStateAction<CVData | null>>;
-  isLoaded: boolean;
   user: User | null;
+  isLoaded: boolean;
+  userCvs: CVData[];
+  setUserCvs: React.Dispatch<React.SetStateAction<CVData[]>>;
+  activeCv: CVData | null;
+  setActiveCv: React.Dispatch<React.SetStateAction<CVData | null>>;
+  handleCreateNewCv: () => Promise<CVData | undefined>;
 }
 
 // Create the context
@@ -42,64 +44,92 @@ const CVContext = createContext<CVContextType | undefined>(undefined);
 
 // Create the provider component
 export const CVProvider = ({ children }: { children: ReactNode }) => {
-  const [cvData, setCvData] = useState<CVData | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [userChecked, setUserChecked] = useState(false);
+  const [userCvs, setUserCvs] = useState<CVData[]>([]);
+  const [activeCv, setActiveCv] = useState<CVData | null>(null);
+
+  const loadLocalCv = () => {
+    try {
+      const storedCvData = localStorage.getItem('cv-craft-data');
+      if (storedCvData) {
+        setActiveCv(JSON.parse(storedCvData));
+      } else {
+        const now = Date.now();
+        const localCv = {
+          ...createDefaultCv(),
+          id: `local_${now}`,
+          userId: 'anonymous',
+          cvName: 'My Local CV',
+          createdAt: now,
+          updatedAt: now,
+        };
+        setActiveCv(localCv);
+      }
+    } catch (e) {
+      console.error("Failed to parse CV data from localStorage", e);
+    }
+  }
 
   // Handle user authentication state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       setUserChecked(true);
+      setIsLoaded(false);
+
       if (currentUser) {
-        setIsLoaded(false); // Set loading state while fetching user data
-        const userData = await getCvDataForUser(currentUser.uid);
-        if (userData) {
-          setCvData(userData);
+        const userCvsFromDb = await getCvsForUser(currentUser.uid);
+        if (userCvsFromDb.length > 0) {
+          setUserCvs(userCvsFromDb);
+          setActiveCv(userCvsFromDb[0]);
         } else {
           // If no data in Firestore, create a default CV for the new user
-          const newCv = createDefaultCv(currentUser.uid);
-          await saveCvData(newCv); // Save it to Firestore
-          setCvData(newCv);
+          const defaultData = createDefaultCv();
+          const newCv = await createNewCv(currentUser.uid, defaultData);
+          setUserCvs([newCv]);
+          setActiveCv(newCv);
         }
-        setIsLoaded(true);
       } else {
         // No user, fall back to localStorage
-        try {
-          const storedCvData = localStorage.getItem('cv-craft-data');
-          if (storedCvData) {
-            setCvData(JSON.parse(storedCvData));
-          } else {
-            setCvData(createDefaultCv());
-          }
-        } catch (e) {
-          console.error("Failed to parse CV data from localStorage", e);
-          setCvData(createDefaultCv());
-        } finally {
-          setIsLoaded(true);
-        }
+        setUserCvs([]);
+        loadLocalCv();
       }
+      setIsLoaded(true);
     });
     return () => unsubscribe();
   }, []);
 
-  // Save data to localStorage (for anonymous users) or Firestore (for logged-in users)
+  // Save active CV to localStorage (for anonymous users)
   useEffect(() => {
-    if (isLoaded && cvData) {
-      if (user) {
-        // Debounced save to Firestore could be implemented here if needed
-      } else {
-        try {
-          localStorage.setItem('cv-craft-data', JSON.stringify(cvData));
-        } catch (e) {
-          console.error("Failed to save CV data to localStorage", e);
-        }
+    if (isLoaded && activeCv && !user) {
+      try {
+        localStorage.setItem('cv-craft-data', JSON.stringify(activeCv));
+      } catch (e) {
+        console.error("Failed to save CV data to localStorage", e);
       }
     }
-  }, [cvData, isLoaded, user]);
+  }, [activeCv, isLoaded, user]);
 
-  const value = { cvData, setCvData, isLoaded: isLoaded && userChecked, user };
+  const handleCreateNewCv = async () => {
+    if (!user) return;
+    const defaultData = createDefaultCv();
+    const newCv = await createNewCv(user.uid, defaultData);
+    setUserCvs(prev => [newCv, ...prev]);
+    setActiveCv(newCv);
+    return newCv;
+  };
+
+  const value = { 
+    user, 
+    isLoaded: isLoaded && userChecked, 
+    userCvs, 
+    setUserCvs,
+    activeCv,
+    setActiveCv,
+    handleCreateNewCv,
+  };
 
   return (
     <CVContext.Provider value={value}>
