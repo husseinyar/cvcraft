@@ -35,54 +35,45 @@ export default function EditorClient() {
     }
   };
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = async () => {
     const input = cvPreviewRef.current;
-    if (input && cvData) {
-        // Use the direct child of the ref for capture, which is the template itself.
-        const elementToCapture = input.firstChild as HTMLElement;
-        if (!elementToCapture) {
-            console.error("CV preview element to capture not found.");
-            return;
-        }
+    if (!input || !cvData) {
+        console.error("CV preview ref or CV data is not available.");
+        return;
+    }
 
-        html2canvas(elementToCapture, {
-            scale: 2, // Higher scale for better quality
-            useCORS: true,
-            // Allow tainting to handle cross-origin images if any
-            allowTaint: true, 
-        }).then(canvas => {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+    // Find all elements that represent a page
+    const pages = input.querySelectorAll('.cv-page') as NodeListOf<HTMLElement>;
+
+    // If no specific page elements are found, capture the whole preview area as one page.
+    if (pages.length === 0) {
+        const canvas = await html2canvas(input, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    } else {
+        // Process each page element
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const canvas = await html2canvas(page, {
+                scale: 2, // Higher scale for better quality
+                useCORS: true,
+                backgroundColor: cvData.template === 'onyx' ? '#1A1A1A' : '#ffffff', // Handle different template backgrounds
+            });
+
             const imgData = canvas.toDataURL('image/png');
             
-            // Create a new PDF in A4 size
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            
-            // Calculate the aspect ratio to fit the image to the PDF page
-            const canvasAspectRatio = canvas.width / canvas.height;
-            const pageAspectRatio = pdfWidth / pdfHeight;
-
-            let imgWidth = pdfWidth;
-            let imgHeight = pdfHeight;
-            
-            if (canvasAspectRatio > pageAspectRatio) {
-                // Canvas is wider than page
-                imgHeight = pdfWidth / canvasAspectRatio;
-            } else {
-                // Canvas is taller than page
-                imgWidth = pdfHeight * canvasAspectRatio;
+            if (i > 0) {
+                pdf.addPage();
             }
-
-            // Center the image on the page (optional)
-            const xOffset = (pdfWidth - imgWidth) / 2;
-            const yOffset = (pdfHeight - imgHeight) / 2;
-
-            pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
-            pdf.save(`${cvData.name.replace(/\s+/g, '_')}_CV.pdf`);
-        });
-    } else {
-        console.error("CV preview ref or CV data is not available.");
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+        }
     }
+
+    pdf.save(`${cvData.name.replace(/\s+/g, '_')}_CV.pdf`);
   };
   
   if (!isLoaded || !cvData || !setCvData) {
@@ -95,8 +86,8 @@ export default function EditorClient() {
          <CvEditor cvData={cvData} setCvData={setCvData} />
       </aside>
       
-      <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col">
-          <div className="flex justify-end items-center gap-4 mb-4">
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col items-center justify-start">
+          <div className="flex justify-end items-center gap-4 mb-4 w-full max-w-[210mm]">
               <Sheet>
                     <SheetTrigger asChild>
                         <Button variant="outline">
@@ -115,7 +106,7 @@ export default function EditorClient() {
                                                 <Image 
                                                     src={`https://placehold.co/200x275.png`}
                                                     width={200}
-                                                    height={275}
+                                                    height={282}
                                                     alt={t(`templates.${template.name}` as any)}
                                                     data-ai-hint={template.hint}
                                                     className="rounded-md"
@@ -133,8 +124,8 @@ export default function EditorClient() {
                   <Download className="mr-2" /> {t('editor.download_pdf')}
               </Button>
           </div>
-          <div className="flex-grow flex items-center justify-center">
-             <div className="max-w-4xl w-full">
+          <div className="flex-grow flex items-start justify-center pt-8">
+             <div className="transform scale-[0.9] origin-top">
                 <TemplatePreview cvData={cvData} ref={cvPreviewRef} />
              </div>
           </div>
@@ -157,7 +148,7 @@ function EditorPageSkeleton() {
       </aside>
       <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
          <div className="max-w-4xl mx-auto">
-            <Skeleton className="aspect-[8.5/11] w-full" />
+            <Skeleton className="aspect-[210/297] w-full max-w-[210mm]" />
          </div>
       </main>
     </div>

@@ -8,7 +8,7 @@ interface TemplateProps {
 
 export default function CreativeTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-gray-800 flex font-sans">
+    <div className="a4-container flex font-sans text-gray-800">
       {/* Left Sidebar */}
       <aside className="w-1/3 bg-primary text-primary-foreground p-8 flex flex-col justify-between">
         <div>

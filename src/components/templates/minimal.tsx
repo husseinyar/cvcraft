@@ -4,9 +4,9 @@ interface TemplateProps {
   data: CVData;
 }
 
-export default function PrincetonTemplate({ data }: TemplateProps) {
+export default function MinimalTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-gray-700 p-12 font-sans">
+    <div className="a4-container p-12 font-sans text-gray-700">
       <header className="text-center mb-12">
         <h1 className="text-5xl font-light tracking-widest uppercase">{data.name}</h1>
         <h2 className="text-lg font-normal tracking-wider text-gray-500 mt-2">{data.jobTitle}</h2>

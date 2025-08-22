@@ -5,9 +5,9 @@ interface TemplateProps {
   data: CVData;
 }
 
-export default function OtagoTemplate({ data }: TemplateProps) {
+export default function ProfessionalTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-gray-800 p-8 font-sans text-sm">
+    <div className="a4-container p-8 font-sans text-sm text-gray-800">
       <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight text-primary">{data.name}</h1>
         <h2 className="text-lg font-medium text-muted-foreground mt-1">{data.jobTitle}</h2>

@@ -1,0 +1,19 @@
+
+.a4-container {
+    width: 210mm;
+    min-height: 297mm;
+    /* max-height: 297mm; Remove max-height to allow content to grow */
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden; /* This hides content that overflows the width */
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.cv-page {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    position: relative;
+    page-break-after: always; /* Helps with print styling */
+}
