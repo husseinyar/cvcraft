@@ -32,6 +32,7 @@ export type CVData = {
   skills: string[];
   template: TemplateOption;
   role: 'admin' | 'user';
+  sectionOrder: string[]; // Add this line
   createdAt: number; // Timestamp
   updatedAt: number; // Timestamp
 };

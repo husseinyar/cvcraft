@@ -1,14 +1,14 @@
 
 'use client';
 
-import React, { createContext, useState, useContext, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import type { CVData } from '@/types';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { getCvsForUser, createNewCv } from '@/services/cv-service';
 
 // Default CV structure
-const createDefaultCv = (userId?: string): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt' | 'updatedAt'> => ({
+const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt' | 'updatedAt'> => ({
   name: 'Alex Doe',
   jobTitle: 'Software Developer',
   contact: {
@@ -26,6 +26,7 @@ const createDefaultCv = (userId?: string): Omit<CVData, 'id' | 'userId' | 'cvNam
   skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
   template: 'onyx',
   role: 'user',
+  sectionOrder: ['summary', 'experience', 'education', 'skills'],
 });
 
 // Define the shape of the context
@@ -54,7 +55,12 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
     try {
       const storedCvData = localStorage.getItem('cv-craft-data');
       if (storedCvData) {
-        setActiveCv(JSON.parse(storedCvData));
+        const parsedData = JSON.parse(storedCvData);
+        // Ensure old local CVs have a sectionOrder
+        if (!parsedData.sectionOrder) {
+          parsedData.sectionOrder = createDefaultCv().sectionOrder;
+        }
+        setActiveCv(parsedData);
       } else {
         const now = Date.now();
         const localCv = {
@@ -82,8 +88,13 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       if (currentUser) {
         const userCvsFromDb = await getCvsForUser(currentUser.uid);
         if (userCvsFromDb.length > 0) {
-          setUserCvs(userCvsFromDb);
-          setActiveCv(userCvsFromDb[0]);
+          // Ensure all fetched CVs have a sectionOrder
+          const sanitizedCvs = userCvsFromDb.map(cv => ({
+            ...cv,
+            sectionOrder: cv.sectionOrder || createDefaultCv().sectionOrder,
+          }));
+          setUserCvs(sanitizedCvs);
+          setActiveCv(sanitizedCvs[0]);
         } else {
           // If no data in Firestore, create a default CV for the new user
           const defaultData = createDefaultCv();

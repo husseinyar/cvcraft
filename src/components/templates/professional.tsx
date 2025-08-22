@@ -1,11 +1,64 @@
 import type { CVData } from "@/types";
 import { Mail, Phone, Globe } from "lucide-react";
+import React from "react";
 
 interface TemplateProps {
   data: CVData;
 }
 
+const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }) => {
+  switch (sectionId) {
+    case 'summary':
+      return (
+        <section>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-2 border-b-2 border-primary/20 pb-1">Profile</h3>
+          <p className="leading-relaxed text-gray-700">{data.summary}</p>
+        </section>
+      );
+    case 'experience':
+      return (
+        <section>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Experience</h3>
+          <div className="space-y-4">
+            {data.experience.map(exp => (
+              <div key={exp.id}>
+                <div className="flex justify-between items-baseline mb-1">
+                    <h4 className="text-base font-semibold">{exp.role}</h4>
+                    <p className="text-xs text-gray-500 font-medium">{exp.dates}</p>
+                </div>
+                <p className="font-medium text-gray-600 mb-1">{exp.company}</p>
+                <p className="text-gray-700 leading-normal">{exp.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    case 'education':
+      return (
+        <section>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Education</h3>
+          <div className="space-y-3">
+            {data.education.map(edu => (
+              <div key={edu.id}>
+                <div className="flex justify-between items-baseline">
+                    <h4 className="text-base font-semibold">{edu.degree}</h4>
+                    <p className="text-xs text-gray-500 font-medium">{edu.dates}</p>
+                </div>
+                <p className="font-medium text-gray-600">{edu.school}</p>
+                {edu.description && <p className="text-gray-700 text-xs mt-1">{edu.description}</p>}
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function ProfessionalTemplate({ data }: TemplateProps) {
+  const { sectionOrder = ['summary', 'experience', 'education'] } = data;
+
   return (
     <div className="a4-container p-8 font-sans text-sm text-gray-800">
       <header className="mb-8">
@@ -15,42 +68,9 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
       
       <main className="grid grid-cols-3 gap-x-12">
         <div className="col-span-2 space-y-6">
-            <section>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-2 border-b-2 border-primary/20 pb-1">Profile</h3>
-              <p className="leading-relaxed text-gray-700">{data.summary}</p>
-            </section>
-
-            <section>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Experience</h3>
-              <div className="space-y-4">
-                {data.experience.map(exp => (
-                  <div key={exp.id}>
-                    <div className="flex justify-between items-baseline mb-1">
-                        <h4 className="text-base font-semibold">{exp.role}</h4>
-                        <p className="text-xs text-gray-500 font-medium">{exp.dates}</p>
-                    </div>
-                    <p className="font-medium text-gray-600 mb-1">{exp.company}</p>
-                    <p className="text-gray-700 leading-normal">{exp.description}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-            
-            <section>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Education</h3>
-              <div className="space-y-3">
-                {data.education.map(edu => (
-                  <div key={edu.id}>
-                    <div className="flex justify-between items-baseline">
-                        <h4 className="text-base font-semibold">{edu.degree}</h4>
-                        <p className="text-xs text-gray-500 font-medium">{edu.dates}</p>
-                    </div>
-                    <p className="font-medium text-gray-600">{edu.school}</p>
-                    {edu.description && <p className="text-gray-700 text-xs mt-1">{edu.description}</p>}
-                  </div>
-                ))}
-              </div>
-            </section>
+          {sectionOrder.map(sectionId => (
+            <SectionContent key={sectionId} sectionId={sectionId} data={data} />
+          ))}
         </div>
 
         <aside className="col-span-1 space-y-6">

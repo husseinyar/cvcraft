@@ -6,7 +6,53 @@ interface TemplateProps {
   data: CVData;
 }
 
+const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }) => {
+  switch (sectionId) {
+    case 'summary':
+      return (
+        <section className="mb-10">
+          <p className="text-sm leading-relaxed text-gray-600 border-l-4 border-primary pl-4">{data.summary}</p>
+        </section>
+      );
+    case 'experience':
+      return (
+        <section className="mb-10">
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Work Experience</h3>
+          <div className="space-y-6">
+            {data.experience.map((exp) => (
+              <div key={exp.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
+                <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{exp.dates}</p>
+                <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
+                <p className="font-medium text-gray-600">{exp.company}</p>
+                <p className="text-sm text-gray-600 mt-2 leading-relaxed">{exp.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    case 'education':
+      return (
+        <section>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Education</h3>
+          <div className="space-y-5">
+            {data.education.map((edu) => (
+              <div key={edu.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
+                 <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{edu.dates}</p>
+                <h4 className="text-lg font-semibold">{edu.degree}</h4>
+                <p className="font-medium text-gray-600">{edu.school}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function CreativeTemplate({ data }: TemplateProps) {
+  const { sectionOrder = ['summary', 'experience', 'education'] } = data;
+
   return (
     <div className="a4-container flex font-sans text-gray-800">
       {/* Left Sidebar */}
@@ -55,36 +101,10 @@ export default function CreativeTemplate({ data }: TemplateProps) {
           <h2 className="text-xl font-light text-gray-600 mt-2">{data.jobTitle}</h2>
         </header>
 
-        <section className="mb-10">
-          <p className="text-sm leading-relaxed text-gray-600 border-l-4 border-primary pl-4">{data.summary}</p>
-        </section>
+        {sectionOrder.map(sectionId => (
+          <SectionContent key={sectionId} sectionId={sectionId} data={data} />
+        ))}
 
-        <section className="mb-10">
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Work Experience</h3>
-          <div className="space-y-6">
-            {data.experience.map((exp, index) => (
-              <div key={`exp-${exp.id}-${index}`} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
-                <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{exp.dates}</p>
-                <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
-                <p className="font-medium text-gray-600">{exp.company}</p>
-                <p className="text-sm text-gray-600 mt-2 leading-relaxed">{exp.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Education</h3>
-          <div className="space-y-5">
-            {data.education.map((edu, index) => (
-              <div key={`edu-${edu.id}-${index}`} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
-                 <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{edu.dates}</p>
-                <h4 className="text-lg font-semibold">{edu.degree}</h4>
-                <p className="font-medium text-gray-600">{edu.school}</p>
-              </div>
-            ))}
-          </div>
-        </section>
       </main>
     </div>
   );
