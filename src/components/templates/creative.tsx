@@ -62,8 +62,8 @@ export default function CreativeTemplate({ data }: TemplateProps) {
         <section className="mb-10">
           <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Work Experience</h3>
           <div className="space-y-6">
-            {data.experience.map(exp => (
-              <div key={exp.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
+            {data.experience.map((exp, index) => (
+              <div key={`exp-${exp.id}-${index}`} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
                 <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{exp.dates}</p>
                 <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
                 <p className="font-medium text-gray-600">{exp.company}</p>
@@ -76,8 +76,8 @@ export default function CreativeTemplate({ data }: TemplateProps) {
         <section>
           <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Education</h3>
           <div className="space-y-5">
-            {data.education.map(edu => (
-              <div key={edu.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
+            {data.education.map((edu, index) => (
+              <div key={`edu-${edu.id}-${index}`} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
                  <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{edu.dates}</p>
                 <h4 className="text-lg font-semibold">{edu.degree}</h4>
                 <p className="font-medium text-gray-600">{edu.school}</p>
