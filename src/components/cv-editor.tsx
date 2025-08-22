@@ -22,7 +22,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { suggestImprovements } from "@/ai/flows/suggest-improvements";
+import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
 import { Wand2, X, PlusCircle, Save, Trash2 } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
@@ -39,7 +39,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   // Local state for immediate input changes
   const [cvData, setCvData] = useState(initialCvData);
   const [jobDescription, setJobDescription] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestImprovementsOutput['suggestions']>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
@@ -283,16 +283,27 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
 
 
         <Dialog open={isSuggestionModalOpen} onOpenChange={setIsSuggestionModalOpen}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{t('editor.suggestions_modal.title')}</DialogTitle>
                     <DialogDescription>
-                        {t('editor.suggestions_modal.description')}
+                      {t('editor.suggestions_modal.description')}
                     </DialogDescription>
                 </DialogHeader>
-                <ul className="space-y-2 list-disc list-inside max-h-[60vh] overflow-y-auto p-2">
-                    {suggestions.map((s, i) => <li key={i} className="text-sm">{s}</li>)}
-                </ul>
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto p-2">
+                    {suggestions.map((s, i) => (
+                      <Card key={i} className="bg-muted/50">
+                        <CardContent className="p-4">
+                          <p className="font-semibold text-sm mb-2">{s.suggestion}</p>
+                          {s.example && (
+                            <div className="text-xs text-muted-foreground bg-background/50 p-2 rounded-md whitespace-pre-wrap">
+                              {s.example}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
             </DialogContent>
         </Dialog>
     </div>

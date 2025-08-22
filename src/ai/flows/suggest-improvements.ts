@@ -1,4 +1,3 @@
-
 // src/ai/flows/suggest-improvements.ts
 'use server';
 /**
@@ -22,10 +21,15 @@ const SuggestImprovementsInputSchema = z.object({
 
 export type SuggestImprovementsInput = z.infer<typeof SuggestImprovementsInputSchema>;
 
+const SuggestionItemSchema = z.object({
+  suggestion: z.string().describe("A specific, actionable suggestion to improve the CV section."),
+  example: z.string().optional().describe("A concrete 'before' and 'after' example demonstrating how to apply the suggestion. Format as 'Before: ...\\nAfter: ...'"),
+});
+
 const SuggestImprovementsOutputSchema = z.object({
   suggestions: z
-    .array(z.string())
-    .describe('A list of suggestions to improve the CV section.'),
+    .array(SuggestionItemSchema)
+    .describe('A list of suggestions, each with a clear action and an illustrative example.'),
 });
 
 export type SuggestImprovementsOutput = z.infer<typeof SuggestImprovementsOutputSchema>;
@@ -43,13 +47,21 @@ const suggestImprovementsFlow = ai.defineFlow(
   async (input) => {
     const { output } = await ai.generate({
       model: googleAI.model('gemini-1.5-flash-latest'),
-      prompt: `You are a CV improvement expert. Given the job description and the CV section, you will provide suggestions to improve the CV section to better match the job description.
+      prompt: `You are an expert CV writer and career coach. Your task is to provide actionable suggestions to improve a section of a CV, making it more impactful and better aligned with a specific job description.
 
-Job Description: ${input.jobDescription}
+For each suggestion, you MUST provide a concrete "Before" and "After" example to make the advice easy to understand and implement.
 
-CV Section: ${input.cvSection}
+Job Description:
+---
+${input.jobDescription}
+---
 
-Please provide a list of suggestions to improve the CV section.`,
+CV Section to Improve:
+---
+${input.cvSection}
+---
+
+Please provide a list of structured suggestions. Each suggestion should include a clear piece of advice and a practical example.`,
       output: {
         format: 'json',
         schema: SuggestImprovementsOutputSchema,
