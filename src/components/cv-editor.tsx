@@ -6,7 +6,7 @@ import type { CVData, Experience, Education } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -22,9 +22,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle } from "lucide-react";
+import { scoreCv, type ScoreCvOutput } from "@/ai/flows/score-cv";
+import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
 import { useCV } from "@/context/cv-context";
@@ -45,6 +47,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
   const [currentSuggestionField, setCurrentSuggestionField] = useState<string | null>(null);
+  const [isScoring, setIsScoring] = useState(false);
+  const [scoreResult, setScoreResult] = useState<ScoreCvOutput | null>(null);
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
@@ -226,13 +230,39 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     });
   };
 
+  const handleScoreCv = async () => {
+    if (!jobDescription.trim()) {
+      toast({
+        title: t('editor.toast.job_description_missing.title'),
+        description: t('editor.toast.job_description_missing.description'),
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsScoring(true);
+    setScoreResult(null);
+    try {
+      const result = await scoreCv({ jobDescription, cvData });
+      setScoreResult(result);
+    } catch (error) {
+      console.error("Failed to score CV:", error);
+      toast({
+        title: t('editor.toast.ai_error.title'),
+        description: "The AI failed to score your CV. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsScoring(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
         <h2 className="text-2xl font-bold text-primary">CV Editor</h2>
         <Accordion type="multiple" className="w-full" defaultValue={['ai-assist', 'personal-details']}>
           <AccordionItem value="ai-assist">
             <AccordionTrigger className="text-lg font-semibold">{t('editor.ai_assistant.title')}</AccordionTrigger>
-            <AccordionContent className="space-y-2">
+            <AccordionContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 {t('editor.ai_assistant.description')}
               </p>
@@ -242,6 +272,39 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={4}
               />
+              <Button onClick={handleScoreCv} disabled={isScoring || !jobDescription.trim()} className="w-full">
+                <Zap className="mr-2" /> {isScoring ? "Scoring..." : "Score My CV"}
+              </Button>
+              {isScoring && <p className="text-center text-sm text-muted-foreground">AI is analyzing your CV, this may take a moment...</p>}
+              {scoreResult && (
+                <Card className="bg-muted/50">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2"><Bot /> AI Score & Feedback</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <div className="flex justify-between items-baseline mb-1">
+                        <h4 className="font-semibold">Overall Score</h4>
+                        <span className="font-bold text-primary text-lg">{scoreResult.overallScore}/100</span>
+                      </div>
+                      <Progress value={scoreResult.overallScore} />
+                      <p className="text-xs text-muted-foreground mt-2">{scoreResult.summary}</p>
+                    </div>
+                    <div className="space-y-3">
+                      {scoreResult.scores.map(metric => (
+                        <div key={metric.metric}>
+                          <div className="flex justify-between items-baseline mb-1">
+                             <h5 className="font-semibold text-sm">{metric.metric}</h5>
+                             <span className="font-semibold text-sm text-muted-foreground">{metric.score}/100</span>
+                          </div>
+                          <Progress value={metric.score} />
+                           <p className="text-xs text-muted-foreground mt-1">{metric.feedback}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="personal-details">
