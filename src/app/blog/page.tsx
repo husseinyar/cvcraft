@@ -64,6 +64,7 @@ export default function BlogPage() {
         <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
         <nav className="hidden md:flex gap-6 items-center">
           <Link href="/editor" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
+          <Link href="/cover-letter" className="text-sm font-medium text-muted-foreground hover:text-primary">Cover Letter</Link>
           <Link href="/templates" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
           <Link href="/blog" className="text-sm font-medium text-primary hover:text-primary">{t('nav.blog')}</Link>
           <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
@@ -83,6 +84,7 @@ export default function BlogPage() {
             <SheetContent side="right">
               <nav className="flex flex-col gap-6 pt-12">
                 <Link href="/editor" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.create_cv')}</Link>
+                <Link href="/cover-letter" className="text-lg font-medium text-muted-foreground hover:text-primary">Cover Letter</Link>
                 <Link href="/templates" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.templates')}</Link>
                 <Link href="/blog" className="text-lg font-medium text-primary hover:text-primary">{t('nav.blog')}</Link>
                 <Link href="/pricing" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
