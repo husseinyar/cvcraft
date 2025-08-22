@@ -8,7 +8,7 @@ interface TemplateProps {
 }
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <section className="mb-6">
+    <section className="mb-6 break-inside-avoid">
         <h3 className="text-sm font-bold uppercase tracking-widest text-white/60 mb-3">{title}</h3>
         <div className="space-y-4 text-sm">{children}</div>
     </section>
@@ -56,6 +56,23 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
           </div>
         </Section>
       ) : null;
+    case 'volunteering':
+        return data.volunteering && data.volunteering.length > 0 ? (
+            <Section title="Volunteering">
+                <div className="space-y-4">
+                    {data.volunteering.map(vol => (
+                        <div key={vol.id}>
+                            <div className="flex justify-between items-baseline mb-1">
+                                <h4 className="text-base font-semibold">{vol.role}</h4>
+                                <p className="text-xs text-white/50">{vol.dates}</p>
+                            </div>
+                            <p className="font-medium text-white/70 mb-1">{vol.organization}</p>
+                            <p className="text-white/80 text-xs">{vol.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </Section>
+        ) : null;
     default:
       return null;
   }
@@ -83,15 +100,57 @@ const SidebarSectionContent = ({ sectionId, data }: { sectionId: string, data: C
                 </div>
             </Section>
           ) : null;
+      case 'languages':
+        return data.languages && data.languages.length > 0 ? (
+            <Section title="Languages">
+                <div className="space-y-2">
+                    {data.languages.map(lang => (
+                        <div key={lang.id} className="flex justify-between items-baseline text-white/80">
+                            <span>{lang.name}</span>
+                            <span className="text-xs text-white/60">{lang.level}</span>
+                        </div>
+                    ))}
+                </div>
+            </Section>
+        ) : null;
+      case 'certifications':
+        return data.certifications && data.certifications.length > 0 ? (
+            <Section title="Certifications">
+                 <div className="space-y-3">
+                    {data.certifications.map(cert => (
+                        <div key={cert.id} className="text-white/80">
+                            <p className="font-semibold">{cert.name}</p>
+                            <p className="text-xs text-white/60">{cert.issuer} ({cert.date})</p>
+                        </div>
+                    ))}
+                </div>
+            </Section>
+        ) : null;
+       case 'awards':
+        return data.awards && data.awards.length > 0 ? (
+            <Section title="Awards">
+                <div className="space-y-3">
+                    {data.awards.map(award => (
+                        <div key={award.id} className="text-white/80">
+                            <p className="font-semibold">{award.name}</p>
+                            <p className="text-xs text-white/60">{award.issuer} ({award.date})</p>
+                        </div>
+                    ))}
+                </div>
+            </Section>
+        ) : null;
       default:
         return null;
   }
 }
 
 export default function OnyxTemplate({ data }: TemplateProps) {
-  const { sectionOrder = ['summary', 'experience', 'education'] } = data;
-  const mainSections = sectionOrder.filter(s => ['summary', 'experience', 'education'].includes(s));
-  const sidebarSections = ['contact', 'skills'];
+  const { sectionOrder = ['summary', 'experience', 'education', 'skills'] } = data;
+  const mainSections = sectionOrder.filter(s => ['summary', 'experience', 'education', 'volunteering'].includes(s));
+  const sidebarSections = sectionOrder.filter(s => !mainSections.includes(s));
+  
+  if (!sidebarSections.includes('contact')) sidebarSections.unshift('contact');
+
 
   return (
     <div className="cv-page bg-[#1A1A1A] text-white font-sans flex flex-col md:flex-row">

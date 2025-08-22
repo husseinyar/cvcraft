@@ -27,6 +27,10 @@ const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt
   template: 'onyx',
   role: 'user',
   sectionOrder: ['summary', 'experience', 'education', 'skills'],
+  languages: [],
+  certifications: [],
+  awards: [],
+  volunteering: [],
 });
 
 // Define the shape of the context
@@ -56,11 +60,11 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       const storedCvData = localStorage.getItem('cv-craft-data');
       if (storedCvData) {
         const parsedData = JSON.parse(storedCvData);
-        // Ensure old local CVs have a sectionOrder
+        // Ensure old local CVs have a sectionOrder and other new fields
         if (!parsedData.sectionOrder) {
           parsedData.sectionOrder = createDefaultCv().sectionOrder;
         }
-        setActiveCv(parsedData);
+        setActiveCv({ ...createDefaultCv(), ...parsedData});
       } else {
         const now = Date.now();
         const localCv = {
@@ -88,8 +92,9 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       if (currentUser) {
         const userCvsFromDb = await getCvsForUser(currentUser.uid);
         if (userCvsFromDb.length > 0) {
-          // Ensure all fetched CVs have a sectionOrder
+          // Ensure all fetched CVs have a sectionOrder and new sections
           const sanitizedCvs = userCvsFromDb.map(cv => ({
+            ...createDefaultCv(),
             ...cv,
             sectionOrder: cv.sectionOrder || createDefaultCv().sectionOrder,
           }));

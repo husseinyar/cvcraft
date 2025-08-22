@@ -12,8 +12,37 @@ export type Education = {
   school: string;
   degree: string;
   dates: string;
+  description?: string;
+};
+
+export type Language = {
+  id: string;
+  name: string;
+  level: string;
+};
+
+export type Certification = {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+};
+
+export type Award = {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
+};
+
+export type VolunteerWork = {
+  id: string;
+  role: string;
+  organization: string;
+  dates: string;
   description: string;
 };
+
 
 export type CVData = {
   id: string; // Unique ID for the CV document
@@ -32,7 +61,11 @@ export type CVData = {
   skills: string[];
   template: TemplateOption;
   role: 'admin' | 'user';
-  sectionOrder: string[]; // Add this line
+  sectionOrder: string[];
+  languages?: Language[];
+  certifications?: Certification[];
+  awards?: Award[];
+  volunteering?: VolunteerWork[];
   createdAt: number; // Timestamp
   updatedAt: number; // Timestamp
 };

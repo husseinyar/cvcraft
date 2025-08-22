@@ -2,11 +2,11 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
-import type { CVData, Experience, Education } from "@/types";
+import type { CVData, Experience, Education, Language, Certification, Award, VolunteerWork } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -14,6 +14,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Dialog,
   DialogContent,
@@ -47,6 +53,10 @@ const SECTION_COMPONENTS: Record<string, React.FC<any>> = {
   'experience': ExperienceSection,
   'education': EducationSection,
   'skills': SkillsSection,
+  'languages': LanguagesSection,
+  'certifications': CertificationsSection,
+  'awards': AwardsSection,
+  'volunteering': VolunteeringSection,
 };
 
 // New Sortable Accordion Item component
@@ -243,6 +253,25 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     }
   };
   
+  const handleAddSection = (sectionId: keyof CVData) => {
+      setCvData(prev => {
+          // If section doesn't exist, initialize it
+          const currentSection = prev[sectionId] as any[];
+          if (!currentSection || currentSection.length === 0) {
+              return {
+                  ...prev,
+                  [sectionId]: [],
+                  sectionOrder: [...prev.sectionOrder, sectionId as string],
+              };
+          }
+          // If it exists but not in order, add it to order
+          if (!prev.sectionOrder.includes(sectionId as string)) {
+              return { ...prev, sectionOrder: [...prev.sectionOrder, sectionId as string] };
+          }
+          return prev;
+      });
+  };
+
   const sectionProps = {
     cvData,
     setCvData,
@@ -259,7 +288,18 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     'experience': t('editor.experience.title'),
     'education': t('editor.education.title'),
     'skills': t('editor.skills.title'),
+    'languages': 'Languages',
+    'certifications': 'Certifications',
+    'awards': 'Awards',
+    'volunteering': 'Volunteering',
   };
+
+  const availableSections: { id: keyof CVData; label: string }[] = [
+      { id: 'languages', label: 'Languages' },
+      { id: 'certifications', label: 'Certifications' },
+      { id: 'awards', label: 'Awards' },
+      { id: 'volunteering', label: 'Volunteering' },
+  ].filter(section => !cvData.sectionOrder.includes(section.id as string));
 
   return (
     <div className="space-y-6">
@@ -306,6 +346,18 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         
         <div className="flex items-center gap-4 mt-6">
             <Button onClick={handleSaveChanges} className="w-full" disabled={isPending || !user}><Save className="mr-2" />{isPending ? "Saving..." : "Save to Cloud"}</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={availableSections.length === 0}><PlusCircle className="mr-2" /> Add Section</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {availableSections.map(section => (
+                  <DropdownMenuItem key={section.id} onClick={() => handleAddSection(section.id)}>
+                    {section.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
         </div>
 
         <Dialog open={isSuggestionModalOpen} onOpenChange={setIsSuggestionModalOpen}>
@@ -444,6 +496,137 @@ function SkillsSection({ cvData, setCvData, t }: any) {
           </Badge>
         ))}
       </div>
+    </div>
+  );
+}
+
+
+function LanguagesSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+  const languages = cvData.languages || [];
+  const handleDynamicChange = (index: number, field: keyof Language, value: string) => {
+    const newLanguages = [...languages];
+    (newLanguages[index] as any)[field] = value;
+    setCvData({ ...cvData, languages: newLanguages });
+  };
+  const addDynamicItem = () => {
+    const newItem = { id: `lang${Date.now()}`, name: '', level: '' };
+    setCvData({ ...cvData, languages: [...languages, newItem] });
+  };
+  const removeDynamicItem = (index: number) => {
+    setCvData({ ...cvData, languages: languages.filter((_, i) => i !== index) });
+  };
+
+  return (
+    <div className="space-y-4 p-2">
+      {languages.map((lang, index) => (
+        <Card key={lang.id} className="bg-card/50">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex justify-end"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></div>
+            <div className="flex gap-4">
+              <Input placeholder="Language (e.g., English)" value={lang.name} onChange={(e) => handleDynamicChange(index, 'name', e.target.value)} />
+              <Input placeholder="Level (e.g., Native)" value={lang.level} onChange={(e) => handleDynamicChange(index, 'level', e.target.value)} />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      <Button onClick={addDynamicItem} variant="outline" className="w-full"><PlusCircle className="mr-2" /> Add Language</Button>
+    </div>
+  );
+}
+
+function CertificationsSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+  const certifications = cvData.certifications || [];
+  const handleDynamicChange = (index: number, field: keyof Certification, value: string) => {
+    const newCerts = [...certifications];
+    (newCerts[index] as any)[field] = value;
+    setCvData({ ...cvData, certifications: newCerts });
+  };
+  const addDynamicItem = () => {
+    const newItem = { id: `cert${Date.now()}`, name: '', issuer: '', date: '' };
+    setCvData({ ...cvData, certifications: [...certifications, newItem] });
+  };
+  const removeDynamicItem = (index: number) => {
+    setCvData({ ...cvData, certifications: certifications.filter((_, i) => i !== index) });
+  };
+  
+  return (
+     <div className="space-y-4 p-2">
+      {certifications.map((cert, index) => (
+        <Card key={cert.id} className="bg-card/50">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex justify-end"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></div>
+            <Input placeholder="Certification Name" value={cert.name} onChange={(e) => handleDynamicChange(index, 'name', e.target.value)} />
+            <Input placeholder="Issuing Organization" value={cert.issuer} onChange={(e) => handleDynamicChange(index, 'issuer', e.target.value)} />
+            <Input placeholder="Date (e.g., 2023)" value={cert.date} onChange={(e) => handleDynamicChange(index, 'date', e.target.value)} />
+          </CardContent>
+        </Card>
+      ))}
+      <Button onClick={addDynamicItem} variant="outline" className="w-full"><PlusCircle className="mr-2" /> Add Certification</Button>
+    </div>
+  );
+}
+
+function AwardsSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+  const awards = cvData.awards || [];
+  const handleDynamicChange = (index: number, field: keyof Award, value: string) => {
+    const newAwards = [...awards];
+    (newAwards[index] as any)[field] = value;
+    setCvData({ ...cvData, awards: newAwards });
+  };
+  const addDynamicItem = () => {
+    const newItem = { id: `award${Date.now()}`, name: '', issuer: '', date: '' };
+    setCvData({ ...cvData, awards: [...awards, newItem] });
+  };
+  const removeDynamicItem = (index: number) => {
+    setCvData({ ...cvData, awards: awards.filter((_, i) => i !== index) });
+  };
+
+  return (
+     <div className="space-y-4 p-2">
+      {awards.map((award, index) => (
+        <Card key={award.id} className="bg-card/50">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex justify-end"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></div>
+            <Input placeholder="Award Name" value={award.name} onChange={(e) => handleDynamicChange(index, 'name', e.target.value)} />
+            <Input placeholder="Awarding Organization" value={award.issuer} onChange={(e) => handleDynamicChange(index, 'issuer', e.target.value)} />
+            <Input placeholder="Date (e.g., 2023)" value={award.date} onChange={(e) => handleDynamicChange(index, 'date', e.target.value)} />
+          </CardContent>
+        </Card>
+      ))}
+      <Button onClick={addDynamicItem} variant="outline" className="w-full"><PlusCircle className="mr-2" /> Add Award</Button>
+    </div>
+  );
+}
+
+function VolunteeringSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+  const volunteering = cvData.volunteering || [];
+  const handleDynamicChange = (index: number, field: keyof VolunteerWork, value: string) => {
+    const newVolunteering = [...volunteering];
+    (newVolunteering[index] as any)[field] = value;
+    setCvData({ ...cvData, volunteering: newVolunteering });
+  };
+  const addDynamicItem = () => {
+    const newItem = { id: `vol${Date.now()}`, role: '', organization: '', dates: '', description: '' };
+    setCvData({ ...cvData, volunteering: [...volunteering, newItem] });
+  };
+  const removeDynamicItem = (index: number) => {
+    setCvData({ ...cvData, volunteering: volunteering.filter((_, i) => i !== index) });
+  };
+
+  return (
+    <div className="space-y-4 p-2">
+      {volunteering.map((vol, index) => (
+        <Card key={vol.id} className="bg-card/50">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex justify-end"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeDynamicItem(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button></div>
+            <Input placeholder="Role" value={vol.role} onChange={(e) => handleDynamicChange(index, 'role', e.target.value)} />
+            <Input placeholder="Organization" value={vol.organization} onChange={(e) => handleDynamicChange(index, 'organization', e.target.value)} />
+            <Input placeholder="Dates" value={vol.dates} onChange={(e) => handleDynamicChange(index, 'dates', e.target.value)} />
+            <Textarea placeholder="Description" rows={3} value={vol.description} onChange={(e) => handleDynamicChange(index, 'description', e.target.value)} />
+          </CardContent>
+        </Card>
+      ))}
+      <Button onClick={addDynamicItem} variant="outline" className="w-full"><PlusCircle className="mr-2" /> Add Volunteer Work</Button>
     </div>
   );
 }
