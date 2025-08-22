@@ -26,7 +26,8 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
 import { scoreCv, type ScoreCvOutput } from "@/ai/flows/score-cv";
-import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap } from "lucide-react";
+import { analyzeSkillGap, type AnalyzeSkillGapOutput } from "@/ai/flows/analyze-skill-gap";
+import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap, Search } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
 import { useCV } from "@/context/cv-context";
@@ -49,6 +50,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [currentSuggestionField, setCurrentSuggestionField] = useState<string | null>(null);
   const [isScoring, setIsScoring] = useState(false);
   const [scoreResult, setScoreResult] = useState<ScoreCvOutput | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [skillGapResult, setSkillGapResult] = useState<AnalyzeSkillGapOutput | null>(null);
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
@@ -255,6 +258,32 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
       setIsScoring(false);
     }
   };
+  
+  const handleAnalyzeSkillGap = async () => {
+    if (!jobDescription.trim()) {
+      toast({
+        title: t('editor.toast.job_description_missing.title'),
+        description: t('editor.toast.job_description_missing.description'),
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsAnalyzing(true);
+    setSkillGapResult(null);
+    try {
+      const result = await analyzeSkillGap({ jobDescription, cvData });
+      setSkillGapResult(result);
+    } catch (error) {
+      console.error("Failed to analyze skill gap:", error);
+      toast({
+        title: t('editor.toast.ai_error.title'),
+        description: "The AI failed to analyze your skill gap. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -272,9 +301,15 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={4}
               />
-              <Button onClick={handleScoreCv} disabled={isScoring || !jobDescription.trim()} className="w-full">
-                <Zap className="mr-2" /> {isScoring ? "Scoring..." : "Score My CV"}
-              </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Button onClick={handleScoreCv} disabled={isScoring || !jobDescription.trim()}>
+                  <Zap className="mr-2" /> {isScoring ? "Scoring..." : "Score My CV"}
+                </Button>
+                <Button onClick={handleAnalyzeSkillGap} disabled={isAnalyzing || !jobDescription.trim()} variant="outline">
+                  <Search className="mr-2" /> {isAnalyzing ? "Analyzing..." : "Analyze Skill Gap"}
+                </Button>
+              </div>
+              
               {isScoring && <p className="text-center text-sm text-muted-foreground">AI is analyzing your CV, this may take a moment...</p>}
               {scoreResult && (
                 <Card className="bg-muted/50">
@@ -302,6 +337,23 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                         </div>
                       ))}
                     </div>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {isAnalyzing && <p className="text-center text-sm text-muted-foreground">AI is checking for missing skills...</p>}
+               {skillGapResult && (
+                <Card className="bg-muted/50">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2"><Bot /> Skill Gap Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                     <p className="text-sm text-muted-foreground">{skillGapResult.summary}</p>
+                     <div className="flex flex-wrap gap-2">
+                        {skillGapResult.missingSkills.map(skill => (
+                            <Badge key={skill} variant="destructive">{skill}</Badge>
+                        ))}
+                     </div>
                   </CardContent>
                 </Card>
               )}
