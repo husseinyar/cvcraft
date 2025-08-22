@@ -8,6 +8,7 @@ import LanguageSwitcher from '@/components/language-switcher';
 import type { TemplateOption } from '@/types';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import AuthButton from '@/components/auth-button';
 
 export default function TemplatesPage() {
   const { t } = useTranslation();
@@ -31,9 +32,7 @@ export default function TemplatesPage() {
           <Link href="/blog" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
           <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
           <Link href="/contact" className="text-sm font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
-          <Link href="/editor">
-            <Button variant="outline">{t('nav.login')}</Button>
-          </Link>
+          <AuthButton />
           <LanguageSwitcher />
         </nav>
         <div className="md:hidden flex items-center gap-2">
@@ -52,9 +51,7 @@ export default function TemplatesPage() {
                 <Link href="/blog" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.blog')}</Link>
                 <Link href="/pricing" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.pricing')}</Link>
                 <Link href="/contact" className="text-lg font-medium text-muted-foreground hover:text-primary">{t('nav.contact')}</Link>
-                <Link href="/editor">
-                  <Button variant="outline" className="w-full">{t('nav.login')}</Button>
-                </Link>
+                <AuthButton />
               </nav>
             </SheetContent>
           </Sheet>
