@@ -20,10 +20,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
-import { Wand2, X, PlusCircle, Save, Trash2 } from "lucide-react";
+import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
 import { useCV } from "@/context/cv-context";
@@ -43,6 +44,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [skillsInput, setSkillsInput] = useState("");
+  const [currentSuggestionField, setCurrentSuggestionField] = useState<string | null>(null);
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
@@ -105,7 +107,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     setCvData(newCvData);
   };
 
-  const handleGetSuggestions = async (cvSection: string) => {
+  const handleGetSuggestions = async (cvSection: string, fieldPath: string) => {
     if (!jobDescription.trim()) {
       toast({
         title: t('editor.toast.job_description_missing.title'),
@@ -115,6 +117,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
       return;
     }
     setIsSuggesting(true);
+    setCurrentSuggestionField(fieldPath);
     setSuggestions([]);
     try {
       const result = await suggestImprovements({ jobDescription, cvSection });
@@ -130,6 +133,58 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     } finally {
       setIsSuggesting(false);
     }
+  };
+
+  const handleApplySuggestion = () => {
+    if (!currentSuggestionField || !suggestions.length || !suggestions[0].example) {
+      return;
+    }
+
+    // Extract the "After" part from the first suggestion's example
+    const afterTextMatch = suggestions[0].example.match(/After:\s*([\s\S]*)/i);
+    if (!afterTextMatch || !afterTextMatch[1]) {
+      return;
+    }
+    const newText = afterTextMatch[1].trim();
+
+    const newCvData = JSON.parse(JSON.stringify(cvData));
+    let current: any = newCvData;
+    const keys = currentSuggestionField.split('.');
+    
+    for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+        const indexMatch = key.match(/\[(\d+)\]/);
+        if (indexMatch) {
+            current = current[key.replace(indexMatch[0], '')][parseInt(indexMatch[1], 10)];
+        } else {
+            current = current[key];
+        }
+    }
+    
+    const lastKey = keys[keys.length - 1];
+    const indexMatch = lastKey.match(/\[(\d+)\]/);
+     if (indexMatch) {
+        current[lastKey.replace(indexMatch[0], '')][parseInt(indexMatch[1], 10)] = newText;
+    } else {
+       current[lastKey] = newText;
+    }
+    
+    // To update a specific description in an experience item
+    if (keys[0] === 'experience' && keys.length === 3) {
+      newCvData.experience[parseInt(keys[1], 10)].description = newText;
+    } else if (keys[0] === 'summary') {
+      newCvData.summary = newText;
+    }
+
+
+    setCvData(newCvData);
+    setIsSuggestionModalOpen(false);
+    setCurrentSuggestionField(null);
+
+    toast({
+      title: "Changes Applied",
+      description: "The AI suggestion has been added to your CV. You can edit it further.",
+    });
   };
 
   const handleSkillsKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -203,7 +258,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
             <AccordionTrigger className="text-lg font-semibold">{t('editor.summary.title')}</AccordionTrigger>
             <AccordionContent>
               <Textarea name="summary" value={cvData.summary} onChange={handleInputChange} placeholder={t('editor.summary.placeholder')} rows={5} />
-              <Button onClick={() => handleGetSuggestions(cvData.summary)} disabled={isSuggesting || !jobDescription.trim()} size="sm" className="mt-2">
+              <Button onClick={() => handleGetSuggestions(cvData.summary, 'summary')} disabled={isSuggesting || !jobDescription.trim()} size="sm" className="mt-2">
                 <Wand2 className="mr-2 h-4 w-4" />
                 {isSuggesting ? t('editor.experience.thinking') : t('editor.experience.get_suggestions')}
               </Button>
@@ -222,7 +277,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                     <Input placeholder={t('editor.experience.company')} value={exp.company} onChange={(e) => handleDynamicChange('experience', index, 'company', e.target.value)} />
                     <Input placeholder={t('editor.experience.dates')} value={exp.dates} onChange={(e) => handleDynamicChange('experience', index, 'dates', e.target.value)} />
                     <Textarea placeholder={t('editor.experience.description')} rows={4} value={exp.description} onChange={(e) => handleDynamicChange('experience', index, 'description', e.target.value)} />
-                    <Button onClick={() => handleGetSuggestions(exp.description)} disabled={isSuggesting || !jobDescription.trim()} size="sm">
+                    <Button onClick={() => handleGetSuggestions(exp.description, `experience.${index}.description`)} disabled={isSuggesting || !jobDescription.trim()} size="sm">
                       <Wand2 className="mr-2 h-4 w-4" />
                       {isSuggesting ? t('editor.experience.thinking') : t('editor.experience.get_suggestions')}
                     </Button>
@@ -304,6 +359,14 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
                       </Card>
                     ))}
                 </div>
+                 <DialogFooter className="pt-4 border-t">
+                    <div className="w-full text-center">
+                        <p className="text-xs text-muted-foreground mb-2">Click ‘Apply Suggestion’ to instantly update your CV. You can edit it anytime.</p>
+                        <Button onClick={handleApplySuggestion}>
+                           <CheckCircle className="mr-2" /> Apply Suggestion
+                        </Button>
+                    </div>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     </div>
