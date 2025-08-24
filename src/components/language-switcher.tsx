@@ -10,9 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
 
 export default function LanguageSwitcher() {
   const { language, setLanguage } = useTranslation();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // Don't render on the server or during the initial client render
+  }
+
 
   return (
     <DropdownMenu>
