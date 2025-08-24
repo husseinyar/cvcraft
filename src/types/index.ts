@@ -44,6 +44,10 @@ export type VolunteerWork = {
   description: string;
 };
 
+export type CVTheme = {
+  primaryColor: string;
+  fontSize: number;
+};
 
 export type CVData = {
   id: string; // Unique ID for the CV document
@@ -66,6 +70,7 @@ export type CVData = {
   certifications: Certification[];
   awards: Award[];
   volunteering: VolunteerWork[];
+  theme: CVTheme;
   createdAt: number; // Timestamp
   updatedAt: number; // Timestamp
 };

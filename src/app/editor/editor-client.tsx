@@ -2,31 +2,20 @@
 "use client";
 
 import { useRef, useState, useEffect } from 'react';
-import type { CVData, TemplateOption, UserProfile } from '@/types';
+import type { CVData, TemplateOption } from '@/types';
 import CvEditor from '@/components/cv-editor';
 import TemplatePreview from '@/components/template-preview';
 import { useTranslation } from '@/context/language-context';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Download, Palette, Plus, Copy, UserCog } from "lucide-react";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import Image from 'next/image';
+import { Plus, Copy, UserCog } from "lucide-react";
 import { useCV } from '@/context/cv-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { duplicateCv } from '@/services/cv-service';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-
-const templateOptions: { name: TemplateOption, hint: string }[] = [
-    { name: 'onyx', hint: 'resume modern dark' },
-    { name: 'professional', hint: 'resume professional' },
-    { name: 'creative', hint: 'resume creative' },
-    { name: 'minimal', hint: 'resume minimal' },
-];
+import EditorToolbar from '@/components/editor-toolbar';
+import CvStyleProvider from '@/components/cv-style-provider';
 
 export default function EditorClient() {
   const { 
@@ -57,56 +46,6 @@ export default function EditorClient() {
     }
   }, [allUsers, activeUser, isAdmin, setActiveUser, user]);
 
-  const handleTemplateChange = (template: CVData['template']) => {
-    if (setActiveCv && activeCv) {
-        setActiveCv(prev => ({ ...prev!, template }));
-    }
-  };
-
-  const handleDownloadPdf = async () => {
-    const input = cvPreviewRef.current;
-    if (!input || !activeCv) {
-      console.error("CV preview ref or CV data is not available.");
-      return;
-    }
-
-    // Use html2canvas to capture the entire CV container
-    const canvas = await html2canvas(input, {
-      scale: 2, // Higher scale for better quality
-      useCORS: true,
-      backgroundColor: activeCv.template === 'onyx' ? '#1A1A1A' : '#ffffff',
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-
-    // Calculate the aspect ratio to fit the content to the PDF width
-    const ratio = pdfWidth / canvasWidth;
-    const imgHeight = canvasHeight * ratio;
-    
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    // Add the first page
-    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-    heightLeft -= pdfHeight;
-
-    // Add new pages if the content is longer than one page
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-      heightLeft -= pdfHeight;
-    }
-
-    pdf.save(`${activeCv.cvName.replace(/\s+/g, '_')}_CV.pdf`);
-  };
-  
   const handleCvSelectionChange = (cvId: string) => {
     const selectedCv = userCvs.find(cv => cv.id === cvId);
     if (selectedCv) {
@@ -199,47 +138,13 @@ export default function EditorClient() {
 
                 </div>
               )}
-              <div className="flex justify-end items-center gap-4">
-                  <Sheet>
-                        <SheetTrigger asChild>
-                            <Button variant="outline">
-                                <Palette className="mr-2" /> {t('editor.template.title')}
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent>
-                            <h3 className="text-lg font-semibold mb-4">{t('editor.template.title')}</h3>
-                            <RadioGroup defaultValue={activeCv.template} onValueChange={(value) => handleTemplateChange(value as TemplateOption)}>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {templateOptions.map(template => (
-                                        <div key={template.name}>
-                                            <RadioGroupItem value={template.name} id={template.name} className="sr-only" />
-                                            <Label htmlFor={template.name} className="cursor-pointer">
-                                                <div className="border-2 border-transparent rounded-md hover:border-primary data-[state=checked]:border-primary">
-                                                    <Image 
-                                                        src={`https://placehold.co/200x275.png`}
-                                                        width={200}
-                                                        height={282}
-                                                        alt={t(`templates.${template.name}` as any)}
-                                                        data-ai-hint={template.hint}
-                                                        className="rounded-md"
-                                                    />
-                                                    <p className="text-center text-sm mt-2">{t(`templates.${template.name}` as any)}</p>
-                                                </div>
-                                            </Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </RadioGroup>
-                        </SheetContent>
-                    </Sheet>
-                  <Button onClick={handleDownloadPdf}>
-                      <Download className="mr-2" /> {t('editor.download_pdf')}
-                  </Button>
-              </div>
+             <EditorToolbar cvData={activeCv} setCvData={setActiveCv} cvPreviewRef={cvPreviewRef} />
           </div>
           <div className="flex-grow flex items-start justify-center pt-8">
              <div className="transform scale-[0.9] origin-top">
-                <TemplatePreview cvData={activeCv} ref={cvPreviewRef} />
+                <CvStyleProvider theme={activeCv.theme}>
+                    <TemplatePreview cvData={activeCv} ref={cvPreviewRef} />
+                </CvStyleProvider>
              </div>
           </div>
       </main>

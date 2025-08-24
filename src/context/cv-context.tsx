@@ -31,6 +31,10 @@ const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt
   certifications: [],
   awards: [],
   volunteering: [],
+  theme: {
+    primaryColor: 'hsl(211, 30%, 50%)',
+    fontSize: 10,
+  }
 });
 
 // Define the shape of the context
@@ -68,7 +72,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       const storedCvData = localStorage.getItem('cv-craft-data');
       if (storedCvData) {
         const parsedData = JSON.parse(storedCvData);
-        setActiveCv({ ...createDefaultCv(), ...parsedData, sectionOrder: parsedData.sectionOrder || createDefaultCv().sectionOrder });
+        setActiveCv({ ...createDefaultCv(), ...parsedData, sectionOrder: parsedData.sectionOrder || createDefaultCv().sectionOrder, theme: parsedData.theme || createDefaultCv().theme });
       } else {
         const now = Date.now();
         setActiveCv({ ...createDefaultCv(), id: `local_${now}`, userId: 'anonymous', cvName: 'My Local CV', createdAt: now, updatedAt: now });
@@ -120,7 +124,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
           setIsLoaded(false);
           const cvs = await getCvsForUser(activeUser.id);
           if (cvs.length > 0) {
-              const sanitizedCvs = cvs.map(cv => ({ ...createDefaultCv(), ...cv, sectionOrder: cv.sectionOrder || createDefaultCv().sectionOrder }));
+              const sanitizedCvs = cvs.map(cv => ({ ...createDefaultCv(), ...cv, sectionOrder: cv.sectionOrder || createDefaultCv().sectionOrder, theme: cv.theme || createDefaultCv().theme }));
               setUserCvs(sanitizedCvs);
               setActiveCv(sanitizedCvs[0]);
           } else {
