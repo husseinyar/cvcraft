@@ -5,3 +5,4 @@ import '@/ai/flows/parse-cv-text.ts';
 import '@/ai/flows/score-cv.ts';
 import '@/ai/flows/generate-cover-letter.ts';
 import '@/ai/flows/analyze-skill-gap.ts';
+import '@/ai/flows/generate-experience.ts';

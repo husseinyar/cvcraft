@@ -31,9 +31,10 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
+import { generateExperience } from "@/ai/flows/generate-experience";
 import { scoreCv, type ScoreCvOutput } from "@/ai/flows/score-cv";
 import { analyzeSkillGap, type AnalyzeSkillGapOutput } from "@/ai/flows/analyze-skill-gap";
-import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap, Search, GripVertical } from "lucide-react";
+import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap, Search, GripVertical, Sparkles } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
 import { useCV } from "@/context/cv-context";
@@ -396,17 +397,41 @@ function SummarySection({ cvData, handleInputChange, handleGetSuggestions, isSug
 }
 
 function ExperienceSection({ cvData, setCvData, handleGetSuggestions, isSuggesting, jobDescription, t }: any) {
+  const [isGenerating, setIsGenerating] = useState<Record<number, boolean>>({});
+
   const handleDynamicChange = (index: number, field: keyof Experience, value: string) => {
     const newCvData = JSON.parse(JSON.stringify(cvData));
     (newCvData.experience[index] as any)[field] = value;
     setCvData(newCvData);
   };
+  
   const addDynamicItem = () => {
     const newItem = { id: `exp${Date.now()}`, role: '', company: '', dates: '', description: '' };
     setCvData({ ...cvData, experience: [...cvData.experience, newItem] });
   };
+  
   const removeDynamicItem = (index: number) => {
     setCvData({ ...cvData, experience: cvData.experience.filter((_: any, i: number) => i !== index) });
+  };
+
+  const handleGenerateExperience = async (index: number) => {
+    const exp = cvData.experience[index];
+    if (!exp.role) {
+        // In a real app, you might use a toast notification here.
+        alert("Please enter a role before generating with AI.");
+        return;
+    }
+    setIsGenerating(prev => ({...prev, [index]: true}));
+    try {
+        const result = await generateExperience({ role: exp.role, company: exp.company });
+        const bulletPoints = result.bulletPoints.map(pt => `• ${pt}`).join('\n');
+        handleDynamicChange(index, 'description', bulletPoints);
+    } catch (error) {
+        console.error("Failed to generate experience:", error);
+        alert("The AI failed to generate bullet points. Please try again.");
+    } finally {
+        setIsGenerating(prev => ({...prev, [index]: false}));
+    }
   };
 
   return (
@@ -419,10 +444,16 @@ function ExperienceSection({ cvData, setCvData, handleGetSuggestions, isSuggesti
             <Input placeholder={t('editor.experience.company')} value={exp.company} onChange={(e) => handleDynamicChange(index, 'company', e.target.value)} />
             <Input placeholder={t('editor.experience.dates')} value={exp.dates} onChange={(e) => handleDynamicChange(index, 'dates', e.target.value)} />
             <Textarea placeholder={t('editor.experience.description')} rows={4} value={exp.description} onChange={(e) => handleDynamicChange(index, 'description', e.target.value)} />
-            <Button onClick={() => handleGetSuggestions(exp.description, `experience.${index}.description`)} disabled={isSuggesting || !jobDescription.trim()} size="sm">
-              <Wand2 className="mr-2 h-4 w-4" />
-              {isSuggesting ? t('editor.experience.thinking') : t('editor.experience.get_suggestions')}
-            </Button>
+            <div className="flex gap-2">
+                <Button onClick={() => handleGenerateExperience(index)} disabled={isGenerating[index] || !exp.role} size="sm" variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    {isGenerating[index] ? 'Generating...' : 'Generate with AI'}
+                </Button>
+                <Button onClick={() => handleGetSuggestions(exp.description, `experience.${index}.description`)} disabled={isSuggesting || !jobDescription.trim()} size="sm">
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  {isSuggesting ? t('editor.experience.thinking') : 'Improve Text'}
+                </Button>
+            </div>
           </CardContent>
         </Card>
       ))}
