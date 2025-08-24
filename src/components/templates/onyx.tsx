@@ -19,7 +19,7 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
     case 'summary':
       return data.summary ? (
         <Section title="Profile">
-          <p className="text-sm leading-relaxed text-white/80">{data.summary}</p>
+          <p className="text-sm leading-relaxed text-white/80 whitespace-pre-wrap">{data.summary}</p>
         </Section>
       ) : null;
     case 'experience':
@@ -33,7 +33,7 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
                   <p className="text-xs text-white/50 font-medium">{exp.dates}</p>
                 </div>
                 <p className="font-medium text-white/70 mb-1">{exp.company}</p>
-                <p className="text-white/80 leading-normal text-xs">{exp.description}</p>
+                <p className="text-white/80 leading-normal text-xs whitespace-pre-wrap">{exp.description}</p>
               </div>
             ))}
           </div>
@@ -50,7 +50,7 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
                   <p className="text-xs text-white/50 font-medium">{edu.dates}</p>
                 </div>
                 <p className="font-medium text-white/70">{edu.school}</p>
-                {edu.description && <p className="text-white/80 text-xs mt-1">{edu.description}</p>}
+                {edu.description && <p className="text-white/80 text-xs mt-1 whitespace-pre-wrap">{edu.description}</p>}
               </div>
             ))}
           </div>
@@ -67,7 +67,7 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
                                 <p className="text-xs text-white/50">{vol.dates}</p>
                             </div>
                             <p className="font-medium text-white/70 mb-1">{vol.organization}</p>
-                            <p className="text-white/80 text-xs">{vol.description}</p>
+                            <p className="text-white/80 text-xs whitespace-pre-wrap">{vol.description}</p>
                         </div>
                     ))}
                 </div>
@@ -84,9 +84,9 @@ const SidebarSectionContent = ({ sectionId, data }: { sectionId: string, data: C
         return (
           <Section title="Contact">
             <div className="space-y-3 text-sm">
-                <p className="flex items-center gap-3 text-white/80"><Mail size={14}/> {data.contact.email}</p>
+                <p className="flex items-center gap-3 text-white/80 break-all"><Mail size={14}/> {data.contact.email}</p>
                 <p className="flex items-center gap-3 text-white/80"><Phone size={14}/> {data.contact.phone}</p>
-                <p className="flex items-center gap-3 text-white/80"><Globe size={14}/> {data.contact.website}</p>
+                <p className="flex items-center gap-3 text-white/80 break-all"><Globe size={14}/> {data.contact.website}</p>
             </div>
           </Section>
         );
