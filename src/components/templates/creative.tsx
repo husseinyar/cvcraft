@@ -54,7 +54,7 @@ export default function CreativeTemplate({ data }: TemplateProps) {
   const { sectionOrder = ['summary', 'experience', 'education'] } = data;
 
   return (
-    <div className="a4-container flex font-sans text-gray-800">
+    <div className="cv-page flex font-sans text-gray-800 bg-white">
       {/* Left Sidebar */}
       <aside className="w-1/3 bg-primary text-primary-foreground p-8 flex flex-col justify-between">
         <div>

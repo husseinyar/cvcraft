@@ -6,7 +6,7 @@ interface TemplateProps {
 
 export default function PrincetonTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-gray-700 p-12 font-sans">
+    <div className="cv-page bg-white text-gray-700 p-12 font-sans">
       <header className="text-center mb-12">
         <h1 className="text-5xl font-light tracking-widest uppercase">{data.name}</h1>
         <h2 className="text-lg font-normal tracking-wider text-gray-500 mt-2">{data.jobTitle}</h2>

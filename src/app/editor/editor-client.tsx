@@ -77,6 +77,7 @@ export default function EditorClient() {
     const pages = input.querySelectorAll('.cv-page') as NodeListOf<HTMLElement>;
 
     if (pages.length === 0) {
+        // Fallback for templates that might not have the .cv-page structure
         const canvas = await html2canvas(input, { scale: 2, useCORS: true });
         const imgData = canvas.toDataURL('image/png');
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
@@ -94,11 +95,12 @@ export default function EditorClient() {
             if (i > 0) {
                 pdf.addPage();
             }
+            // Add the image to the PDF, fitting it to the A4 page size
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         }
     }
 
-    pdf.save(`${activeCv.name.replace(/\s+/g, '_')}_CV.pdf`);
+    pdf.save(`${activeCv.cvName.replace(/\s+/g, '_')}_CV.pdf`);
   };
   
   const handleCvSelectionChange = (cvId: string) => {

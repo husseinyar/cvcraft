@@ -1,4 +1,5 @@
 import type { CVData } from "@/types";
+import React from "react";
 
 interface TemplateProps {
   data: CVData;
@@ -66,7 +67,7 @@ export default function MinimalTemplate({ data }: TemplateProps) {
   const { sectionOrder = ['summary', 'experience', 'education', 'skills'] } = data;
 
   return (
-    <div className="a4-container p-12 font-sans text-gray-700">
+    <div className="cv-page p-12 font-sans text-gray-700 bg-white">
       <header className="text-center mb-12">
         <h1 className="text-5xl font-light tracking-widest uppercase">{data.name}</h1>
         <h2 className="text-lg font-normal tracking-wider text-gray-500 mt-2">{data.jobTitle}</h2>

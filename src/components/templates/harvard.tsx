@@ -8,7 +8,7 @@ interface TemplateProps {
 
 export default function HarvardTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-gray-800 flex font-sans">
+    <div className="cv-page bg-white text-gray-800 flex font-sans">
       {/* Left Sidebar */}
       <aside className="w-1/3 bg-primary text-primary-foreground p-8 flex flex-col justify-between">
         <div>

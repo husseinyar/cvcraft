@@ -7,7 +7,7 @@ interface TemplateProps {
 
 export default function OtagoTemplate({ data }: TemplateProps) {
   return (
-    <div className="w-full h-full bg-white text-gray-800 p-8 font-sans text-sm">
+    <div className="cv-page bg-white text-gray-800 p-8 font-sans text-sm">
       <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight text-primary">{data.name}</h1>
         <h2 className="text-lg font-medium text-muted-foreground mt-1">{data.jobTitle}</h2>

@@ -145,7 +145,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
   const asideSections = sectionOrder.filter(id => asideSectionIds.includes(id));
 
   return (
-    <div className="a4-container p-8 font-sans text-sm text-gray-800">
+    <div className="cv-page p-8 font-sans text-sm text-gray-800 bg-white">
       <header className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight text-primary">{data.name}</h1>
         <h2 className="text-lg font-medium text-muted-foreground mt-1">{data.jobTitle}</h2>
