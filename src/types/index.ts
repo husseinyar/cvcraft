@@ -62,10 +62,10 @@ export type CVData = {
   template: TemplateOption;
   role: 'admin' | 'user';
   sectionOrder: string[];
-  languages?: Language[];
-  certifications?: Certification[];
-  awards?: Award[];
-  volunteering?: VolunteerWork[];
+  languages: Language[];
+  certifications: Certification[];
+  awards: Award[];
+  volunteering: VolunteerWork[];
   createdAt: number; // Timestamp
   updatedAt: number; // Timestamp
 };
