@@ -66,38 +66,42 @@ export default function EditorClient() {
   const handleDownloadPdf = async () => {
     const input = cvPreviewRef.current;
     if (!input || !activeCv) {
-        console.error("CV preview ref or CV data is not available.");
-        return;
+      console.error("CV preview ref or CV data is not available.");
+      return;
     }
 
+    // Use html2canvas to capture the entire CV container
+    const canvas = await html2canvas(input, {
+      scale: 2, // Higher scale for better quality
+      useCORS: true,
+      backgroundColor: activeCv.template === 'onyx' ? '#1A1A1A' : '#ffffff',
+    });
+
+    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    const pages = input.querySelectorAll('.cv-page') as NodeListOf<HTMLElement>;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
 
-    if (pages.length === 0) {
-        // Fallback for templates that might not have the .cv-page structure
-        const canvas = await html2canvas(input, { scale: 2, useCORS: true });
-        const imgData = canvas.toDataURL('image/png');
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    } else {
-        for (let i = 0; i < pages.length; i++) {
-            const page = pages[i];
-            const canvas = await html2canvas(page, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: activeCv.template === 'onyx' ? '#1A1A1A' : '#ffffff',
-            });
+    // Calculate the aspect ratio to fit the content to the PDF width
+    const ratio = pdfWidth / canvasWidth;
+    const imgHeight = canvasHeight * ratio;
+    
+    let heightLeft = imgHeight;
+    let position = 0;
 
-            const imgData = canvas.toDataURL('image/png');
-            
-            if (i > 0) {
-                pdf.addPage();
-            }
-            // Add the image to the PDF, fitting it to the A4 page size
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-        }
+    // Add the first page
+    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+    heightLeft -= pdfHeight;
+
+    // Add new pages if the content is longer than one page
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pdfHeight;
     }
 
     pdf.save(`${activeCv.cvName.replace(/\s+/g, '_')}_CV.pdf`);
