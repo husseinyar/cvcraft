@@ -10,7 +10,7 @@ export default function HarvardTemplate({ data }: TemplateProps) {
   return (
     <div className="cv-page bg-white text-gray-800 flex font-sans">
       {/* Left Sidebar */}
-      <aside className="w-1/3 bg-primary text-primary-foreground p-8 flex flex-col justify-between">
+      <aside className="w-1/3 bg-[--cv-primary-color] text-primary-foreground p-8 flex flex-col justify-between">
         <div>
           <Image
             src="https://placehold.co/150x150.png"
@@ -21,7 +21,7 @@ export default function HarvardTemplate({ data }: TemplateProps) {
             data-ai-hint="person portrait"
           />
           <h1 className="text-4xl font-bold tracking-tight">{data.name.split(' ')[0]}<br/>{data.name.split(' ').slice(1).join(' ')}</h1>
-          <h2 className="text-lg font-light text-primary-foreground/80 mt-2 pb-6 border-b-2 border-primary-foreground/20">{data.jobTitle}</h2>
+          <h2 className="text-lg font-light text-white/80 mt-2 pb-6 border-b-2 border-white/20">{data.jobTitle}</h2>
           
           <div className="mt-8 space-y-4 text-sm">
              <div className="flex items-center gap-3">
@@ -53,12 +53,12 @@ export default function HarvardTemplate({ data }: TemplateProps) {
       {/* Main Content */}
       <main className="w-2/3 p-10 overflow-y-auto">
         <section className="mb-10">
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-4">Profile</h3>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-[--cv-primary-color] mb-4">Profile</h3>
           <p className="text-sm leading-relaxed text-gray-600">{data.summary}</p>
         </section>
 
         <section className="mb-10">
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Experience</h3>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-[--cv-primary-color] mb-6">Experience</h3>
           <div className="space-y-6">
             {data.experience.map(exp => (
               <div key={exp.id}>
@@ -72,7 +72,7 @@ export default function HarvardTemplate({ data }: TemplateProps) {
         </section>
 
         <section>
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Education</h3>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-[--cv-primary-color] mb-6">Education</h3>
           <div className="space-y-5">
             {data.education.map(edu => (
               <div key={edu.id}>

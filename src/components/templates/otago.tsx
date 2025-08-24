@@ -9,19 +9,19 @@ export default function OtagoTemplate({ data }: TemplateProps) {
   return (
     <div className="cv-page bg-white text-gray-800 p-8 font-sans text-sm">
       <header className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight text-primary">{data.name}</h1>
+        <h1 className="text-4xl font-bold tracking-tight text-[--cv-primary-color]">{data.name}</h1>
         <h2 className="text-lg font-medium text-muted-foreground mt-1">{data.jobTitle}</h2>
       </header>
       
       <main className="grid grid-cols-3 gap-x-12">
         <div className="col-span-2 space-y-6">
             <section>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-2 border-b-2 border-primary/20 pb-1">Profile</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-2 border-b-2 border-[--cv-primary-color]/20 pb-1">Profile</h3>
               <p className="leading-relaxed text-gray-700">{data.summary}</p>
             </section>
 
             <section>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Experience</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Experience</h3>
               <div className="space-y-4">
                 {data.experience.map(exp => (
                   <div key={exp.id}>
@@ -37,7 +37,7 @@ export default function OtagoTemplate({ data }: TemplateProps) {
             </section>
             
             <section>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Education</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Education</h3>
               <div className="space-y-3">
                 {data.education.map(edu => (
                   <div key={edu.id}>
@@ -55,7 +55,7 @@ export default function OtagoTemplate({ data }: TemplateProps) {
 
         <aside className="col-span-1 space-y-6">
             <section>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Contact</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Contact</h3>
                 <div className="space-y-2 text-xs">
                     <p className="flex items-center gap-2"><Mail size={12}/> {data.contact.email}</p>
                     <p className="flex items-center gap-2"><Phone size={12}/> {data.contact.phone}</p>
@@ -63,7 +63,7 @@ export default function OtagoTemplate({ data }: TemplateProps) {
                 </div>
             </section>
             <section>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Skills</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Skills</h3>
                 <div className="flex flex-col space-y-1">
                     {data.skills.map(skill => (
                         <span key={skill} className="text-gray-700">{skill}</span>

@@ -12,14 +12,14 @@ const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }
     case 'summary':
       return (
         <section>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-2 border-b-2 border-primary/20 pb-1">Profile</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-2 border-b-2 border-[--cv-primary-color]/20 pb-1">Profile</h3>
           <p className="leading-relaxed text-gray-700">{data.summary}</p>
         </section>
       );
     case 'experience':
       return (
         <section>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Experience</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Experience</h3>
           <div className="space-y-4">
             {data.experience.map(exp => (
               <div key={exp.id}>
@@ -37,7 +37,7 @@ const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }
     case 'education':
       return (
         <section>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Education</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Education</h3>
           <div className="space-y-3">
             {data.education.map(edu => (
               <div key={edu.id}>
@@ -55,7 +55,7 @@ const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }
     case 'volunteering':
         return data.volunteering && data.volunteering.length > 0 ? (
             <section>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Volunteering</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Volunteering</h3>
                 <div className="space-y-4">
                     {data.volunteering.map(vol => (
                         <div key={vol.id}>
@@ -80,7 +80,7 @@ const AsideSectionContent = ({ sectionId, data }: { sectionId: string, data: CVD
         case 'skills':
             return data.skills && data.skills.length > 0 ? (
                 <section>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Skills</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Skills</h3>
                     <div className="flex flex-col space-y-1">
                         {data.skills.map(skill => (
                             <span key={skill} className="text-gray-700">{skill}</span>
@@ -91,7 +91,7 @@ const AsideSectionContent = ({ sectionId, data }: { sectionId: string, data: CVD
         case 'languages':
             return data.languages && data.languages.length > 0 ? (
                 <section>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Languages</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Languages</h3>
                      <div className="space-y-1">
                         {data.languages.map(lang => (
                             <div key={lang.id} className="flex justify-between items-baseline">
@@ -105,7 +105,7 @@ const AsideSectionContent = ({ sectionId, data }: { sectionId: string, data: CVD
         case 'certifications':
             return data.certifications && data.certifications.length > 0 ? (
                 <section>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Certifications</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Certifications</h3>
                     <div className="space-y-2">
                         {data.certifications.map(cert => (
                             <div key={cert.id}>
@@ -119,7 +119,7 @@ const AsideSectionContent = ({ sectionId, data }: { sectionId: string, data: CVD
         case 'awards':
             return data.awards && data.awards.length > 0 ? (
                 <section>
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Awards</h3>
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Awards</h3>
                     <div className="space-y-2">
                         {data.awards.map(award => (
                             <div key={award.id}>
@@ -147,7 +147,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
   return (
     <div className="cv-page p-8 font-sans text-sm text-gray-800 bg-white">
       <header className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight text-primary">{data.name}</h1>
+        <h1 className="text-4xl font-bold tracking-tight text-[--cv-primary-color]">{data.name}</h1>
         <h2 className="text-lg font-medium text-muted-foreground mt-1">{data.jobTitle}</h2>
       </header>
       
@@ -160,7 +160,7 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
 
         <aside className="col-span-1 space-y-6">
             <section>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-primary mb-3 border-b-2 border-primary/20 pb-1">Contact</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-[--cv-primary-color] mb-3 border-b-2 border-[--cv-primary-color]/20 pb-1">Contact</h3>
                 <div className="space-y-2 text-xs">
                     <p className="flex items-center gap-2"><Mail size={12}/> {data.contact.email}</p>
                     <p className="flex items-center gap-2"><Phone size={12}/> {data.contact.phone}</p>

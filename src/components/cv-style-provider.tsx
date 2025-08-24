@@ -12,8 +12,11 @@ interface CvStyleProviderProps {
 export default function CvStyleProvider({ theme, children }: CvStyleProviderProps) {
   const { primaryColor, fontSize } = theme;
 
+  // Use a unique class to scope the variables instead of :root
+  const scopeClass = "cv-theme-provider";
+
   const style = `
-    :root {
+    .${scopeClass} {
       --cv-primary-color: ${primaryColor};
       --cv-font-size-base: ${fontSize}px;
       --cv-font-size-sm: ${fontSize * 0.85}px;
@@ -24,9 +27,9 @@ export default function CvStyleProvider({ theme, children }: CvStyleProviderProp
   `;
 
   return (
-    <>
+    <div className={scopeClass}>
       <style>{style}</style>
       {children}
-    </>
+    </div>
   );
 }

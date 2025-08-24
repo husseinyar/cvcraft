@@ -11,16 +11,16 @@ const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }
     case 'summary':
       return (
         <section className="mb-10">
-          <p className="text-sm leading-relaxed text-gray-600 border-l-4 border-primary pl-4">{data.summary}</p>
+          <p className="text-sm leading-relaxed text-gray-600 border-l-4 border-[--cv-primary-color] pl-4">{data.summary}</p>
         </section>
       );
     case 'experience':
       return (
         <section className="mb-10">
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Work Experience</h3>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-[--cv-primary-color] mb-6">Work Experience</h3>
           <div className="space-y-6">
             {data.experience.map((exp) => (
-              <div key={exp.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
+              <div key={exp.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-[--cv-primary-color] before:rounded-full">
                 <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{exp.dates}</p>
                 <h4 className="text-lg font-semibold text-gray-800">{exp.role}</h4>
                 <p className="font-medium text-gray-600">{exp.company}</p>
@@ -33,10 +33,10 @@ const SectionContent = ({ sectionId, data }: { sectionId: string, data: CVData }
     case 'education':
       return (
         <section>
-          <h3 className="text-2xl font-bold uppercase tracking-wider text-primary mb-6">Education</h3>
+          <h3 className="text-2xl font-bold uppercase tracking-wider text-[--cv-primary-color] mb-6">Education</h3>
           <div className="space-y-5">
             {data.education.map((edu) => (
-              <div key={edu.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-primary before:rounded-full">
+              <div key={edu.id} className="relative pl-6 before:absolute before:left-0 before:top-2 before:h-2 before:w-2 before:bg-[--cv-primary-color] before:rounded-full">
                  <p className="text-xs text-gray-500 font-medium tracking-wider mb-1">{edu.dates}</p>
                 <h4 className="text-lg font-semibold">{edu.degree}</h4>
                 <p className="font-medium text-gray-600">{edu.school}</p>
@@ -56,7 +56,7 @@ export default function CreativeTemplate({ data }: TemplateProps) {
   return (
     <div className="cv-page flex font-sans text-gray-800 bg-white">
       {/* Left Sidebar */}
-      <aside className="w-1/3 bg-primary text-primary-foreground p-8 flex flex-col justify-between">
+      <aside className="w-1/3 bg-[--cv-primary-color] text-primary-foreground p-8 flex flex-col justify-between">
         <div>
           <Image
             src="https://placehold.co/150x150.png"
@@ -97,7 +97,7 @@ export default function CreativeTemplate({ data }: TemplateProps) {
       {/* Main Content */}
       <main className="w-2/3 p-10 overflow-y-auto">
         <header className="mb-10">
-          <h1 className="text-5xl font-bold tracking-tight text-primary">{data.name}</h1>
+          <h1 className="text-5xl font-bold tracking-tight text-[--cv-primary-color]">{data.name}</h1>
           <h2 className="text-xl font-light text-gray-600 mt-2">{data.jobTitle}</h2>
         </header>
 
