@@ -9,6 +9,7 @@ import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from '@/components/auth-button';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from './theme-toggle';
 
 interface NavLink {
     href: string;
@@ -60,9 +61,11 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
           ))}
           <AuthButton />
           <LanguageSwitcher />
+          <ThemeToggle />
         </nav>
         <div className="md:hidden flex items-center gap-2">
           <LanguageSwitcher />
+          <ThemeToggle />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">

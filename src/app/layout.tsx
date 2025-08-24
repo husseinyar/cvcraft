@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { LanguageProvider } from '@/context/language-context';
 import { CVProvider } from '@/context/cv-context';
 import { Inter } from 'next/font/google';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,12 +27,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased" suppressHydrationWarning>
-        <LanguageProvider>
-          <CVProvider>
-            {children}
-            <Toaster />
-          </CVProvider>
-        </LanguageProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <LanguageProvider>
+            <CVProvider>
+              {children}
+              <Toaster />
+            </CVProvider>
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
