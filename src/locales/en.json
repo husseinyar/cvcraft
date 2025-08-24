@@ -116,7 +116,7 @@
         "title": "Work Experience",
         "role": "Role",
         "company": "Company",
-        "dates": "Dates (e.g., Jan 2020 - Present)",
+        "dates": "e.g., Jan 2020 - Present",
         "description": "Description",
         "get_suggestions": "Get Suggestions",
         "thinking": "Thinking...",
@@ -126,7 +126,7 @@
         "title": "Education",
         "school": "School/University",
         "degree": "Degree/Field of Study",
-        "dates": "Dates (e.g., 2016 - 2020)",
+        "dates": "e.g., 2016 - 2020",
         "description": "Description",
         "add_education": "Add Education"
     },
@@ -149,122 +149,5 @@
         "description": "Here are some suggestions to improve your CV section."
     },
     "download_pdf": "Download PDF"
-  },
-   "blog": {
-    "title": "CV Craft Blog",
-    "subtitle": "Tips, tricks, and insights to help you land your dream job.",
-    "read_more": "Read More",
-    "posts": {
-      "one": {
-        "title": "How to Write a Killer CV That Gets Noticed",
-        "excerpt": "Learn the fundamentals of crafting a compelling CV that stands out to recruiters and hiring managers."
-      },
-      "two": {
-        "title": "5 Common CV Mistakes and How to Avoid Them",
-        "excerpt": "Don't let these simple errors cost you an interview. We break down the most common pitfalls."
-      },
-      "three": {
-        "title": "Tailoring Your CV for Each Job Application",
-        "excerpt": "A one-size-fits-all CV is a recipe for rejection. Discover how to customize your CV for every role."
-      },
-      "four": {
-        "title": "The Importance of Keywords in Your CV",
-        "excerpt": "Understand how Applicant Tracking Systems (ATS) work and how to optimize your CV with the right keywords."
-      },
-      "five": {
-        "title": "Creative vs. Professional: Which CV Template is Right for You?",
-        "excerpt": "The right look can make a big impact. We'll help you decide which template best suits your industry and personality."
-      },
-      "six": {
-        "title": "How to Quantify Your Achievements on Your CV",
-        "excerpt": "Numbers speak louder than words. Learn how to turn your responsibilities into measurable achievements."
-      }
-    }
-  },
-  "contact_page": {
-    "title": "Get In Touch",
-    "subtitle": "Have a question or feedback? We'd love to hear from you. Fill out the form below and we'll get back to you as soon as possible.",
-    "form_title": "Send us a Message",
-    "form_description": "Let us know how we can help.",
-    "name_label": "Name",
-    "name_placeholder": "Your Name",
-    "email_label": "Email",
-    "email_placeholder": "your.email@example.com",
-    "message_label": "Message",
-    "message_placeholder": "Your message...",
-    "submit_button": "Send Message",
-    "info_title": "Contact Information",
-    "email": "Email",
-    "phone": "Phone",
-    "address": "Address"
-  },
-   "pricing_page": {
-    "title": "Simple, Transparent Pricing",
-    "subtitle": "Choose the plan that's right for you and start building your dream CV today.",
-    "free": {
-      "name": "Free",
-      "price": "$0 / month",
-      "description": "For getting started.",
-      "features": {
-        "one": "1 CV",
-        "two": "3 templates",
-        "three": "PDF export"
-      },
-      "cta": "Start for Free"
-    },
-    "pro": {
-      "name": "Pro",
-      "price": "$9 / month",
-      "description": "For professionals.",
-      "features": {
-        "one": "Unlimited CVs",
-        "two": "All templates",
-        "three": "AI suggestions",
-        "four": "Remove branding"
-      },
-      "cta": "Go Pro"
-    },
-    "business": {
-      "name": "Business",
-      "price": "Contact Us",
-      "description": "For teams and organizations.",
-      "features": {
-        "one": "All Pro features",
-        "two": "Team management",
-        "three": "Priority support",
-        "four": "Custom branding"
-      },
-      "cta": "Contact Sales"
-    }
-  },
-  "features_page": {
-    "title": "Everything You Need to Succeed",
-    "subtitle": "CV Craft is packed with powerful features to help you create a CV that opens doors.",
-    "list": {
-      "ai": {
-        "title": "AI-Powered Content",
-        "description": "Leverage AI to write compelling summary and experience sections tailored to specific jobs."
-      },
-      "templates": {
-        "title": "Professional Templates",
-        "description": "Choose from a wide variety of professionally designed templates that are proven to impress."
-      },
-      "preview": {
-        "title": "Live Preview",
-        "description": "Instantly see how your CV looks as you make changes. No more guessing."
-      },
-      "ats": {
-        "title": "ATS-Optimized",
-        "description": "Our templates are designed to be easily parsed by Applicant Tracking Systems."
-      },
-      "save": {
-        "title": "Real-time Saving",
-        "description": "Your progress is saved automatically, so you can pick up right where you left off."
-      },
-      "export": {
-        "title": "Easy PDF Export",
-        "description": "Download a pixel-perfect PDF of your CV, ready to be sent to employers."
-      }
-    }
   }
 }

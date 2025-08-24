@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useRef, useState } from 'react';
-import type { CVData, TemplateOption } from '@/types';
+import { useRef, useState, useEffect } from 'react';
+import type { CVData, TemplateOption, UserProfile } from '@/types';
 import CvEditor from '@/components/cv-editor';
 import TemplatePreview from '@/components/template-preview';
 import { useTranslation } from '@/context/language-context';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Download, Palette, Plus, Copy } from "lucide-react";
+import { Download, Palette, Plus, Copy, UserCog } from "lucide-react";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { duplicateCv } from '@/services/cv-service';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 const templateOptions: { name: TemplateOption, hint: string }[] = [
     { name: 'onyx', hint: 'resume modern dark' },
@@ -31,6 +32,9 @@ export default function EditorClient() {
   const { 
     user,
     isLoaded, 
+    allUsers, // For admin
+    activeUser, // For admin
+    setActiveUser, // For admin
     userCvs, 
     setUserCvs,
     activeCv, 
@@ -41,6 +45,17 @@ export default function EditorClient() {
   const { toast } = useToast();
   const cvPreviewRef = useRef<HTMLDivElement>(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
+
+  // Determine if the current user is an admin
+  const isAdmin = user?.role === 'admin';
+
+  useEffect(() => {
+    // If an admin is viewing another user and that user is removed,
+    // fall back to the admin's own view.
+    if (isAdmin && activeUser && !allUsers.find(u => u.id === activeUser.id)) {
+      setActiveUser(user);
+    }
+  }, [allUsers, activeUser, isAdmin, setActiveUser, user]);
 
   const handleTemplateChange = (template: CVData['template']) => {
     if (setActiveCv && activeCv) {
@@ -110,6 +125,13 @@ export default function EditorClient() {
         setIsDuplicating(false);
     }
   };
+  
+  const handleUserSelectionChange = (userId: string) => {
+    const selectedUser = allUsers.find(u => u.id === userId);
+    if (selectedUser) {
+      setActiveUser(selectedUser);
+    }
+  };
 
   if (!isLoaded || !activeCv || !setActiveCv) {
     return <EditorPageSkeleton />;
@@ -124,22 +146,51 @@ export default function EditorClient() {
       <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col items-center justify-start">
           <div className="w-full max-w-[210mm] space-y-4 mb-4">
               {user && (
-                <div className="bg-card border rounded-lg p-3">
-                  <Label className="text-xs text-muted-foreground">Manage CVs</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                      <Select value={activeCv.id} onValueChange={handleCvSelectionChange}>
-                          <SelectTrigger className="flex-grow">
-                              <SelectValue placeholder="Select a CV" />
-                          </SelectTrigger>
-                          <SelectContent>
-                              {userCvs.map(cv => (
-                                  <SelectItem key={cv.id} value={cv.id}>{cv.cvName}</SelectItem>
-                              ))}
-                          </SelectContent>
-                      </Select>
-                      <Button variant="outline" size="icon" onClick={handleCreateNewCv}><Plus /></Button>
-                      <Button variant="outline" size="icon" onClick={handleDuplicate} disabled={isDuplicating}><Copy /></Button>
+                <div className="bg-card border rounded-lg p-3 space-y-3">
+                  {isAdmin && (
+                    <div>
+                       <Label className="text-xs text-muted-foreground flex items-center justify-between">
+                          <span>{t('editor.manage_users.title')}</span>
+                          <Badge variant="destructive">{t('editor.admin_view_badge')}</Badge>
+                       </Label>
+                       <div className="flex items-center gap-2 mt-1">
+                           <Select value={activeUser?.id || user.id} onValueChange={handleUserSelectionChange}>
+                               <SelectTrigger className="flex-grow">
+                                   <SelectValue placeholder={t('editor.manage_users.placeholder')} />
+                               </SelectTrigger>
+                               <SelectContent>
+                                   {allUsers.map(u => (
+                                       <SelectItem key={u.id} value={u.id}>
+                                          <div className="flex items-center gap-2">
+                                            <UserCog className="h-4 w-4" />
+                                            {u.email}
+                                          </div>
+                                       </SelectItem>
+                                   ))}
+                               </SelectContent>
+                           </Select>
+                       </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Manage CVs</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                        <Select value={activeCv.id} onValueChange={handleCvSelectionChange} disabled={userCvs.length === 0}>
+                            <SelectTrigger className="flex-grow">
+                                <SelectValue placeholder="Select a CV" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {userCvs.map(cv => (
+                                    <SelectItem key={cv.id} value={cv.id}>{cv.cvName}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Button variant="outline" size="icon" onClick={handleCreateNewCv}><Plus /></Button>
+                        <Button variant="outline" size="icon" onClick={handleDuplicate} disabled={isDuplicating}><Copy /></Button>
+                    </div>
                   </div>
+
                 </div>
               )}
               <div className="flex justify-end items-center gap-4">

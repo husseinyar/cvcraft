@@ -1,4 +1,5 @@
 
+
 export type Experience = {
   id: string;
   role: string;
@@ -60,7 +61,6 @@ export type CVData = {
   education: Education[];
   skills: string[];
   template: TemplateOption;
-  role: 'admin' | 'user';
   sectionOrder: string[];
   languages: Language[];
   certifications: Certification[];
@@ -71,3 +71,12 @@ export type CVData = {
 };
 
 export type TemplateOption = 'onyx' | 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
+
+export type UserRole = 'admin' | 'user';
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  role: UserRole;
+  cvs?: CVData[]; // CVs can be attached for admin views
+};

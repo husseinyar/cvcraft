@@ -116,7 +116,7 @@
         "title": "Arbetslivserfarenhet",
         "role": "Roll",
         "company": "Företag",
-        "dates": "Datum (t.ex. jan 2020 - nu)",
+        "dates": "t.ex. jan 2020 - nu",
         "description": "Beskrivning",
         "get_suggestions": "Få förslag",
         "thinking": "Tänker...",
@@ -126,7 +126,7 @@
         "title": "Utbildning",
         "school": "Skola/Universitet",
         "degree": "Examen/Studieområde",
-        "dates": "Datum (t.ex. 2016 - 2020)",
+        "dates": "t.ex. 2016 - 2020",
         "description": "Beskrivning",
         "add_education": "Lägg till utbildning"
     },
@@ -149,122 +149,5 @@
         "description": "Här är några förslag för att förbättra din CV-sektion."
     },
     "download_pdf": "Ladda ner PDF"
-  },
-  "blog": {
-    "title": "CV Craft Blogg",
-    "subtitle": "Tips, tricks och insikter som hjälper dig att få ditt drömjobb.",
-    "read_more": "Läs mer",
-    "posts": {
-      "one": {
-        "title": "Hur man skriver ett grymt CV som blir uppmärksammat",
-        "excerpt": "Lär dig grunderna i att skapa ett övertygande CV som sticker ut för rekryterare och anställningschefer."
-      },
-      "two": {
-        "title": "5 vanliga CV-misstag och hur man undviker dem",
-        "excerpt": "Låt inte dessa enkla fel kosta dig en intervju. Vi går igenom de vanligaste fallgroparna."
-      },
-      "three": {
-        "title": "Anpassa ditt CV för varje jobbansökan",
-        "excerpt": "Ett CV som passar alla är ett recept för avslag. Upptäck hur du anpassar ditt CV för varje roll."
-      },
-      "four": {
-        "title": "Vikten av nyckelord i ditt CV",
-        "excerpt": "Förstå hur ansökningsspårningssystem (ATS) fungerar och hur du optimerar ditt CV med rätt nyckelord."
-      },
-      "five": {
-        "title": "Kreativa vs. professionella CV-mallar: Vilken är rätt för dig?",
-        "excerpt": "Rätt utseende kan göra stor skillnad. Vi hjälper dig att bestämma vilken mall som bäst passar din bransch och personlighet."
-      },
-      "six": {
-        "title": "Hur du kvantifierar dina prestationer i ditt CV",
-        "excerpt": "Siffror talar högre än ord. Lär dig hur du omvandlar dina ansvarsområden till mätbara prestationer."
-      }
-    }
-  },
-   "contact_page": {
-    "title": "Kontakta oss",
-    "subtitle": "Har du en fråga eller feedback? Vi vill gärna höra från dig. Fyll i formuläret nedan så återkommer vi till dig så snart som möjligt.",
-    "form_title": "Skicka ett meddelande",
-    "form_description": "Låt oss veta hur vi kan hjälpa till.",
-    "name_label": "Namn",
-    "name_placeholder": "Ditt namn",
-    "email_label": "E-post",
-    "email_placeholder": "din.epost@exempel.com",
-    "message_label": "Meddelande",
-    "message_placeholder": "Ditt meddelande...",
-    "submit_button": "Skicka meddelande",
-    "info_title": "Kontaktinformation",
-    "email": "E-post",
-    "phone": "Telefon",
-    "address": "Adress"
-  },
-   "pricing_page": {
-    "title": "Enkel, transparent prissättning",
-    "subtitle": "Välj den plan som passar dig och börja bygga ditt dröm-CV idag.",
-    "free": {
-      "name": "Gratis",
-      "price": "0 kr / månad",
-      "description": "För att komma igång.",
-      "features": {
-        "one": "1 CV",
-        "two": "3 mallar",
-        "three": "PDF-export"
-      },
-      "cta": "Börja gratis"
-    },
-    "pro": {
-      "name": "Pro",
-      "price": "99 kr / månad",
-      "description": "För proffs.",
-      "features": {
-        "one": "Obegränsat antal CV:n",
-        "two": "Alla mallar",
-        "three": "AI-förslag",
-        "four": "Ta bort varumärke"
-      },
-      "cta": "Bli Pro"
-    },
-    "business": {
-      "name": "Företag",
-      "price": "Kontakta oss",
-      "description": "För team och organisationer.",
-      "features": {
-        "one": "Alla Pro-funktioner",
-        "two": "Teamhantering",
-        "three": "Prioriterad support",
-        "four": "Anpassat varumärke"
-      },
-      "cta": "Kontakta säljavdelningen"
-    }
-  },
-    "features_page": {
-    "title": "Allt du behöver för att lyckas",
-    "subtitle": "CV Craft är fullmatat med kraftfulla funktioner som hjälper dig att skapa ett CV som öppnar dörrar.",
-    "list": {
-      "ai": {
-        "title": "AI-drivet innehåll",
-        "description": "Använd AI för att skriva övertygande sammanfattningar och erfarenhetsavsnitt anpassade för specifika jobb."
-      },
-      "templates": {
-        "title": "Professionella mallar",
-        "description": "Välj från ett brett utbud av professionellt designade mallar som garanterat kommer att imponera."
-      },
-      "preview": {
-        "title": "Live-förhandsvisning",
-        "description": "Se direkt hur ditt CV ser ut när du gör ändringar. Inga fler gissningar."
-      },
-      "ats": {
-        "title": "ATS-optimerad",
-        "description": "Våra mallar är utformade för att enkelt kunna tolkas av ansökningsspårningssystem."
-      },
-      "save": {
-        "title": "Spara i realtid",
-        "description": "Dina framsteg sparas automatiskt, så att du kan fortsätta precis där du slutade."
-      },
-      "export": {
-        "title": "Enkel PDF-export",
-        "description": "Ladda ner en pixelperfekt PDF av ditt CV, redo att skickas till arbetsgivare."
-      }
-    }
   }
 }

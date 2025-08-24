@@ -3,7 +3,27 @@
 import { db } from '@/lib/firebase';
 import type { CVData } from '@/types';
 import { collection, doc, getDoc, getDocs, setDoc, addDoc, serverTimestamp, writeBatch, query, orderBy } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
+
+// IMPORTANT: Replace this with the actual Firebase UID of your admin user.
+// You can find a user's UID in the Firebase Authentication console.
+const ADMIN_UID = 'REPLACE_WITH_YOUR_ADMIN_FIREBASE_UID';
+
+/**
+ * Checks if a user is an admin.
+ * @param userId The ID of the user to check.
+ * @returns A promise that resolves to 'admin' or 'user'.
+ */
+export async function getUserRole(userId: string): Promise<'admin' | 'user'> {
+    if (userId === ADMIN_UID) {
+        return 'admin';
+    }
+    // In a real application, you would look up the user's role from a document
+    // in a 'users' collection, for example:
+    // const userDoc = await getDoc(doc(db, 'users', userId));
+    // if (userDoc.exists() && userDoc.data().role === 'admin') return 'admin';
+    return 'user';
+}
+
 
 /**
  * Fetches all CV documents for a specific user, ordered by last updated.
@@ -41,6 +61,7 @@ export async function saveCv(cvData: CVData): Promise<void> {
             ...cvData,
             updatedAt: Date.now(),
         };
+        // Use setDoc with merge:true to create or update the document
         await setDoc(cvDocRef, dataToSave, { merge: true });
     } catch (error) {
         console.error("Error saving CV data:", error);
