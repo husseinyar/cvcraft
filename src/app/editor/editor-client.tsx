@@ -1,21 +1,26 @@
 
 "use client";
 
-import { useRef, useState, useEffect } from 'react';
-import type { CVData, TemplateOption } from '@/types';
+import { useRef, useState, useEffect, useMemo } from 'react';
+import type { CVData, TemplateOption, JobApplication } from '@/types';
 import CvEditor from '@/components/cv-editor';
 import TemplatePreview from '@/components/template-preview';
 import { useTranslation } from '@/context/language-context';
 import { Button } from '@/components/ui/button';
-import { Plus, Copy, UserCog } from "lucide-react";
+import { Plus, Copy, UserCog, Briefcase } from "lucide-react";
 import { useCV } from '@/context/cv-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { duplicateCv } from '@/services/cv-service';
+import { getJobsForUser } from '@/services/job-application-service';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import EditorToolbar from '@/components/editor-toolbar';
 import CvStyleProvider from '@/components/cv-style-provider';
+import KeywordMatcher from '@/components/keyword-matcher';
+import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+
 
 export default function EditorClient() {
   const { 
@@ -34,7 +39,14 @@ export default function EditorClient() {
   const { toast } = useToast();
   const cvPreviewRef = useRef<HTMLDivElement>(null);
   const [isDuplicating, setIsDuplicating] = useState(false);
+  const [userJobs, setUserJobs] = useState<JobApplication[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
+  const selectedJob = useMemo(() => {
+      if (!selectedJobId) return null;
+      return userJobs.find(job => job.id === selectedJobId) || null;
+  }, [selectedJobId, userJobs]);
+  
   // Determine if the current user is an admin
   const isAdmin = user?.role === 'admin';
 
@@ -45,6 +57,16 @@ export default function EditorClient() {
       setActiveUser(user);
     }
   }, [allUsers, activeUser, isAdmin, setActiveUser, user]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+        if (activeUser) {
+            const jobs = await getJobsForUser(activeUser.id);
+            setUserJobs(jobs);
+        }
+    };
+    fetchJobs();
+  }, [activeUser]);
 
   const handleCvSelectionChange = (cvId: string) => {
     const selectedCv = userCvs.find(cv => cv.id === cvId);
@@ -75,6 +97,7 @@ export default function EditorClient() {
     const selectedUser = allUsers.find(u => u.id === userId);
     if (selectedUser) {
       setActiveUser(selectedUser);
+      setSelectedJobId(null); // Reset job selection when user changes
     }
   };
 
@@ -85,7 +108,7 @@ export default function EditorClient() {
   return (
     <div className="grid md:grid-cols-[400px_1fr] h-screen bg-muted/40">
       <aside className="bg-background border-r p-4 lg:p-6 overflow-y-auto">
-         <CvEditor cvData={activeCv} setCvData={setActiveCv} />
+         <CvEditor cvData={activeCv} setCvData={setActiveCv} jobDescription={selectedJob?.description || ""} />
       </aside>
       
       <main className="flex-1 p-4 lg:p-8 overflow-y-auto flex flex-col items-center justify-start">
@@ -135,10 +158,28 @@ export default function EditorClient() {
                         <Button variant="outline" size="icon" onClick={handleDuplicate} disabled={isDuplicating}><Copy /></Button>
                     </div>
                   </div>
+                  
+                   <div>
+                    <Label className="text-xs text-muted-foreground">Target Job (for Keyword Analysis)</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                        <Select value={selectedJobId || ''} onValueChange={setSelectedJobId}>
+                            <SelectTrigger className="flex-grow">
+                                <SelectValue placeholder="Select a target job..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {userJobs.length > 0 ? userJobs.map(job => (
+                                    <SelectItem key={job.id} value={job.id}>{job.jobTitle} at {job.company}</SelectItem>
+                                )) : <div className="p-4 text-sm text-muted-foreground text-center">No jobs saved.</div>}
+                            </SelectContent>
+                        </Select>
+                        <Button variant="outline" size="icon" asChild><Link href="/applications"><Briefcase /></Link></Button>
+                    </div>
+                  </div>
 
                 </div>
               )}
              <EditorToolbar cvData={activeCv} setCvData={setActiveCv} cvPreviewRef={cvPreviewRef} />
+             {selectedJob && <KeywordMatcher job={selectedJob} cv={activeCv} />}
           </div>
           <div className="flex-grow flex items-start justify-center pt-8">
              <div className="transform scale-[0.9] origin-top">

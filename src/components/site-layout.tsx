@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 interface NavLink {
     href: string;
     labelKey: 'nav.create_cv' | 'nav.templates' | 'nav.blog' | 'nav.pricing' | 'nav.contact' | 'footer.features';
-    id: 'editor' | 'cover-letter' | 'templates' | 'blog' | 'pricing' | 'contact' | 'features';
+    id: 'editor' | 'cover-letter' | 'applications' | 'templates' | 'blog' | 'pricing' | 'contact' | 'features';
     label: string;
 }
 
@@ -27,6 +27,7 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
 
   const navLinks: NavLink[] = [
     { href: "/editor", labelKey: "nav.create_cv", id: "editor", label: "Create CV" },
+    { href: "/applications", label: "Applications", id: "applications", labelKey: "nav.create_cv" }, // Placeholder labelkey
     { href: "/cover-letter", label: "Cover Letter", id: "cover-letter", labelKey: "nav.create_cv" }, // Placeholder labelkey
     { href: "/templates", labelKey: "nav.templates", id: "templates", label: "Templates" },
     { href: "/blog", labelKey: "nav.blog", id: "blog", label: "Blog" },
@@ -37,6 +38,7 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
   // Quick fix for cover letter labelKey
   const getLabel = (link: NavLink) => {
     if (link.id === 'cover-letter') return "Cover Letter";
+    if (link.id === 'applications') return "Applications";
     return t(link.labelKey);
   }
 

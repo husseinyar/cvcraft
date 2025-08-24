@@ -75,6 +75,18 @@ export type CVData = {
   updatedAt: number; // Timestamp
 };
 
+export type JobApplication = {
+    id: string;
+    userId: string;
+    jobTitle: string;
+    company: string;
+    description: string;
+    status: 'saved' | 'applied' | 'interviewing' | 'rejected' | 'offer';
+    keywords: string[];
+    createdAt: number;
+    updatedAt: number;
+};
+
 export type TemplateOption = 'onyx' | 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
 
 export type UserRole = 'admin' | 'user';

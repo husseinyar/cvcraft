@@ -32,8 +32,6 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
 import { generateExperience } from "@/ai/flows/generate-experience";
-import { scoreCv, type ScoreCvOutput } from "@/ai/flows/score-cv";
-import { analyzeSkillGap, type AnalyzeSkillGapOutput } from "@/ai/flows/analyze-skill-gap";
 import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap, Search, GripVertical, Sparkles } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
@@ -46,6 +44,7 @@ import { CSS } from '@dnd-kit/utilities';
 interface CvEditorProps {
   cvData: CVData;
   setCvData: React.Dispatch<React.SetStateAction<CVData | null>>;
+  jobDescription: string;
 }
 
 const SECTION_COMPONENTS: Record<string, React.FC<any>> = {
@@ -91,18 +90,13 @@ function SortableAccordionItem({ id, children, trigger, ...props }: { id: string
 }
 
 
-export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData }: CvEditorProps) {
+export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCvData, jobDescription }: CvEditorProps) {
   const { toast } = useToast();
   const [cvData, setCvData] = useState(initialCvData);
-  const [jobDescription, setJobDescription] = useState("");
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isSuggestionModalOpen, setIsSuggestionModalOpen] = useState(false);
   const [currentSuggestionField, setCurrentSuggestionField] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<SuggestImprovementsOutput['suggestions']>([]);
-  const [isScoring, setIsScoring] = useState(false);
-  const [scoreResult, setScoreResult] = useState<ScoreCvOutput | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [skillGapResult, setSkillGapResult] = useState<AnalyzeSkillGapOutput | null>(null);
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
@@ -208,36 +202,6 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
     });
   };
 
-  const handleScoreCv = async () => {
-    if (!jobDescription.trim()) {
-      toast({ title: t('editor.toast.job_description_missing.title'), description: t('editor.toast.job_description_missing.description'), variant: "destructive" });
-      return;
-    }
-    setIsScoring(true); setScoreResult(null);
-    try {
-      setScoreResult(await scoreCv({ jobDescription, cvData }));
-    } catch (error) {
-      toast({ title: t('editor.toast.ai_error.title'), description: "The AI failed to score your CV.", variant: "destructive" });
-    } finally {
-      setIsScoring(false);
-    }
-  };
-  
-  const handleAnalyzeSkillGap = async () => {
-    if (!jobDescription.trim()) {
-      toast({ title: t('editor.toast.job_description_missing.title'), description: t('editor.toast.job_description_missing.description'), variant: "destructive" });
-      return;
-    }
-    setIsAnalyzing(true); setSkillGapResult(null);
-    try {
-      setSkillGapResult(await analyzeSkillGap({ jobDescription, cvData }));
-    } catch (error) {
-      toast({ title: t('editor.toast.ai_error.title'), description: "The AI failed to analyze skill gap.", variant: "destructive" });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -305,29 +269,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   return (
     <div className="space-y-6">
         <h2 className="text-2xl font-bold text-primary">{cvData.cvName || "CV Editor"}</h2>
-        <Accordion type="multiple" className="w-full" defaultValue={['ai-assist', 'personal-details']}>
-          <AccordionItem value="ai-assist">
-            <AccordionTrigger className="text-lg font-semibold">{t('editor.ai_assistant.title')}</AccordionTrigger>
-            <AccordionContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">{t('editor.ai_assistant.description')}</p>
-              <Textarea placeholder={t('editor.ai_assistant.placeholder')} value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} rows={4} />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Button onClick={handleScoreCv} disabled={isScoring || !jobDescription.trim()}><Zap className="mr-2" /> {isScoring ? "Scoring..." : "Score My CV"}</Button>
-                <Button onClick={handleAnalyzeSkillGap} disabled={isAnalyzing || !jobDescription.trim()} variant="outline"><Search className="mr-2" /> {isAnalyzing ? "Analyzing..." : "Analyze Skill Gap"}</Button>
-              </div>
-              
-              {isScoring && <p className="text-center text-sm text-muted-foreground">AI is analyzing your CV...</p>}
-              {scoreResult && (
-                <Card className="bg-muted/50"><CardHeader><CardTitle className="text-lg flex items-center gap-2"><Bot /> AI Score & Feedback</CardTitle></CardHeader><CardContent className="space-y-4"><div><div className="flex justify-between items-baseline mb-1"><h4 className="font-semibold">Overall Score</h4><span className="font-bold text-primary text-lg">{scoreResult.overallScore}/100</span></div><Progress value={scoreResult.overallScore} /><p className="text-xs text-muted-foreground mt-2">{scoreResult.summary}</p></div><div className="space-y-3">{scoreResult.scores.map(metric => (<div key={metric.metric}><div className="flex justify-between items-baseline mb-1"><h5 className="font-semibold text-sm">{metric.metric}</h5><span className="font-semibold text-sm text-muted-foreground">{metric.score}/100</span></div><Progress value={metric.score} /><p className="text-xs text-muted-foreground mt-1">{metric.feedback}</p></div>))}</div></CardContent></Card>
-              )}
-              
-              {isAnalyzing && <p className="text-center text-sm text-muted-foreground">AI is checking for missing skills...</p>}
-              {skillGapResult && (
-                <Card className="bg-muted/50"><CardHeader><CardTitle className="text-lg flex items-center gap-2"><Bot /> Skill Gap Analysis</CardTitle></CardHeader><CardContent className="space-y-3"><p className="text-sm text-muted-foreground">{skillGapResult.summary}</p><div className="flex flex-wrap gap-2">{skillGapResult.missingSkills.map(skill => (<Badge key={skill} variant="destructive">{skill}</Badge>))}</div></CardContent></Card>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-          
+        <Accordion type="multiple" className="w-full" defaultValue={['personal-details']}>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={cvData.sectionOrder} strategy={verticalListSortingStrategy}>
               {cvData.sectionOrder.map((sectionId) => {
