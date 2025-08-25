@@ -25,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={` ${inter.variable} ` } suppressHydrationWarning>
-      <body className="font-body antialiased" suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
