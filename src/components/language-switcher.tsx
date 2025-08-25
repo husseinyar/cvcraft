@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEffect, useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 export default function LanguageSwitcher() {
   const { language, setLanguage } = useTranslation();
@@ -21,7 +22,7 @@ export default function LanguageSwitcher() {
   }, []);
 
   if (!isMounted) {
-    return null; // Don't render on the server or during the initial client render
+    return <Skeleton className="h-10 w-10" />;
   }
 
 
