@@ -64,6 +64,7 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
           <ThemeToggle />
         </nav>
         <div className="md:hidden flex items-center gap-2">
+          <AuthButton />
           <LanguageSwitcher />
           <ThemeToggle />
           <Sheet>
@@ -86,7 +87,6 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
                         {getLabel(link)}
                      </Link>
                   ))}
-                <AuthButton />
               </nav>
             </SheetContent>
           </Sheet>
