@@ -1,4 +1,6 @@
 // src/lib/firebase-admin-config.ts
+import { config } from 'dotenv';
+config(); // Load environment variables from .env file
 
 // This file securely loads the Firebase Admin SDK credentials.
 // It uses environment variables to avoid hardcoding sensitive keys in the source code.
