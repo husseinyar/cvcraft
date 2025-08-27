@@ -1,6 +1,6 @@
 
 "use client"
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/context/language-context';
@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from '@/components/auth-button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
+import { Skeleton } from './ui/skeleton';
 
 interface NavLink {
     href: string;
@@ -23,8 +24,44 @@ interface SiteLayoutProps {
   activeLink?: NavLink['id'];
 }
 
+// This new component will ensure its children only render on the client side.
+const ClientOnlyHeaderActions = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    // Render placeholders or skeletons on the server and initial client render
+    return (
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-10 w-10" />
+        <Skeleton className="h-10 w-10" />
+      </div>
+    );
+  }
+
+  // Render the actual components only on the client
+  return (
+    <>
+      <AuthButton />
+      <LanguageSwitcher />
+      <ThemeToggle />
+    </>
+  );
+};
+
+
 export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
   const { t } = useTranslation();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
 
   const navLinks: NavLink[] = [
     { href: "/editor", labelKey: "nav.create_cv", id: "editor", label: "Create CV" },
@@ -47,6 +84,7 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm z-50">
         <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
+        
         <nav className="hidden md:flex gap-6 items-center">
           {navLinks.map(link => (
              <Link 
@@ -59,37 +97,48 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
                 {getLabel(link)}
              </Link>
           ))}
-          <AuthButton />
-          <LanguageSwitcher />
-          <ThemeToggle />
+          <ClientOnlyHeaderActions />
         </nav>
+        
         <div className="md:hidden flex items-center gap-2">
-          <AuthButton />
-          <LanguageSwitcher />
-          <ThemeToggle />
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Menu />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="flex flex-col gap-6 pt-12">
-                 {navLinks.map(link => (
-                     <Link 
-                        key={link.id} 
-                        href={link.href} 
-                        className={cn(
-                            "text-lg font-medium hover:text-primary",
-                            activeLink === link.id ? "text-primary" : "text-muted-foreground"
-                        )}>
-                        {getLabel(link)}
-                     </Link>
-                  ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+           {isMounted ? (
+            <>
+              <AuthButton />
+              <LanguageSwitcher />
+              <ThemeToggle />
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Menu />
+                    <span className="sr-only">Open menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                  <nav className="flex flex-col gap-6 pt-12">
+                     {navLinks.map(link => (
+                         <Link 
+                            key={link.id} 
+                            href={link.href} 
+                            className={cn(
+                                "text-lg font-medium hover:text-primary",
+                                activeLink === link.id ? "text-primary" : "text-muted-foreground"
+                            )}>
+                            {getLabel(link)}
+                         </Link>
+                      ))}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </>
+           ) : (
+            // Skeleton for mobile header actions
+             <div className="flex items-center gap-2">
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+             </div>
+           )}
         </div>
       </header>
 
