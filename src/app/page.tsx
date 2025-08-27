@@ -10,9 +10,16 @@ import { TestimonialCard } from '@/components/TestimonialCard';
 import { FAQ } from '@/components/FAQ';
 import CVStartCards from '@/components/CVStartCards';
 import SiteLayout from '@/components/site-layout';
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LandingPage() {
   const { t } = useTranslation();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const features = [
       {
@@ -103,98 +110,108 @@ export default function LandingPage() {
 
   return (
     <SiteLayout>
-        {/* Hero Section */}
-        <section className="py-20 md:py-32">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              Skapa ett <span className="text-primary">ATS-optimerat CV</span> som får dig anställd
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10">
-              Bygg professionella CV:n som passerar automatiska filter och imponerar på rekryterare. Svenskdesignade mallar med experttips för den svenska arbetsmarknaden.
-            </p>
-            <div className="flex justify-center gap-4 mb-12">
-              <Link href="/editor">
-                <Button size="lg">{t('hero.cta')}</Button>
-              </Link>
-               <Link href="/templates">
-                <Button size="lg" variant="outline">Se exempel-CV</Button>
-              </Link>
+      {!isMounted ? (
+        <div className="container mx-auto px-4 py-12">
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-64 w-full mt-8" />
+          <Skeleton className="h-64 w-full mt-8" />
+        </div>
+      ) : (
+        <>
+          {/* Hero Section */}
+          <section className="py-20 md:py-32">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+                Skapa ett <span className="text-primary">ATS-optimerat CV</span> som får dig anställd
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10">
+                Bygg professionella CV:n som passerar automatiska filter och imponerar på rekryterare. Svenskdesignade mallar med experttips för den svenska arbetsmarknaden.
+              </p>
+              <div className="flex justify-center gap-4 mb-12">
+                <Link href="/editor">
+                  <Button size="lg">{t('hero.cta')}</Button>
+                </Link>
+                 <Link href="/templates">
+                  <Button size="lg" variant="outline">Se exempel-CV</Button>
+                </Link>
+              </div>
+              <div className="max-w-4xl mx-auto p-8 bg-card/50 rounded-2xl shadow-lg">
+                  <Image 
+                      src="https://placehold.co/1200x600.png"
+                      width={1200}
+                      height={600}
+                      alt="CV template example"
+                      data-ai-hint="resume document"
+                      className="rounded-xl"
+                  />
+              </div>
             </div>
-            <div className="max-w-4xl mx-auto p-8 bg-card/50 rounded-2xl shadow-lg">
-                <Image 
-                    src="https://placehold.co/1200x600.png"
-                    width={1200}
-                    height={600}
-                    alt="CV template example"
-                    data-ai-hint="resume document"
-                    className="rounded-xl"
-                />
-            </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Start Cards Section */}
-        <CVStartCards />
-       
-        {/* Why Choose Us Section */}
-        <section className="py-24 bg-muted/50">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Varför välja CV Craft?</h2>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Vi kombinerar svensk design med kraftfull AI för att ge dig de bästa förutsättningarna.
-                    </p>
-                </div>
-                <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
-                    {features.map(feature => (
-                        <div key={feature.title} className="flex flex-col items-center text-center">
-                            <div className="p-4 bg-primary/10 rounded-full mb-4">
-                                <feature.icon className="w-10 h-10 text-primary" />
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                            <p className="text-muted-foreground">{feature.description}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </section>
+          {/* Start Cards Section */}
+          <CVStartCards />
+         
+          {/* Why Choose Us Section */}
+          <section className="py-24 bg-muted/50">
+              <div className="container mx-auto px-4">
+                  <div className="text-center mb-16">
+                      <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Varför välja CV Craft?</h2>
+                      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                          Vi kombinerar svensk design med kraftfull AI för att ge dig de bästa förutsättningarna.
+                      </p>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+                      {features.map(feature => (
+                          <div key={feature.title} className="flex flex-col items-center text-center">
+                              <div className="p-4 bg-primary/10 rounded-full mb-4">
+                                  <feature.icon className="w-10 h-10 text-primary" />
+                              </div>
+                              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                              <p className="text-muted-foreground">{feature.description}</p>
+                          </div>
+                      ))}
+                  </div>
+              </div>
+          </section>
 
-        {/* Pricing Section */}
-        <section className="py-24">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Välj din plan</h2>
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Börja gratis eller uppgradera för att få tillgång till alla våra kraftfulla verktyg.
-                    </p>
-                </div>
-                <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
-                    {pricingTiers.map(tier => (
-                        <PricingCard key={tier.name} tier={tier} />
-                    ))}
-                </div>
-            </div>
-        </section>
+          {/* Pricing Section */}
+          <section className="py-24">
+              <div className="container mx-auto px-4">
+                  <div className="text-center mb-16">
+                      <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Välj din plan</h2>
+                      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                          Börja gratis eller uppgradera för att få tillgång till alla våra kraftfulla verktyg.
+                      </p>
+                  </div>
+                  <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+                      {pricingTiers.map(tier => (
+                          <PricingCard key={tier.name} tier={tier} />
+                      ))}
+                  </div>
+              </div>
+          </section>
 
-        {/* Testimonials Section */}
-        <section className="py-24 bg-muted/50">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{t('testimonials.title')}</h2>
-                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        {t('testimonials.subtitle')}
-                    </p>
-                </div>
-                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                    {testimonials.map(testimonial => (
-                        <TestimonialCard key={testimonial.name} {...testimonial} />
-                    ))}
-                </div>
-            </div>
-        </section>
-        
-        {/* FAQ Section */}
-        <FAQ />
+          {/* Testimonials Section */}
+          <section className="py-24 bg-muted/50">
+              <div className="container mx-auto px-4">
+                  <div className="text-center mb-16">
+                      <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{t('testimonials.title')}</h2>
+                       <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                          {t('testimonials.subtitle')}
+                      </p>
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                      {testimonials.map(testimonial => (
+                          <TestimonialCard key={testimonial.name} {...testimonial} />
+                      ))}
+                  </div>
+              </div>
+          </section>
+          
+          {/* FAQ Section */}
+          <FAQ />
+        </>
+      )}
     </SiteLayout>
   );
 }

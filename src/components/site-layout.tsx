@@ -44,16 +44,15 @@ const navLinks: NavLink[] = [
 ];
 
 
-// This new component will ensure its children only render on the client side.
-const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] }) => {
-  const [isMounted, setIsMounted] = useState(false);
+export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
   const { t } = useTranslation();
   const { user } = useCV();
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  
+ 
   const getRoleBadgeVariant = (role: string | undefined) => {
     switch (role) {
       case 'premium': return 'default';
@@ -63,28 +62,11 @@ const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] })
     }
   }
 
-  if (!isMounted) {
-    // Render placeholders or skeletons on the server and initial client render
-    return (
-        <>
-            {/* Desktop Skeleton */}
-            <div className="hidden md:flex items-center gap-2">
-                <Skeleton className="h-10 w-24" />
-                <Skeleton className="h-10 w-10" />
-                <Skeleton className="h-10 w-10" />
-            </div>
-             {/* Mobile Skeleton */}
-            <div className="md:hidden flex items-center gap-2">
-                <Skeleton className="h-10 w-24" />
-                <Skeleton className="h-10 w-10" />
-            </div>
-        </>
-    );
-  }
-
-  // Render the actual components only on the client
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-background">
+      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm z-50">
+        <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
+
         {/* Desktop Controls */}
         <div className="hidden md:flex gap-6 items-center">
              {navLinks.map(link => (
@@ -98,7 +80,7 @@ const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] })
                 {getLabel(link, t)}
              </Link>
           ))}
-            {user && <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>}
+            {isMounted && user && <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>}
             <AuthButton />
             <LanguageSwitcher />
             <ThemeToggle />
@@ -116,7 +98,7 @@ const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] })
                 </SheetTrigger>
                 <SheetContent side="right">
                     <nav className="flex flex-col gap-6 pt-12">
-                        {user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
+                        {isMounted && user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
                         {navLinks.map(link => (
                             <Link 
                                 key={link.id} 
@@ -136,19 +118,6 @@ const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] })
                 </SheetContent>
             </Sheet>
         </div>
-    </>
-  );
-};
-
-
-export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
-  const { t } = useTranslation();
- 
-  return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm z-50">
-        <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
-        <ClientOnlyHeaderActions activeLink={activeLink} />
       </header>
 
       <main className="flex-grow">
