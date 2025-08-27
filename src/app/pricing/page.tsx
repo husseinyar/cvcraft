@@ -8,12 +8,19 @@ import SiteLayout from '@/components/site-layout';
 import { useCV } from '@/context/cv-context';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function PricingPage() {
   const { t } = useTranslation();
   const { user, setUser } = useCV();
   const { toast } = useToast();
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleChoosePlan = (plan: 'premium' | 'pro') => {
     if (!user) {
@@ -87,32 +94,49 @@ export default function PricingPage() {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('pricing_page.subtitle')}</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pricingTiers.map((tier) => (
-              <Card key={tier.name} className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>{t(tier.name as any)}</CardTitle>
-                  <CardDescription>{t(tier.description as any)}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow space-y-6">
-                  <p className="text-4xl font-bold">{t(tier.price as any)}</p>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    {tier.features.map(feature => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        {t(feature as any)}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button className="w-full" onClick={tier.action} variant={tier.variant}>
-                    {t(tier.cta as any)}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+          {!isMounted ? (
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {Array.from({ length: 3 }).map((_, index) => (
+                    <Card key={index}>
+                        <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
+                        <CardContent className="space-y-4">
+                            <Skeleton className="h-10 w-1/3" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/4" />
+                        </CardContent>
+                        <CardFooter><Skeleton className="h-10 w-full" /></CardFooter>
+                    </Card>
+                ))}
+             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {pricingTiers.map((tier) => (
+                <Card key={tier.name} className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle>{t(tier.name as any)}</CardTitle>
+                    <CardDescription>{t(tier.description as any)}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow space-y-6">
+                    <p className="text-4xl font-bold">{t(tier.price as any)}</p>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {tier.features.map(feature => (
+                        <li key={feature} className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-green-500" />
+                          {t(feature as any)}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="w-full" onClick={tier.action} variant={tier.variant}>
+                      {t(tier.cta as any)}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </SiteLayout>

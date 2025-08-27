@@ -7,9 +7,16 @@ import { useTranslation } from '@/context/language-context';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import SiteLayout from '@/components/site-layout';
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function BlogPage() {
   const { t } = useTranslation();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const blogPosts = [
     {
@@ -64,33 +71,49 @@ export default function BlogPage() {
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('blog.title')}</h2>
                   <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('blog.subtitle')}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {blogPosts.map(post => (
-                      <Card key={post.slug} className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                         <Link href={`/blog/${post.slug}`}>
-                              <Image 
-                                  src={post.image}
-                                  alt={t(post.title as any)}
-                                  width={600}
-                                  height={400}
-                                  className="w-full object-cover"
-                                  data-ai-hint={post.hint}
-                              />
-                          </Link>
-                          <CardContent className="p-6">
-                              <h3 className="text-xl font-semibold mb-2 h-14">
-                                 <Link href={`/blog/${post.slug}`}>{t(post.title as any)}</Link>
-                              </h3>
-                              <p className="text-muted-foreground text-sm mb-4 h-20">{t(post.excerpt as any)}</p>
-                              <Link href={`/blog/${post.slug}`}>
-                                  <Button variant="link" className="p-0">
-                                      {t('blog.read_more')} <ArrowRight className="ml-2" />
-                                  </Button>
-                              </Link>
-                          </CardContent>
+              {!isMounted ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {Array.from({ length: 6 }).map((_, index) => (
+                      <Card key={index} className="overflow-hidden">
+                        <Skeleton className="h-48 w-full" />
+                        <CardContent className="p-6">
+                            <Skeleton className="h-6 w-3/4 mb-2" />
+                            <Skeleton className="h-4 w-full mb-4" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-8 w-1/3 mt-4" />
+                        </CardContent>
                       </Card>
-                  ))}
-              </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {blogPosts.map(post => (
+                        <Card key={post.slug} className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                           <Link href={`/blog/${post.slug}`}>
+                                <Image 
+                                    src={post.image}
+                                    alt={t(post.title as any)}
+                                    width={600}
+                                    height={400}
+                                    className="w-full object-cover"
+                                    data-ai-hint={post.hint}
+                                />
+                            </Link>
+                            <CardContent className="p-6">
+                                <h3 className="text-xl font-semibold mb-2 h-14">
+                                   <Link href={`/blog/${post.slug}`}>{t(post.title as any)}</Link>
+                                </h3>
+                                <p className="text-muted-foreground text-sm mb-4 h-20">{t(post.excerpt as any)}</p>
+                                <Link href={`/blog/${post.slug}`}>
+                                    <Button variant="link" className="p-0">
+                                        {t('blog.read_more')} <ArrowRight className="ml-2" />
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+              )}
           </div>
       </section>
     </SiteLayout>

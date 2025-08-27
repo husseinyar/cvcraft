@@ -66,61 +66,70 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm z-50">
         <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
+        
+        {isMounted ? (
+            <>
+                {/* Desktop Controls */}
+                <div className="hidden md:flex gap-6 items-center">
+                     {navLinks.map(link => (
+                     <Link 
+                        key={link.id} 
+                        href={link.href} 
+                        className={cn(
+                            "text-sm font-medium hover:text-primary",
+                            activeLink === link.id ? "text-primary" : "text-muted-foreground"
+                        )}>
+                        {getLabel(link, t)}
+                     </Link>
+                  ))}
+                    {user && <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>}
+                    <AuthButton />
+                    <LanguageSwitcher />
+                    <ThemeToggle />
+                </div>
 
-        {/* Desktop Controls */}
-        <div className="hidden md:flex gap-6 items-center">
-             {navLinks.map(link => (
-             <Link 
-                key={link.id} 
-                href={link.href} 
-                className={cn(
-                    "text-sm font-medium hover:text-primary",
-                    activeLink === link.id ? "text-primary" : "text-muted-foreground"
-                )}>
-                {getLabel(link, t)}
-             </Link>
-          ))}
-            {isMounted && user && <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>}
-            <AuthButton />
-            <LanguageSwitcher />
-            <ThemeToggle />
-        </div>
-
-        {/* Mobile Controls */}
-        <div className="md:hidden flex items-center gap-2">
-            <AuthButton />
-            <Sheet>
-                <SheetTrigger asChild>
-                    <Button variant="outline" size="icon">
-                        <Menu />
-                        <span className="sr-only">Open menu</span>
-                    </Button>
-                </SheetTrigger>
-                <SheetContent side="right">
-                    <SheetHeader>
-                        <SheetTitle>Navigation</SheetTitle>
-                    </SheetHeader>
-                    <nav className="flex flex-col gap-6 pt-12">
-                        {isMounted && user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
-                        {navLinks.map(link => (
-                            <Link 
-                                key={link.id} 
-                                href={link.href} 
-                                className={cn(
-                                    "text-lg font-medium hover:text-primary",
-                                    activeLink === link.id ? "text-primary" : "text-muted-foreground"
-                                )}>
-                                {getLabel(link, t)}
-                            </Link>
-                        ))}
-                    </nav>
-                    <div className="flex gap-4 pt-8">
-                      <LanguageSwitcher />
-                      <ThemeToggle />
-                    </div>
-                </SheetContent>
-            </Sheet>
-        </div>
+                {/* Mobile Controls */}
+                <div className="md:hidden flex items-center gap-2">
+                    <AuthButton />
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <Menu />
+                                <span className="sr-only">Open menu</span>
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right">
+                            <SheetHeader>
+                                <SheetTitle>Navigation</SheetTitle>
+                            </SheetHeader>
+                            <nav className="flex flex-col gap-6 pt-12">
+                                {user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
+                                {navLinks.map(link => (
+                                    <Link 
+                                        key={link.id} 
+                                        href={link.href} 
+                                        className={cn(
+                                            "text-lg font-medium hover:text-primary",
+                                            activeLink === link.id ? "text-primary" : "text-muted-foreground"
+                                        )}>
+                                        {getLabel(link, t)}
+                                    </Link>
+                                ))}
+                            </nav>
+                            <div className="flex gap-4 pt-8">
+                              <LanguageSwitcher />
+                              <ThemeToggle />
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            </>
+        ) : (
+            <div className="flex items-center gap-2">
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-10" />
+            </div>
+        )}
       </header>
 
       <main className="flex-grow">
