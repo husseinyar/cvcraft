@@ -24,9 +24,28 @@ interface SiteLayoutProps {
   activeLink?: NavLink['id'];
 }
 
+// Quick fix for cover letter labelKey
+const getLabel = (link: NavLink, t: (key: any) => string) => {
+    if (link.id === 'cover-letter') return "Cover Letter";
+    if (link.id === 'applications') return "Applications";
+    return t(link.labelKey);
+}
+
+const navLinks: NavLink[] = [
+    { href: "/editor", labelKey: "nav.create_cv", id: "editor", label: "Create CV" },
+    { href: "/applications", label: "Applications", id: "applications", labelKey: "nav.create_cv" }, // Placeholder labelkey
+    { href: "/cover-letter", label: "Cover Letter", id: "cover-letter", labelKey: "nav.create_cv" }, // Placeholder labelkey
+    { href: "/templates", labelKey: "nav.templates", id: "templates", label: "Templates" },
+    { href: "/blog", labelKey: "nav.blog", id: "blog", label: "Blog" },
+    { href: "/pricing", labelKey: "nav.pricing", id: "pricing", label: "Pricing" },
+    { href: "/contact", labelKey: "nav.contact", id: "contact", label: "Contact" },
+];
+
+
 // This new component will ensure its children only render on the client side.
-const ClientOnlyHeaderActions = () => {
+const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setIsMounted(true);
@@ -35,58 +54,28 @@ const ClientOnlyHeaderActions = () => {
   if (!isMounted) {
     // Render placeholders or skeletons on the server and initial client render
     return (
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-10 w-24" />
-        <Skeleton className="h-10 w-10" />
-        <Skeleton className="h-10 w-10" />
-      </div>
+        <>
+            {/* Desktop Skeleton */}
+            <div className="hidden md:flex items-center gap-2">
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-10" />
+                <Skeleton className="h-10 w-10" />
+            </div>
+             {/* Mobile Skeleton */}
+            <div className="md:hidden flex items-center gap-2">
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-10" />
+            </div>
+        </>
     );
   }
 
   // Render the actual components only on the client
   return (
     <>
-      <AuthButton />
-      <LanguageSwitcher />
-      <ThemeToggle />
-    </>
-  );
-};
-
-
-export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
-  const { t } = useTranslation();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-
-  const navLinks: NavLink[] = [
-    { href: "/editor", labelKey: "nav.create_cv", id: "editor", label: "Create CV" },
-    { href: "/applications", label: "Applications", id: "applications", labelKey: "nav.create_cv" }, // Placeholder labelkey
-    { href: "/cover-letter", label: "Cover Letter", id: "cover-letter", labelKey: "nav.create_cv" }, // Placeholder labelkey
-    { href: "/templates", labelKey: "nav.templates", id: "templates", label: "Templates" },
-    { href: "/blog", labelKey: "nav.blog", id: "blog", label: "Blog" },
-    { href: "/pricing", labelKey: "nav.pricing", id: "pricing", label: "Pricing" },
-    { href: "/contact", labelKey: "nav.contact", id: "contact", label: "Contact" },
-  ];
-  
-  // Quick fix for cover letter labelKey
-  const getLabel = (link: NavLink) => {
-    if (link.id === 'cover-letter') return "Cover Letter";
-    if (link.id === 'applications') return "Applications";
-    return t(link.labelKey);
-  }
-
-  return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm z-50">
-        <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
-        
-        <nav className="hidden md:flex gap-6 items-center">
-          {navLinks.map(link => (
+        {/* Desktop Controls */}
+        <div className="hidden md:flex gap-6 items-center">
+             {navLinks.map(link => (
              <Link 
                 key={link.id} 
                 href={link.href} 
@@ -94,52 +83,58 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
                     "text-sm font-medium hover:text-primary",
                     activeLink === link.id ? "text-primary" : "text-muted-foreground"
                 )}>
-                {getLabel(link)}
+                {getLabel(link, t)}
              </Link>
           ))}
-          <ClientOnlyHeaderActions />
-        </nav>
-        
+            <AuthButton />
+            <LanguageSwitcher />
+            <ThemeToggle />
+        </div>
+
+        {/* Mobile Controls */}
         <div className="md:hidden flex items-center gap-2">
-           {isMounted ? (
-            <>
-              <AuthButton />
-              <LanguageSwitcher />
-              <ThemeToggle />
-              <Sheet>
+            <AuthButton />
+            <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <Menu />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
+                    <Button variant="outline" size="icon">
+                        <Menu />
+                        <span className="sr-only">Open menu</span>
+                    </Button>
                 </SheetTrigger>
                 <SheetContent side="right">
-                  <nav className="flex flex-col gap-6 pt-12">
-                     {navLinks.map(link => (
-                         <Link 
-                            key={link.id} 
-                            href={link.href} 
-                            className={cn(
-                                "text-lg font-medium hover:text-primary",
-                                activeLink === link.id ? "text-primary" : "text-muted-foreground"
-                            )}>
-                            {getLabel(link)}
-                         </Link>
-                      ))}
-                  </nav>
+                    <nav className="flex flex-col gap-6 pt-12">
+                        {navLinks.map(link => (
+                            <Link 
+                                key={link.id} 
+                                href={link.href} 
+                                className={cn(
+                                    "text-lg font-medium hover:text-primary",
+                                    activeLink === link.id ? "text-primary" : "text-muted-foreground"
+                                )}>
+                                {getLabel(link, t)}
+                            </Link>
+                        ))}
+                    </nav>
+                    <div className="flex gap-4 pt-8">
+                      <LanguageSwitcher />
+                      <ThemeToggle />
+                    </div>
                 </SheetContent>
-              </Sheet>
-            </>
-           ) : (
-            // Skeleton for mobile header actions
-             <div className="flex items-center gap-2">
-                <Skeleton className="h-10 w-10" />
-                <Skeleton className="h-10 w-10" />
-                <Skeleton className="h-10 w-10" />
-                <Skeleton className="h-10 w-10" />
-             </div>
-           )}
+            </Sheet>
         </div>
+    </>
+  );
+};
+
+
+export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
+  const { t } = useTranslation();
+ 
+  return (
+    <div className="flex flex-col min-h-screen bg-background">
+      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm z-50">
+        <Link href="/" className="text-2xl font-bold text-primary">CV Craft</Link>
+        <ClientOnlyHeaderActions activeLink={activeLink} />
       </header>
 
       <main className="flex-grow">
