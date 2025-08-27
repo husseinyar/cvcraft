@@ -1,18 +1,14 @@
 // src/app/api/auth/route.ts
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
-import { initializeApp, getApps } from 'firebase-admin/app';
+import admin from 'firebase-admin';
 import { serviceAccount } from '@/lib/firebase-admin-config';
 import { cookies } from 'next/headers';
 
 // Initialize Firebase Admin SDK
-if (!getApps().length) {
-  initializeApp({
-    credential: {
-      projectId: serviceAccount.project_id,
-      clientEmail: serviceAccount.client_email,
-      privateKey: serviceAccount.private_key,
-    },
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
   });
 }
 
