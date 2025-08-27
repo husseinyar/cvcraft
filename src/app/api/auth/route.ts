@@ -2,15 +2,11 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase-admin/auth';
 import admin from 'firebase-admin';
-import { serviceAccount } from '@/lib/firebase-admin-config';
+import { initializeAdminApp } from '@/lib/firebase-admin-config';
 import { cookies } from 'next/headers';
 
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+// Ensure the admin app is initialized
+initializeAdminApp();
 
 // Handler for session login
 export async function POST(request: NextRequest) {
