@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
 import { Menu, Star } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from '@/components/auth-button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
@@ -97,6 +97,9 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right">
+                    <SheetHeader>
+                        <SheetTitle>Navigation</SheetTitle>
+                    </SheetHeader>
                     <nav className="flex flex-col gap-6 pt-12">
                         {isMounted && user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
                         {navLinks.map(link => (

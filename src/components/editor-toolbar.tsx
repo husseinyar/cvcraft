@@ -6,7 +6,7 @@ import type { CVData, TemplateOption } from '@/types';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Download, Palette, Type, View } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
@@ -108,8 +108,10 @@ export default function EditorToolbar({ cvData, setCvData, cvPreviewRef }: Edito
             </Button>
         </SheetTrigger>
         <SheetContent>
-            <h3 className="text-lg font-semibold mb-4">Select Template</h3>
-            <RadioGroup defaultValue={cvData.template} onValueChange={(value) => handleTemplateChange(value as TemplateOption)}>
+            <SheetHeader>
+              <SheetTitle>Select Template</SheetTitle>
+            </SheetHeader>
+            <RadioGroup defaultValue={cvData.template} onValueChange={(value) => handleTemplateChange(value as TemplateOption)} className="pt-4">
                 <div className="grid grid-cols-2 gap-4">
                     {templateOptions.map(template => (
                         <div key={template.name}>
