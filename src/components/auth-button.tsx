@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, type User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,14 +17,34 @@ import {
 import { LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 
+// Handles session management by calling our secure API endpoints
+async function setSession(idToken: string) {
+  await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+  });
+}
+
+async function clearSession() {
+  await fetch('/api/auth', { method: 'DELETE' });
+}
+
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       setIsLoading(false);
+      // When auth state changes, update the secure session cookie
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+        await setSession(idToken);
+      } else {
+        await clearSession();
+      }
     });
 
     return () => unsubscribe();
@@ -34,6 +54,7 @@ export default function AuthButton() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
+      // The onAuthStateChanged listener will handle the session creation
     } catch (error) {
       console.error("Authentication error:", error);
     }
@@ -41,7 +62,8 @@ export default function AuthButton() {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      await auth.signOut();
+      // The onAuthStateChanged listener will handle session clearing
     } catch (error) {
       console.error("Sign out error:", error);
     }
