@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/context/language-context';
-import { Wand2, Clipboard, Check } from 'lucide-react';
+import { Wand2, Clipboard, Check, Star } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useCV } from '@/context/cv-context';
@@ -11,16 +11,19 @@ import { generateCoverLetter } from '@/ai/flows/generate-cover-letter';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import SiteLayout from '@/components/site-layout';
+import Link from 'next/link';
 
 export default function CoverLetterPage() {
   const { t } = useTranslation();
-  const { activeCv, isLoaded } = useCV();
+  const { user, isLoaded, activeCv } = useCV();
   const { toast } = useToast();
 
   const [jobDescription, setJobDescription] = useState('');
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
+  
+  const isPremiumUser = user?.role === 'premium' || user?.role === 'pro' || user?.role === 'admin';
 
   const handleGenerate = async () => {
     if (!jobDescription.trim() || !activeCv) {
@@ -53,6 +56,17 @@ export default function CoverLetterPage() {
     setHasCopied(true);
     setTimeout(() => setHasCopied(false), 2000); // Reset after 2 seconds
   };
+  
+  if (!isLoaded) {
+      return (
+          <SiteLayout activeLink="cover-letter">
+              <main className="flex-grow py-12 md:py-20 container mx-auto px-4 sm:px-6 lg:px-8">
+                  <Skeleton className="h-24 w-1/2 mx-auto" />
+                  <Skeleton className="h-64 w-full mt-8" />
+              </main>
+          </SiteLayout>
+      );
+  }
 
   return (
     <SiteLayout activeLink="cover-letter">
@@ -64,8 +78,26 @@ export default function CoverLetterPage() {
                     Create a powerful, tailored cover letter in seconds. Just paste the job description, and our AI will write a compelling letter based on your saved CV.
                 </p>
             </div>
+            
+            {!isPremiumUser && (
+                <Card className="max-w-3xl mx-auto text-center p-8 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+                    <CardHeader>
+                        <CardTitle className="flex items-center justify-center gap-2">
+                            <Star className="text-amber-500" /> Premium Feature
+                        </CardTitle>
+                        <CardDescription>
+                            The AI Cover Letter Builder is a premium feature. Please upgrade your plan to generate unlimited, tailored cover letters.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link href="/pricing">
+                            <Button size="lg">Upgrade to Premium</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+            )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto mt-8 ${!isPremiumUser ? 'opacity-50 pointer-events-none' : ''}`}>
                 <Card>
                     <CardHeader>
                         <CardTitle>1. Job Description</CardTitle>
@@ -77,10 +109,11 @@ export default function CoverLetterPage() {
                             rows={15}
                             value={jobDescription}
                             onChange={(e) => setJobDescription(e.target.value)}
+                            disabled={!isPremiumUser}
                          />
                          <Button 
                             onClick={handleGenerate} 
-                            disabled={isLoading || !isLoaded} 
+                            disabled={isLoading || !isLoaded || !isPremiumUser} 
                             className="w-full mt-4"
                             size="lg"
                          >
@@ -114,6 +147,7 @@ export default function CoverLetterPage() {
                                     rows={15}
                                     placeholder="Your generated cover letter will appear here..."
                                     className="h-full"
+                                    disabled={!isPremiumUser}
                                 />
                                 {generatedLetter && (
                                     <Button 
@@ -121,6 +155,7 @@ export default function CoverLetterPage() {
                                         size="sm" 
                                         onClick={handleCopyToClipboard}
                                         className="absolute top-4 right-4"
+                                        disabled={!isPremiumUser}
                                     >
                                         {hasCopied ? <Check className="text-green-500" /> : <Clipboard />}
                                     </Button>

@@ -1,27 +1,44 @@
 
 // src/services/cv-service.ts
 import { db } from '@/lib/firebase';
-import type { CVData } from '@/types';
+import type { CVData, UserRole } from '@/types';
 import { collection, doc, getDoc, getDocs, setDoc, addDoc, serverTimestamp, writeBatch, query, orderBy } from 'firebase/firestore';
 
-// IMPORTANT: Replace this with the actual Firebase UID of your admin user.
-// You can find a user's UID in the Firebase Authentication console.
-const ADMIN_UID = 'REPLACE_WITH_YOUR_ADMIN_FIREBASE_UID';
+/**
+ * Checks a user's role from the 'users' collection in Firestore.
+ * @param userId The ID of the user to check.
+ * @returns A promise that resolves to the user's role or 'user' by default.
+ */
+export async function getUserRole(userId: string): Promise<UserRole> {
+    try {
+        const userDocRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            // Check for admin UID for fallback
+            const ADMIN_UID = process.env.NEXT_PUBLIC_FIREBASE_ADMIN_UID;
+            if (userId === ADMIN_UID) return 'admin';
+            return userDoc.data().role || 'user';
+        }
+        return 'user';
+    } catch (error) {
+        console.error("Error getting user role:", error);
+        return 'user'; // Default to 'user' on error
+    }
+}
 
 /**
- * Checks if a user is an admin.
- * @param userId The ID of the user to check.
- * @returns A promise that resolves to 'admin' or 'user'.
+ * Updates a user's role in Firestore.
+ * @param userId The ID of the user to update.
+ * @param role The new role to assign.
  */
-export async function getUserRole(userId: string): Promise<'admin' | 'user'> {
-    if (userId === ADMIN_UID) {
-        return 'admin';
+export async function updateUserRole(userId: string, role: UserRole): Promise<void> {
+    try {
+        const userDocRef = doc(db, 'users', userId);
+        await setDoc(userDocRef, { role }, { merge: true });
+    } catch (error) {
+        console.error("Error updating user role:", error);
+        throw new Error("Could not update user role.");
     }
-    // In a real application, you would look up the user's role from a document
-    // in a 'users' collection, for example:
-    // const userDoc = await getDoc(doc(db, 'users', userId));
-    // if (userDoc.exists() && userDoc.data().role === 'admin') return 'admin';
-    return 'user';
 }
 
 
@@ -56,7 +73,12 @@ export async function saveCv(cvData: CVData): Promise<void> {
         throw new Error("Cannot save CV without a userId and a cvId.");
     }
     try {
-        const cvDocRef = doc(db, 'users', cvData.userId, 'cvs', cvData.id);
+        const userDocRef = doc(db, 'users', cvData.userId);
+        const cvDocRef = doc(userDocRef, 'cvs', cvData.id);
+        
+        // Ensure the user document exists with an email before saving a CV
+        await setDoc(userDocRef, { email: auth.currentUser?.email || 'N/A' }, { merge: true });
+
         const dataToSave = {
             ...cvData,
             updatedAt: Date.now(),

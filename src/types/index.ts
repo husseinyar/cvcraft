@@ -89,7 +89,7 @@ export type JobApplication = {
 
 export type TemplateOption = 'onyx' | 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'user' | 'premium' | 'pro';
 
 export type UserProfile = {
   id: string;

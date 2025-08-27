@@ -1,14 +1,39 @@
 
 "use client"
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-context';
 import { Check } from 'lucide-react';
 import SiteLayout from '@/components/site-layout';
+import { useCV } from '@/context/cv-context';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 export default function PricingPage() {
   const { t } = useTranslation();
+  const { user, setUser } = useCV();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const handleChoosePlan = (plan: 'premium' | 'pro') => {
+    if (!user) {
+      toast({
+        title: "Please Log In",
+        description: "You need to be logged in to choose a plan.",
+        variant: "destructive"
+      });
+      return;
+    }
+    // In a real app, this would redirect to a Stripe checkout page.
+    // Here, we'll simulate the upgrade.
+    setUser({ ...user, role: plan });
+    toast({
+      title: "Plan Updated!",
+      description: `You are now on the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.`,
+    });
+    router.push('/editor');
+  };
+
 
   const pricingTiers = [
     {
@@ -20,7 +45,9 @@ export default function PricingPage() {
         "pricing_page.free.features.two",
         "pricing_page.free.features.three"
       ],
-      cta: "pricing_page.free.cta"
+      cta: "pricing_page.free.cta",
+      action: () => router.push('/editor'),
+      variant: "outline" as const,
     },
     {
       name: "pricing_page.pro.name",
@@ -32,7 +59,9 @@ export default function PricingPage() {
         "pricing_page.pro.features.three",
         "pricing_page.pro.features.four"
       ],
-      cta: "pricing_page.pro.cta"
+      cta: "pricing_page.pro.cta",
+      action: () => handleChoosePlan('premium'),
+      isPopular: true,
     },
     {
       name: "pricing_page.business.name",
@@ -44,7 +73,8 @@ export default function PricingPage() {
         "pricing_page.business.features.three",
         "pricing_page.business.features.four"
       ],
-      cta: "pricing_page.business.cta"
+      cta: "pricing_page.business.cta",
+      action: () => handleChoosePlan('pro'),
     }
   ];
 
@@ -75,11 +105,11 @@ export default function PricingPage() {
                     ))}
                   </ul>
                 </CardContent>
-                <div className="p-6">
-                  <Link href="/editor">
-                    <Button className="w-full">{t(tier.cta as any)}</Button>
-                  </Link>
-                </div>
+                <CardFooter>
+                  <Button className="w-full" onClick={tier.action} variant={tier.variant}>
+                    {t(tier.cta as any)}
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>

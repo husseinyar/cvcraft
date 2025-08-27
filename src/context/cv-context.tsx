@@ -5,7 +5,7 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import type { CVData, UserProfile } from '@/types';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getCvsForUser, createNewCv, getUserRole } from '@/services/cv-service';
+import { getCvsForUser, createNewCv, getUserRole, updateUserRole } from '@/services/cv-service';
 import { getAllUsersAndCvs } from '@/services/admin-service';
 
 // Default CV structure
@@ -40,6 +40,7 @@ const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt
 // Define the shape of the context
 interface CVContextType {
   user: UserProfile | null;
+  setUser: React.Dispatch<React.SetStateAction<UserProfile | null>>; // Allow updating user state
   isLoaded: boolean;
   allUsers: UserProfile[]; // For admin
   activeUser: UserProfile | null; // For admin
@@ -154,6 +155,19 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   }, [activeCv, isLoaded, user]);
+  
+  // When the local user state changes (e.g., from a mock plan upgrade),
+  // update the user role in Firestore as well.
+  useEffect(() => {
+    if (user && user.id !== 'anonymous') {
+        getUserRole(user.id).then(dbRole => {
+            if (user.role !== dbRole) {
+                updateUserRole(user.id, user.role);
+            }
+        });
+    }
+  }, [user]);
+
 
   const handleCreateNewCv = async () => {
     if (!activeUser) return;
@@ -166,6 +180,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
 
   const value = { 
     user, 
+    setUser,
     isLoaded: isLoaded && userChecked, 
     allUsers,
     activeUser,

@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/context/language-context';
 import LanguageSwitcher from '@/components/language-switcher';
-import { Menu } from 'lucide-react';
+import { Menu, Star } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import AuthButton from '@/components/auth-button';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './theme-toggle';
 import { Skeleton } from './ui/skeleton';
+import { useCV } from '@/context/cv-context';
+import { Badge } from './ui/badge';
 
 interface NavLink {
     href: string;
@@ -46,10 +48,20 @@ const navLinks: NavLink[] = [
 const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] }) => {
   const [isMounted, setIsMounted] = useState(false);
   const { t } = useTranslation();
+  const { user } = useCV();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+  
+  const getRoleBadgeVariant = (role: string | undefined) => {
+    switch (role) {
+      case 'premium': return 'default';
+      case 'pro': return 'destructive'; // Or another distinct color
+      case 'admin': return 'secondary';
+      default: return 'outline';
+    }
+  }
 
   if (!isMounted) {
     // Render placeholders or skeletons on the server and initial client render
@@ -86,6 +98,7 @@ const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] })
                 {getLabel(link, t)}
              </Link>
           ))}
+            {user && <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>}
             <AuthButton />
             <LanguageSwitcher />
             <ThemeToggle />
@@ -103,6 +116,7 @@ const ClientOnlyHeaderActions = ({ activeLink }: { activeLink?: NavLink['id'] })
                 </SheetTrigger>
                 <SheetContent side="right">
                     <nav className="flex flex-col gap-6 pt-12">
+                        {user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
                         {navLinks.map(link => (
                             <Link 
                                 key={link.id} 
