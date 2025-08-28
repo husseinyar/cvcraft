@@ -149,5 +149,22 @@
         "description": "Här är några förslag för att förbättra din CV-sektion."
     },
     "download_pdf": "Ladda ner PDF"
+  },
+  "cv_start_cards": {
+    "from_scratch": {
+      "title": "Skapa från grunden",
+      "description": "Börja med ett tomt dokument och bygg ditt CV steg för steg med vår guidade redigerare.",
+      "cta": "Börja nu"
+    },
+    "from_template": {
+      "title": "Välj en mall",
+      "description": "Utforska våra professionellt designade mallar för att få ett försprång med ditt CV.",
+      "cta": "Se mallar"
+    },
+    "upload": {
+      "title": "Ladda upp befintligt CV",
+      "description": "Har du ett CV i PDF-format? Vår AI kommer att tolka det och importera din information automatiskt.",
+      "cta": "Ladda upp CV"
+    }
   }
 }

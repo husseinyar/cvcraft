@@ -149,5 +149,22 @@
         "description": "Here are some suggestions to improve your CV section."
     },
     "download_pdf": "Download PDF"
+  },
+   "cv_start_cards": {
+    "from_scratch": {
+      "title": "Create from Scratch",
+      "description": "Start with a blank slate and build your CV step-by-step with our guided editor.",
+      "cta": "Start Now"
+    },
+    "from_template": {
+      "title": "Choose a Template",
+      "description": "Explore our professionally designed templates to get a head start on your CV.",
+      "cta": "See Templates"
+    },
+    "upload": {
+      "title": "Upload Existing CV",
+      "description": "Have a PDF resume? Our AI will parse it and import your information automatically.",
+      "cta": "Upload CV"
+    }
   }
 }
