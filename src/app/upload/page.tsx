@@ -10,18 +10,14 @@ import { UploadCloud, FileText, X, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { CVData } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { parseCvText } from '@/ai/flows/parse-cv-text';
-import * as pdfjs from 'pdfjs-dist';
+import { parseCv } from '@/ai/flows/parse-cv';
 import { useCV } from '@/context/cv-context';
-
-
-// Required for pdfjs-dist to work
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import { createDefaultCv } from '@/context/cv-context';
 
 
 export default function UploadPage() {
   const router = useRouter();
-  const { setCvData } = useCV();
+  const { setActiveCv } = useCV();
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,57 +39,58 @@ export default function UploadPage() {
     onDrop,
     accept: {
       'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     maxFiles: 1,
   });
 
-  const extractTextFromPdf = async (file: File): Promise<string> => {
-    const fileBuffer = await file.arrayBuffer();
-    const loadingTask = pdfjs.getDocument(fileBuffer);
-    const pdf = await loadingTask.promise;
-    let text = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        text += textContent.items.map(item => (item as any).str).join(' ');
-    }
-    return text;
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
   };
   
   const handleUploadAndParse = async () => {
-    if (!file || !setCvData) return;
+    if (!file || !setActiveCv) return;
 
     setIsLoading(true);
     setErrorDetails(null);
     setProgress(10);
 
     try {
-        let resumeText = '';
-        if (file.type === 'application/pdf') {
-            resumeText = await extractTextFromPdf(file);
-        } else {
-            throw new Error('Unsupported file type.');
-        }
-
+        const resumeDataUri = await fileToDataUri(file);
         setProgress(30);
-
-        console.log('--- Extracted Resume Text ---');
-        console.log(resumeText.substring(0, 500)); // Log first 500 chars
         
-        const parsedData = await parseCvText({ resumeText });
+        console.log('--- Uploading Resume Data URI ---');
+        console.log(resumeDataUri.substring(0, 100)); // Log first 100 chars
+        
+        const parsedData = await parseCv({ resumeDataUri });
         
         console.log('--- AI Parsed Data ---', parsedData);
 
         setProgress(80);
 
+        const now = Date.now();
+        const defaultCv = createDefaultCv();
+
+        // Merge parsed data with defaults, ensuring all fields are present
         const newCvData: CVData = {
-          id: `user_${Date.now()}`,
-          template: 'onyx', // Default to the new Onyx template
-          role: 'user',
-          ...parsedData
+          ...defaultCv,
+          ...parsedData,
+          id: `user_${now}`,
+          userId: 'anonymous', // Will be updated on save if user is logged in
+          cvName: `${parsedData.name}'s CV` || 'Imported CV',
+          template: 'onyx', // Default to a modern template
+          sectionOrder: defaultCv.sectionOrder, // Use default order initially
+          theme: defaultCv.theme, // Use default theme
+          createdAt: now,
+          updatedAt: now,
         };
 
-        setCvData(newCvData);
+        setActiveCv(newCvData);
         setProgress(100);
         router.push('/editor');
 
@@ -130,7 +127,7 @@ export default function UploadPage() {
       <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>Upload a .pdf file and we'll transform it into a stunning CV.</CardDescription>
+          <CardDescription>Upload a .pdf or .docx file and we'll transform it into a stunning CV.</CardDescription>
         </CardHeader>
         <CardContent>
           {errorDetails && (

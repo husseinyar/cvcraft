@@ -9,7 +9,7 @@ import { getCvsForUser, createNewCv, getUserRole, updateUserRole } from '@/servi
 import { getAllUsersAndCvs } from '@/services/admin-service';
 
 // Default CV structure
-const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt' | 'updatedAt'> => ({
+export const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'createdAt' | 'updatedAt'> => ({
   name: 'Alex Doe',
   jobTitle: 'Software Developer',
   contact: {
