@@ -39,7 +39,7 @@ import { useCV } from "@/context/cv-context";
 import { DndContext, closestCenter, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 
 interface CvEditorProps {
@@ -599,3 +599,5 @@ function VolunteeringSection({ cvData, handleLocalCvChange }: { cvData: CVData; 
     </div>
   );
 }
+
+    
