@@ -34,7 +34,8 @@ const CVDataSchema = z.object({
     fontSize: z.number(),
   }),
   createdAt: z.number(),
-  updatedAt: z.number(),
+  // Make updatedAt optional as it will be set on the server
+  updatedAt: z.number().optional(),
 });
 
 
@@ -47,7 +48,13 @@ export async function updateCvAction(cvData: CVData) {
       return { success: false, message: 'Invalid CV data provided.' };
     }
 
-    await saveCv(validationResult.data);
+    // Set updatedAt on the server to ensure consistency
+    const dataToSave = {
+        ...validationResult.data,
+        updatedAt: Date.now(),
+    };
+
+    await saveCv(dataToSave);
     revalidatePath('/editor');
     return { success: true, message: 'CV updated successfully!' };
   } catch (error) {

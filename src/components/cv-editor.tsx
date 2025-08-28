@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useCallback, useMemo } from "react";
 import type { CVData, Experience, Education, Language, Certification, Award, VolunteerWork } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ import { useCV } from "@/context/cv-context";
 import { DndContext, closestCenter, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import debounce from 'lodash.debounce';
 
 
 interface CvEditorProps {
@@ -100,23 +101,27 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
 
-  const { activeCv: globalCvData, user } = useCV();
+  const { user } = useCV();
 
   useEffect(() => {
     setCvData(initialCvData);
   }, [initialCvData]);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (JSON.stringify(initialCvData) !== JSON.stringify(cvData)) {
-         setGlobalCvData(cvData);
-      }
-    }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [cvData, initialCvData, setGlobalCvData]);
+  // Debounced update to the global context to avoid excessive re-renders
+  // and also update localStorage via the context's useEffect
+  const debouncedSetGlobalCvData = useMemo(
+    () => debounce((newCvData: CVData) => {
+        setGlobalCvData(newCvData);
+    }, 500),
+    [setGlobalCvData]
+  );
+  
+  // Local state updates instantly, global state is debounced
+  const handleLocalCvChange = useCallback((newCvData: CVData) => {
+      const updatedCvWithTimestamp = { ...newCvData, updatedAt: Date.now() };
+      setCvData(updatedCvWithTimestamp);
+      debouncedSetGlobalCvData(updatedCvWithTimestamp);
+  }, [debouncedSetGlobalCvData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -128,7 +133,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
       current = current[keys[i]];
     }
     current[keys[keys.length - 1]] = value;
-    setCvData(newCvData);
+    handleLocalCvChange(newCvData);
   };
 
   const handleGetSuggestions = async (cvSection: string, fieldPath: string) => {
@@ -179,7 +184,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
       }
     }
 
-    setCvData(newCvData);
+    handleLocalCvChange(newCvData);
     setIsSuggestionModalOpen(false);
     setCurrentSuggestionField(null);
 
@@ -195,8 +200,8 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
         return;
     }
     startTransition(() => {
-        if (!globalCvData) return;
-        updateCvAction(globalCvData).then((res) => {
+        // Ensure we're saving the most up-to-date local state
+        updateCvAction(cvData).then((res) => {
             toast({ title: res.success ? "CV Saved" : "Error", description: res.message });
         });
     });
@@ -207,39 +212,30 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      setCvData((prev) => {
-        const oldIndex = prev.sectionOrder.indexOf(active.id as string);
-        const newIndex = prev.sectionOrder.indexOf(over.id as string);
-        return {
-          ...prev,
-          sectionOrder: arrayMove(prev.sectionOrder, oldIndex, newIndex),
-        };
-      });
+      const oldIndex = cvData.sectionOrder.indexOf(active.id as string);
+      const newIndex = cvData.sectionOrder.indexOf(over.id as string);
+      const newSectionOrder = arrayMove(cvData.sectionOrder, oldIndex, newIndex);
+      handleLocalCvChange({ ...cvData, sectionOrder: newSectionOrder });
     }
   };
   
   const handleAddSection = (sectionId: keyof CVData) => {
-      setCvData(prev => {
-          // If section doesn't exist, initialize it
-          const currentSection = prev[sectionId] as any[];
-          if (!currentSection || currentSection.length === 0) {
-              return {
-                  ...prev,
-                  [sectionId]: [],
-                  sectionOrder: [...prev.sectionOrder, sectionId as string],
-              };
-          }
-          // If it exists but not in order, add it to order
-          if (!prev.sectionOrder.includes(sectionId as string)) {
-              return { ...prev, sectionOrder: [...prev.sectionOrder, sectionId as string] };
-          }
-          return prev;
-      });
+      const updatedCv = { ...cvData };
+      // If section doesn't exist, initialize it
+      const currentSection = updatedCv[sectionId] as any[];
+      if (!currentSection || currentSection.length === 0) {
+          (updatedCv as any)[sectionId] = [];
+      }
+      // If it exists but not in order, add it to order
+      if (!updatedCv.sectionOrder.includes(sectionId as string)) {
+          updatedCv.sectionOrder = [...updatedCv.sectionOrder, sectionId as string];
+      }
+      handleLocalCvChange(updatedCv);
   };
 
   const sectionProps = {
     cvData,
-    setCvData,
+    handleLocalCvChange,
     handleInputChange,
     handleGetSuggestions,
     isSuggesting,
@@ -338,22 +334,22 @@ function SummarySection({ cvData, handleInputChange, handleGetSuggestions, isSug
   );
 }
 
-function ExperienceSection({ cvData, setCvData, handleGetSuggestions, isSuggesting, jobDescription, t }: any) {
+function ExperienceSection({ cvData, handleLocalCvChange, handleGetSuggestions, isSuggesting, jobDescription, t }: any) {
   const [isGenerating, setIsGenerating] = useState<Record<number, boolean>>({});
 
   const handleDynamicChange = (index: number, field: keyof Experience, value: string) => {
     const newCvData = JSON.parse(JSON.stringify(cvData));
     (newCvData.experience[index] as any)[field] = value;
-    setCvData(newCvData);
+    handleLocalCvChange(newCvData);
   };
   
   const addDynamicItem = () => {
     const newItem = { id: `exp${Date.now()}`, role: '', company: '', dates: '', description: '' };
-    setCvData({ ...cvData, experience: [...cvData.experience, newItem] });
+    handleLocalCvChange({ ...cvData, experience: [...cvData.experience, newItem] });
   };
   
   const removeDynamicItem = (index: number) => {
-    setCvData({ ...cvData, experience: cvData.experience.filter((_: any, i: number) => i !== index) });
+    handleLocalCvChange({ ...cvData, experience: cvData.experience.filter((_: any, i: number) => i !== index) });
   };
 
   const handleGenerateExperience = async (index: number) => {
@@ -404,18 +400,18 @@ function ExperienceSection({ cvData, setCvData, handleGetSuggestions, isSuggesti
   );
 }
 
-function EducationSection({ cvData, setCvData, t }: any) {
+function EducationSection({ cvData, handleLocalCvChange, t }: any) {
     const handleDynamicChange = (index: number, field: keyof Education, value: string) => {
         const newCvData = JSON.parse(JSON.stringify(cvData));
         (newCvData.education[index] as any)[field] = value;
-        setCvData(newCvData);
+        handleLocalCvChange(newCvData);
     };
     const addDynamicItem = () => {
         const newItem = { id: `edu${Date.now()}`, school: '', degree: '', dates: '', description: '' };
-        setCvData({ ...cvData, education: [...cvData.education, newItem] });
+        handleLocalCvChange({ ...cvData, education: [...cvData.education, newItem] });
     };
     const removeDynamicItem = (index: number) => {
-        setCvData({ ...cvData, education: cvData.education.filter((_: any, i: number) => i !== index) });
+        handleLocalCvChange({ ...cvData, education: cvData.education.filter((_: any, i: number) => i !== index) });
     };
 
     return (
@@ -436,19 +432,19 @@ function EducationSection({ cvData, setCvData, t }: any) {
     );
 }
 
-function SkillsSection({ cvData, setCvData, t }: any) {
+function SkillsSection({ cvData, handleLocalCvChange, t }: any) {
   const [skillsInput, setSkillsInput] = useState("");
   const handleSkillsKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && skillsInput.trim()) {
       e.preventDefault();
       if (!cvData.skills.includes(skillsInput.trim())) {
-        setCvData({ ...cvData, skills: [...cvData.skills, skillsInput.trim()] });
+        handleLocalCvChange({ ...cvData, skills: [...cvData.skills, skillsInput.trim()] });
       }
       setSkillsInput("");
     }
   };
   const removeSkill = (skillToRemove: string) => {
-    setCvData({ ...cvData, skills: cvData.skills.filter((skill: string) => skill !== skillToRemove) });
+    handleLocalCvChange({ ...cvData, skills: cvData.skills.filter((skill: string) => skill !== skillToRemove) });
   };
   
   return (
@@ -474,19 +470,19 @@ function SkillsSection({ cvData, setCvData, t }: any) {
 }
 
 
-function LanguagesSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+function LanguagesSection({ cvData, handleLocalCvChange }: { cvData: CVData; handleLocalCvChange: (data: CVData) => void }) {
   const languages = cvData.languages || [];
   const handleDynamicChange = (index: number, field: keyof Language, value: string) => {
     const newLanguages = [...languages];
     (newLanguages[index] as any)[field] = value;
-    setCvData({ ...cvData, languages: newLanguages });
+    handleLocalCvChange({ ...cvData, languages: newLanguages });
   };
   const addDynamicItem = () => {
     const newItem = { id: `lang${Date.now()}`, name: '', level: '' };
-    setCvData({ ...cvData, languages: [...languages, newItem] });
+    handleLocalCvChange({ ...cvData, languages: [...languages, newItem] });
   };
   const removeDynamicItem = (index: number) => {
-    setCvData({ ...cvData, languages: languages.filter((_, i) => i !== index) });
+    handleLocalCvChange({ ...cvData, languages: languages.filter((_, i) => i !== index) });
   };
 
   return (
@@ -507,19 +503,19 @@ function LanguagesSection({ cvData, setCvData }: { cvData: CVData; setCvData: (d
   );
 }
 
-function CertificationsSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+function CertificationsSection({ cvData, handleLocalCvChange }: { cvData: CVData; handleLocalCvChange: (data: CVData) => void }) {
   const certifications = cvData.certifications || [];
   const handleDynamicChange = (index: number, field: keyof Certification, value: string) => {
     const newCerts = [...certifications];
     (newCerts[index] as any)[field] = value;
-    setCvData({ ...cvData, certifications: newCerts });
+    handleLocalCvChange({ ...cvData, certifications: newCerts });
   };
   const addDynamicItem = () => {
     const newItem = { id: `cert${Date.now()}`, name: '', issuer: '', date: '' };
-    setCvData({ ...cvData, certifications: [...certifications, newItem] });
+    handleLocalCvChange({ ...cvData, certifications: [...certifications, newItem] });
   };
   const removeDynamicItem = (index: number) => {
-    setCvData({ ...cvData, certifications: certifications.filter((_, i) => i !== index) });
+    handleLocalCvChange({ ...cvData, certifications: certifications.filter((_, i) => i !== index) });
   };
   
   return (
@@ -539,19 +535,19 @@ function CertificationsSection({ cvData, setCvData }: { cvData: CVData; setCvDat
   );
 }
 
-function AwardsSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+function AwardsSection({ cvData, handleLocalCvChange }: { cvData: CVData; handleLocalCvChange: (data: CVData) => void }) {
   const awards = cvData.awards || [];
   const handleDynamicChange = (index: number, field: keyof Award, value: string) => {
     const newAwards = [...awards];
     (newAwards[index] as any)[field] = value;
-    setCvData({ ...cvData, awards: newAwards });
+    handleLocalCvChange({ ...cvData, awards: newAwards });
   };
   const addDynamicItem = () => {
     const newItem = { id: `award${Date.now()}`, name: '', issuer: '', date: '' };
-    setCvData({ ...cvData, awards: [...awards, newItem] });
+    handleLocalCvChange({ ...cvData, awards: [...awards, newItem] });
   };
   const removeDynamicItem = (index: number) => {
-    setCvData({ ...cvData, awards: awards.filter((_, i) => i !== index) });
+    handleLocalCvChange({ ...cvData, awards: awards.filter((_, i) => i !== index) });
   };
 
   return (
@@ -571,19 +567,19 @@ function AwardsSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data
   );
 }
 
-function VolunteeringSection({ cvData, setCvData }: { cvData: CVData; setCvData: (data: CVData) => void }) {
+function VolunteeringSection({ cvData, handleLocalCvChange }: { cvData: CVData; handleLocalCvChange: (data: CVData) => void }) {
   const volunteering = cvData.volunteering || [];
   const handleDynamicChange = (index: number, field: keyof VolunteerWork, value: string) => {
     const newVolunteering = [...volunteering];
     (newVolunteering[index] as any)[field] = value;
-    setCvData({ ...cvData, volunteering: newVolunteering });
+    handleLocalCvChange({ ...cvData, volunteering: newVolunteering });
   };
   const addDynamicItem = () => {
     const newItem = { id: `vol${Date.now()}`, role: '', organization: '', dates: '', description: '' };
-    setCvData({ ...cvData, volunteering: [...volunteering, newItem] });
+    handleLocalCvChange({ ...cvData, volunteering: [...volunteering, newItem] });
   };
   const removeDynamicItem = (index: number) => {
-    setCvData({ ...cvData, volunteering: volunteering.filter((_, i) => i !== index) });
+    handleLocalCvChange({ ...cvData, volunteering: volunteering.filter((_, i) => i !== index) });
   };
 
   return (

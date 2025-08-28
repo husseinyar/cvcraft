@@ -68,19 +68,17 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
   const [userCvs, setUserCvs] = useState<CVData[]>([]);
   const [activeCv, setActiveCv] = useState<CVData | null>(null);
   
-  const loadLocalCv = () => {
+  const loadLocalCvForUser = (userId: string): CVData | null => {
     try {
-      const storedCvData = localStorage.getItem('cv-craft-data');
+      const storedCvData = localStorage.getItem(`cv-craft-data-${userId}`);
       if (storedCvData) {
         const parsedData = JSON.parse(storedCvData);
-        setActiveCv({ ...createDefaultCv(), ...parsedData, sectionOrder: parsedData.sectionOrder || createDefaultCv().sectionOrder, theme: parsedData.theme || createDefaultCv().theme });
-      } else {
-        const now = Date.now();
-        setActiveCv({ ...createDefaultCv(), id: `local_${now}`, userId: 'anonymous', cvName: 'My Local CV', createdAt: now, updatedAt: now });
+        return { ...createDefaultCv(), ...parsedData };
       }
     } catch (e) {
       console.error("Failed to parse CV data from localStorage", e);
     }
+    return null;
   };
 
   // Handle user authentication state changes
@@ -108,7 +106,14 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
         setActiveUser(null);
         setAllUsers([]);
         setUserCvs([]);
-        loadLocalCv();
+        
+        const localCv = loadLocalCvForUser('anonymous');
+        if (localCv) {
+          setActiveCv(localCv);
+        } else {
+            const now = Date.now();
+            setActiveCv({ ...createDefaultCv(), id: `local_${now}`, userId: 'anonymous', cvName: 'My Local CV', createdAt: now, updatedAt: now });
+        }
       }
       
       setUserChecked(true);
@@ -123,18 +128,32 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       
       const loadCvs = async () => {
           setIsLoaded(false);
+          
+          const localCv = loadLocalCvForUser(activeUser.id);
           const cvs = await getCvsForUser(activeUser.id);
+
           if (cvs.length > 0) {
               const sanitizedCvs = cvs.map(cv => ({ ...createDefaultCv(), ...cv, sectionOrder: cv.sectionOrder || createDefaultCv().sectionOrder, theme: cv.theme || createDefaultCv().theme }));
               setUserCvs(sanitizedCvs);
-              setActiveCv(sanitizedCvs[0]);
+              
+              // Prioritize local storage version if it exists and seems more recent
+              if (localCv && localCv.updatedAt > (sanitizedCvs[0].updatedAt || 0)) {
+                  setActiveCv(localCv);
+              } else {
+                  setActiveCv(sanitizedCvs[0]);
+              }
           } else {
-              // If the user has no CVs, create a temporary one for the session
-              const now = Date.now();
-              const defaultData = createDefaultCv();
-              const tempCv: CVData = { ...defaultData, id: `new_${now}`, userId: activeUser.id, cvName: 'New CV', createdAt: now, updatedAt: now };
-              setUserCvs([tempCv]);
-              setActiveCv(tempCv);
+              // If the user has no CVs, check for a local one or create a new temp one
+              if (localCv) {
+                setUserCvs([localCv]);
+                setActiveCv(localCv);
+              } else {
+                const now = Date.now();
+                const defaultData = createDefaultCv();
+                const tempCv: CVData = { ...defaultData, id: `new_${now}`, userId: activeUser.id, cvName: 'New CV', createdAt: now, updatedAt: now };
+                setUserCvs([tempCv]);
+                setActiveCv(tempCv);
+              }
           }
           setIsLoaded(true);
       };
@@ -145,11 +164,12 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
 
   }, [activeUser]);
 
-  // Save active CV to localStorage (for anonymous users)
+  // Save active CV to localStorage (for anonymous OR logged-in users)
   useEffect(() => {
-    if (isLoaded && activeCv && !user) {
+    if (isLoaded && activeCv) {
       try {
-        localStorage.setItem('cv-craft-data', JSON.stringify(activeCv));
+        const userIdToSave = user ? user.id : 'anonymous';
+        localStorage.setItem(`cv-craft-data-${userIdToSave}`, JSON.stringify(activeCv));
       } catch (e) {
         console.error("Failed to save CV data to localStorage", e);
       }
