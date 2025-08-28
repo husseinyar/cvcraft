@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { UserRole } from '@/types';
 
 export default function PricingPage() {
   const { t } = useTranslation();
@@ -22,13 +23,14 @@ export default function PricingPage() {
     setIsMounted(true);
   }, []);
 
-  const handleChoosePlan = (plan: 'premium' | 'pro') => {
-    if (!user) {
+  const handleChoosePlan = (plan: 'standard' | 'pro') => {
+    if (!user || user.id === 'anonymous') {
       toast({
         title: "Please Log In",
         description: "You need to be logged in to choose a plan.",
         variant: "destructive"
       });
+      router.push('/editor'); // Redirect to login implicitly
       return;
     }
     // In a real app, this would redirect to a Stripe checkout page.
@@ -67,7 +69,7 @@ export default function PricingPage() {
         "pricing_page.pro.features.four"
       ],
       cta: "pricing_page.pro.cta",
-      action: () => handleChoosePlan('premium'),
+      action: () => handleChoosePlan('standard'),
       isPopular: true,
     },
     {

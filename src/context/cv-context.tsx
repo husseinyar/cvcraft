@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import type { CVData, UserProfile } from '@/types';
+import type { CVData, UserProfile, UserRole } from '@/types';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { getCvsForUser, createNewCv, getUserRole, updateUserRole } from '@/services/cv-service';
@@ -70,10 +70,14 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
   
   const loadLocalCvForUser = (userId: string): CVData | null => {
     try {
+      if (typeof window === 'undefined') return null;
       const storedCvData = localStorage.getItem(`cv-craft-data-${userId}`);
       if (storedCvData) {
         const parsedData = JSON.parse(storedCvData);
-        return { ...createDefaultCv(), ...parsedData };
+        // Ensure sectionOrder and theme have defaults
+        parsedData.sectionOrder = parsedData.sectionOrder || createDefaultCv().sectionOrder;
+        parsedData.theme = parsedData.theme || createDefaultCv().theme;
+        return parsedData;
       }
     } catch (e) {
       console.error("Failed to parse CV data from localStorage", e);
@@ -102,8 +106,9 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
         }
 
       } else {
-        setUser(null);
-        setActiveUser(null);
+        const anonymousUser: UserProfile = { id: 'anonymous', email: '', role: 'user' };
+        setUser(anonymousUser);
+        setActiveUser(anonymousUser);
         setAllUsers([]);
         setUserCvs([]);
         
@@ -122,35 +127,55 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
   
-  // Effect to load CVs for the active user (for admins)
+  // Effect to load CVs for the active user (for admins or regular users)
   useEffect(() => {
       if (!activeUser) return;
       
       const loadCvs = async () => {
           setIsLoaded(false);
-          
-          const localCv = loadLocalCvForUser(activeUser.id);
-          const cvs = await getCvsForUser(activeUser.id);
 
-          if (cvs.length > 0) {
-              const sanitizedCvs = cvs.map(cv => ({ ...createDefaultCv(), ...cv, sectionOrder: cv.sectionOrder || createDefaultCv().sectionOrder, theme: cv.theme || createDefaultCv().theme }));
-              setUserCvs(sanitizedCvs);
-              
-              // Prioritize local storage version if it exists and seems more recent
-              if (localCv && localCv.updatedAt > (sanitizedCvs[0].updatedAt || 0)) {
+          if (activeUser.id === 'anonymous') {
+              const localCv = loadLocalCvForUser('anonymous');
+              if (localCv) {
+                  setUserCvs([localCv]);
                   setActiveCv(localCv);
               } else {
+                   const now = Date.now();
+                   const tempCv = { ...createDefaultCv(), id: `new_${now}`, userId: 'anonymous', cvName: 'New CV', createdAt: now, updatedAt: now };
+                   setUserCvs([tempCv]);
+                   setActiveCv(tempCv);
+              }
+              setIsLoaded(true);
+              return;
+          }
+          
+          const localCv = loadLocalCvForUser(activeUser.id);
+          const cvsFromDb = await getCvsForUser(activeUser.id);
+
+          if (cvsFromDb.length > 0) {
+              const sanitizedCvs = cvsFromDb.map(cv => ({ ...createDefaultCv(), ...cv }));
+              setUserCvs(sanitizedCvs);
+              
+              const localCvIsMoreRecent = localCv && localCv.updatedAt > (sanitizedCvs[0].updatedAt || 0);
+              const activeCvIsOutdated = activeCv && !sanitizedCvs.find(cv => cv.id === activeCv.id);
+
+              if (localCvIsMoreRecent) {
+                  // If local CV is newer, update the list and set it as active
+                  const updatedCvs = sanitizedCvs.filter(c => c.id !== localCv.id);
+                  setUserCvs([localCv, ...updatedCvs]);
+                  setActiveCv(localCv);
+              } else if (!activeCv || activeCvIsOutdated) {
+                   // Otherwise, set the most recent from DB as active
                   setActiveCv(sanitizedCvs[0]);
               }
           } else {
-              // If the user has no CVs, check for a local one or create a new temp one
+              // If the user has no CVs in DB, check for a local one or create a new temp one
               if (localCv) {
                 setUserCvs([localCv]);
                 setActiveCv(localCv);
               } else {
                 const now = Date.now();
-                const defaultData = createDefaultCv();
-                const tempCv: CVData = { ...defaultData, id: `new_${now}`, userId: activeUser.id, cvName: 'New CV', createdAt: now, updatedAt: now };
+                const tempCv: CVData = { ...createDefaultCv(), id: `new_${now}`, userId: activeUser.id, cvName: 'New CV', createdAt: now, updatedAt: now };
                 setUserCvs([tempCv]);
                 setActiveCv(tempCv);
               }
@@ -158,23 +183,22 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
           setIsLoaded(true);
       };
       
-      if (activeUser.id !== 'anonymous') {
-         loadCvs();
-      }
+      loadCvs();
 
   }, [activeUser]);
 
   // Save active CV to localStorage (for anonymous OR logged-in users)
   useEffect(() => {
-    if (isLoaded && activeCv) {
+    if (isLoaded && activeCv && activeUser) {
       try {
-        const userIdToSave = user ? user.id : 'anonymous';
-        localStorage.setItem(`cv-craft-data-${userIdToSave}`, JSON.stringify(activeCv));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(`cv-craft-data-${activeUser.id}`, JSON.stringify(activeCv));
+        }
       } catch (e) {
         console.error("Failed to save CV data to localStorage", e);
       }
     }
-  }, [activeCv, isLoaded, user]);
+  }, [activeCv, isLoaded, activeUser]);
   
   // When the local user state changes (e.g., from a mock plan upgrade),
   // update the user role in Firestore as well.
@@ -190,7 +214,10 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
 
 
   const handleCreateNewCv = async () => {
-    if (!activeUser) return;
+    if (!activeUser || activeUser.id === 'anonymous') {
+        alert("Please log in to create and save new CVs.");
+        return;
+    };
     const defaultData = createDefaultCv();
     const newCv = await createNewCv(activeUser.id, defaultData);
     setUserCvs(prev => [newCv, ...prev]);

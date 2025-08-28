@@ -55,11 +55,16 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
  
   const getRoleBadgeVariant = (role: string | undefined) => {
     switch (role) {
-      case 'premium': return 'default';
+      case 'standard': return 'default';
       case 'pro': return 'destructive'; // Or another distinct color
       case 'admin': return 'secondary';
       default: return 'outline';
     }
+  }
+  
+  const getRoleDisplayName = (role: string | undefined) => {
+    if (!role) return 'Free';
+    return role.charAt(0).toUpperCase() + role.slice(1);
   }
 
   return (
@@ -82,7 +87,7 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
                         {getLabel(link, t)}
                      </Link>
                   ))}
-                    {user && <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>}
+                    {user && user.id !== 'anonymous' && <Badge variant={getRoleBadgeVariant(user.role)}>{getRoleDisplayName(user.role)}</Badge>}
                     <AuthButton />
                     <LanguageSwitcher />
                     <ThemeToggle />
@@ -103,7 +108,7 @@ export default function SiteLayout({ children, activeLink }: SiteLayoutProps) {
                                 <SheetTitle>Navigation</SheetTitle>
                             </SheetHeader>
                             <nav className="flex flex-col gap-6 pt-12">
-                                {user && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{user.role}</Badge>}
+                                {user && user.id !== 'anonymous' && <Badge variant={getRoleBadgeVariant(user.role)} className="w-fit">{getRoleDisplayName(user.role)}</Badge>}
                                 {navLinks.map(link => (
                                     <Link 
                                         key={link.id} 

@@ -23,7 +23,7 @@ export default function CoverLetterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
   
-  const isPremiumUser = user?.role === 'premium' || user?.role === 'pro' || user?.role === 'admin';
+  const isPremiumUser = user?.role === 'standard' || user?.role === 'pro' || user?.role === 'admin';
 
   const handleGenerate = async () => {
     if (!jobDescription.trim() || !activeCv) {

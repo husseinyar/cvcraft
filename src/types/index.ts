@@ -1,5 +1,4 @@
 
-
 export type Experience = {
   id: string;
   role: string;
@@ -89,11 +88,26 @@ export type JobApplication = {
 
 export type TemplateOption = 'onyx' | 'professional' | 'creative' | 'minimal' | 'auckland' | 'edinburgh' | 'princeton' | 'otago' | 'berkeley' | 'harvard';
 
-export type UserRole = 'admin' | 'user' | 'premium' | 'pro';
+export type UserRole = 'admin' | 'user' | 'standard' | 'pro';
 
 export type UserProfile = {
   id: string;
   email: string;
   role: UserRole;
+  stripeCustomerId?: string;
   cvs?: CVData[]; // CVs can be attached for admin views
 };
+
+export type Subscription = {
+    id: string; // from Stripe
+    userId: string;
+    plan: 'free' | 'standard' | 'pro';
+    status: 'active' | 'canceled' | 'past_due' | 'trialing';
+    current_period_end: number; // Timestamp
+}
+
+export type Usage = {
+    userId: string;
+    dailyApiCallCount: number;
+    lastApiCallTimestamp: number; // Timestamp
+}

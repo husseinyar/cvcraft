@@ -1,6 +1,5 @@
-
 // src/services/cv-service.ts
-import { db } from '@/lib/firebase';
+import { db, auth } from '@/lib/firebase';
 import type { CVData, UserRole } from '@/types';
 import { collection, doc, getDoc, getDocs, setDoc, addDoc, serverTimestamp, writeBatch, query, orderBy } from 'firebase/firestore';
 
@@ -77,7 +76,10 @@ export async function saveCv(cvData: CVData): Promise<void> {
         const cvDocRef = doc(userDocRef, 'cvs', cvData.id);
         
         // Ensure the user document exists with an email before saving a CV
-        await setDoc(userDocRef, { email: auth.currentUser?.email || 'N/A' }, { merge: true });
+        if (auth.currentUser) {
+            await setDoc(userDocRef, { email: auth.currentUser.email || 'N/A' }, { merge: true });
+        }
+
 
         const dataToSave = {
             ...cvData,
