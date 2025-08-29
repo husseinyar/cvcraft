@@ -74,7 +74,8 @@ describe('CvEditor Unit Tests', () => {
     // There is one experience item initially
     expect(screen.getAllByPlaceholderText('Role').length).toBe(1);
 
-    const addExperienceButton = screen.getByText('Add Experience');
+    // Find the button by its role and part of its text content to make it language-agnostic
+    const addExperienceButton = screen.getByRole('button', { name: /add experience/i });
     fireEvent.click(addExperienceButton);
 
     // Now there should be two experience items
