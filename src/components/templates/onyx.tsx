@@ -58,18 +58,16 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
     case 'volunteering':
         return data.volunteering && data.volunteering.length > 0 ? (
             <Section title="Volunteering">
-                <div className="space-y-4">
-                    {data.volunteering.map(vol => (
-                        <div key={vol.id}>
-                            <div className="flex justify-between items-baseline mb-1">
-                                <h4 className="font-semibold" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{vol.role}</h4>
-                                <p className="text-white/50" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.dates}</p>
-                            </div>
-                            <p className="font-medium text-white/70 mb-1" style={{ fontSize: 'var(--cv-font-size-base)' }}>{vol.organization}</p>
-                            <p className="text-white/80 whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.description}</p>
+                {data.volunteering.map(vol => (
+                    <div key={vol.id} className="space-y-4">
+                        <div className="flex justify-between items-baseline mb-1">
+                            <h4 className="font-semibold" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{vol.role}</h4>
+                            <p className="text-white/50" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.dates}</p>
                         </div>
-                    ))}
-                </div>
+                        <p className="font-medium text-white/70 mb-1" style={{ fontSize: 'var(--cv-font-size-base)' }}>{vol.organization}</p>
+                        <p className="text-white/80 whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.description}</p>
+                    </div>
+                ))}
             </Section>
         ) : null;
     default:
