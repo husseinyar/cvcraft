@@ -10,7 +10,7 @@ interface TemplateProps {
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <section className="mb-6 break-inside-avoid">
     <h3 className="font-bold uppercase tracking-widest text-white/60 mb-3" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{title}</h3>
-    <div className="space-y-4">{children}</div>
+    {children}
   </section>
 );
 
@@ -25,46 +25,52 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
     case 'experience':
       return data.experience?.length > 0 ? (
         <Section title="Experience">
-            {data.experience.map(exp => (
-              <div key={exp.id} className="space-y-6">
-                <div className="flex justify-between items-baseline mb-1">
-                  <h4 className="font-semibold text-white" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{exp.role}</h4>
-                  <p className="text-white/50 font-medium" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{exp.dates}</p>
-                </div>
-                <p className="font-medium text-white/70 mb-1" style={{ fontSize: 'var(--cv-font-size-base)' }}>{exp.company}</p>
-                <p className="text-white/80 leading-normal whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{exp.description}</p>
-              </div>
-            ))}
+            <div className="space-y-6">
+                {data.experience.map(exp => (
+                  <div key={exp.id}>
+                    <div className="flex justify-between items-baseline mb-1">
+                      <h4 className="font-semibold text-white" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{exp.role}</h4>
+                      <p className="text-white/50 font-medium" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{exp.dates}</p>
+                    </div>
+                    <p className="font-medium text-white/70 mb-1" style={{ fontSize: 'var(--cv-font-size-base)' }}>{exp.company}</p>
+                    <p className="text-white/80 leading-normal whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{exp.description}</p>
+                  </div>
+                ))}
+            </div>
         </Section>
       ) : null;
     case 'education':
       return data.education?.length > 0 ? (
         <Section title="Education">
-          {data.education.map(edu => (
-            <div key={edu.id} className="space-y-4">
-              <div className="flex justify-between items-baseline">
-                <h4 className="font-semibold" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{edu.degree}</h4>
-                <p className="text-white/50 font-medium" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{edu.dates}</p>
+          <div className="space-y-4">
+            {data.education.map(edu => (
+              <div key={edu.id}>
+                <div className="flex justify-between items-baseline">
+                  <h4 className="font-semibold" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{edu.degree}</h4>
+                  <p className="text-white/50 font-medium" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{edu.dates}</p>
+                </div>
+                <p className="font-medium text-white/70" style={{ fontSize: 'var(--cv-font-size-base)' }}>{edu.school}</p>
+                {edu.description && <p className="text-white/80 mt-1 whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{edu.description}</p>}
               </div>
-              <p className="font-medium text-white/70" style={{ fontSize: 'var(--cv-font-size-base)' }}>{edu.school}</p>
-              {edu.description && <p className="text-white/80 mt-1 whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{edu.description}</p>}
-            </div>
-          ))}
+            ))}
+          </div>
         </Section>
       ) : null;
     case 'volunteering':
       return data.volunteering && data.volunteering.length > 0 ? (
         <Section title="Volunteering">
-          {data.volunteering.map(vol => (
-            <div key={vol.id}>
-              <div className="flex justify-between items-baseline mb-1">
-                <h4 className="font-semibold" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{vol.role}</h4>
-                <p className="text-white/50" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.dates}</p>
+          <div className="space-y-4">
+            {data.volunteering.map(vol => (
+              <div key={vol.id}>
+                <div className="flex justify-between items-baseline mb-1">
+                  <h4 className="font-semibold" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{vol.role}</h4>
+                  <p className="text-white/50" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.dates}</p>
+                </div>
+                <p className="font-medium text-white/70 mb-1" style={{ fontSize: 'var(--cv-font-size-base)' }}>{vol.organization}</p>
+                <p className="text-white/80 whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.description}</p>
               </div>
-              <p className="font-medium text-white/70 mb-1" style={{ fontSize: 'var(--cv-font-size-base)' }}>{vol.organization}</p>
-              <p className="text-white/80 whitespace-pre-wrap" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{vol.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </Section>
       ) : null;
     default:
