@@ -164,10 +164,10 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                     <p className="flex items-center gap-2"><Mail size={12}/> {data.contact.email}</p>
                     <p className="flex items-center gap-2"><Phone size={12}/> {data.contact.phone}</p>
                     {data.contact.website && (
-                      <p className="flex items-center gap-2"><Globe size={12}/> <a href={data.contact.website} target="_blank" rel="noopener noreferrer">{data.contact.website}</a></p>
+                      <p className="flex items-center gap-2"><Globe size={12}/> <a href={data.contact.website} target="_blank" rel="noopener noreferrer" className="hover:underline">{data.contact.website}</a></p>
                     )}
                     {data.contact.linkedin && (
-                      <p className="flex items-center gap-2"><Linkedin size={12}/> <a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+                      <p className="flex items-center gap-2"><Linkedin size={12}/> <a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer" className="hover:underline">LinkedIn</a></p>
                     )}
                 </div>
             </section>

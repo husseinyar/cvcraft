@@ -75,9 +75,12 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
       const storedCvData = localStorage.getItem(`cv-craft-data-${userId}`);
       if (storedCvData) {
         const parsedData = JSON.parse(storedCvData);
+        const defaults = createDefaultCv();
         // Ensure sectionOrder and theme have defaults
-        parsedData.sectionOrder = parsedData.sectionOrder || createDefaultCv().sectionOrder;
-        parsedData.theme = parsedData.theme || createDefaultCv().theme;
+        parsedData.sectionOrder = parsedData.sectionOrder || defaults.sectionOrder;
+        parsedData.theme = parsedData.theme || defaults.theme;
+        // Ensure new fields like linkedin exist
+        parsedData.contact = { ...defaults.contact, ...parsedData.contact };
         return parsedData;
       }
     } catch (e) {
