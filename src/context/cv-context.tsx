@@ -16,6 +16,7 @@ export const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'cr
     email: 'alex.doe@example.com',
     phone: '123-456-7890',
     website: 'alexdoe.com',
+    linkedin: 'linkedin.com/in/alexdoe',
   },
   summary: 'A passionate software developer with experience in building web applications. Start by editing this text!',
   experience: [

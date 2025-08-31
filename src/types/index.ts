@@ -58,6 +58,7 @@ export type CVData = {
     email: string;
     phone: string;
     website: string;
+    linkedin?: string;
   };
   summary: string;
   experience: Experience[];

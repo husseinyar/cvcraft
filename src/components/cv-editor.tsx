@@ -28,11 +28,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { suggestImprovements, type SuggestImprovementsOutput } from "@/ai/flows/suggest-improvements";
 import { generateExperience } from "@/ai/flows/generate-experience";
-import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, Bot, Zap, Search, GripVertical, Sparkles } from "lucide-react";
+import { Wand2, X, PlusCircle, Save, Trash2, CheckCircle, GripVertical, Sparkles } from "lucide-react";
 import { useTranslation } from "@/context/language-context";
 import { updateCvAction } from "@/app/editor/actions";
 import { useCV } from "@/context/cv-context";
@@ -318,6 +317,7 @@ function PersonalDetailsSection({ cvData, handleInputChange, t }: any) {
       <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder={t('editor.personal_details.email')} type="email" />
       <Input name="contact.phone" value={cvData.contact.phone} onChange={handleInputChange} placeholder={t('editor.personal_details.phone')} />
       <Input name="contact.website" value={cvData.contact.website || ''} onChange={handleInputChange} placeholder={t('editor.personal_details.website')} />
+      <Input name="contact.linkedin" value={cvData.contact.linkedin || ''} onChange={handleInputChange} placeholder="LinkedIn Profile URL" />
     </div>
   );
 }
@@ -599,5 +599,3 @@ function VolunteeringSection({ cvData, handleLocalCvChange }: { cvData: CVData; 
     </div>
   );
 }
-
-    

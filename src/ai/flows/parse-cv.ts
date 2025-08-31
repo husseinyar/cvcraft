@@ -44,7 +44,8 @@ const ParseCvOutputSchema = z.object({
   contact: z.object({
     email: z.string().describe("The email address."),
     phone: z.string().describe("The phone number."),
-    website: z.string().optional().describe("The personal website, portfolio, or LinkedIn URL."),
+    website: z.string().optional().describe("The personal website or portfolio URL."),
+    linkedin: z.string().optional().describe("The full URL to the LinkedIn profile."),
   }),
   summary: z.string().describe("A professional summary or profile section."),
   experience: z.array(ExtractedExperienceSchema).describe("A list of professional experiences."),
@@ -73,7 +74,7 @@ const parseCvFlow = ai.defineFlow(
         prompt: [{
           text: `You are an expert resume parser. Your task is to extract structured information from the provided resume file.
 Carefully analyze the resume content and extract the following information in the specified JSON format.
-If a particular piece of information (like a website) is not found, omit the field or return an empty string.
+If a particular piece of information (like a website or LinkedIn URL) is not found, omit the field or return an empty string.
 For dates, try to keep the format as it appears in the resume.`
         },
         {media: { url: input.resumeDataUri }}],
