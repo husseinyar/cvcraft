@@ -33,24 +33,31 @@ async function clearSession() {
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [firebaseEnabled, setFirebaseEnabled] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+    if (auth) {
+      setFirebaseEnabled(true);
+      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        setUser(currentUser);
+        setIsLoading(false);
+        // When auth state changes, update the secure session cookie
+        if (currentUser) {
+          const idToken = await currentUser.getIdToken();
+          await setSession(idToken);
+        } else {
+          await clearSession();
+        }
+      });
+      return () => unsubscribe();
+    } else {
       setIsLoading(false);
-      // When auth state changes, update the secure session cookie
-      if (currentUser) {
-        const idToken = await currentUser.getIdToken();
-        await setSession(idToken);
-      } else {
-        await clearSession();
-      }
-    });
-
-    return () => unsubscribe();
+      setFirebaseEnabled(false);
+    }
   }, []);
 
   const handleSignIn = async () => {
+    if (!auth) return;
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -61,6 +68,7 @@ export default function AuthButton() {
   };
 
   const handleSignOut = async () => {
+    if (!auth) return;
     try {
       await auth.signOut();
       // The onAuthStateChanged listener will handle session clearing
@@ -68,6 +76,14 @@ export default function AuthButton() {
       console.error("Sign out error:", error);
     }
   };
+  
+  if (!firebaseEnabled) {
+    return (
+        <Button variant="outline" disabled>
+            <LogIn className="mr-2" /> Login Disabled
+        </Button>
+    );
+  }
 
   if (isLoading) {
     return <Skeleton className="h-10 w-24" />;

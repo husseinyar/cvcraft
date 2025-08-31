@@ -1,7 +1,7 @@
 // src/lib/firebase.ts
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAuth, connectAuthEmulator, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,20 +12,26 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-const auth = getAuth(app);
+const hasRequiredEnvVars = firebaseConfig.apiKey && firebaseConfig.projectId;
 
-// In a real app, you'd want to be careful about security rules,
-// but for this project, we can connect to the emulator in development.
-if (process.env.NODE_ENV === 'development') {
-    try {
-        connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-    } catch (e) {
-        console.warn("Firebase Auth Emulator not available");
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
+let auth: Auth | null = null;
+
+if (hasRequiredEnvVars) {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+    auth = getAuth(app);
+
+    if (process.env.NODE_ENV === 'development' && auth) {
+        try {
+            connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+        } catch (e) {
+            console.warn("Firebase Auth Emulator not available");
+        }
     }
+} else {
+    console.warn("Firebase environment variables are not set. Firebase features will be disabled.");
 }
-
 
 export { app, db, auth };

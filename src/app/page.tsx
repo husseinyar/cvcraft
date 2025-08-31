@@ -143,6 +143,7 @@ export default function LandingPage() {
                       alt="CV template example"
                       data-ai-hint="resume document"
                       className="rounded-xl"
+                      priority
                   />
               </div>
             </div>

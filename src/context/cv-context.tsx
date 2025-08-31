@@ -27,7 +27,7 @@ export const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'cr
   ],
   skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
   template: 'onyx',
-  sectionOrder: ['summary', 'experience', 'education', 'skills'],
+  sectionOrder: ['summary', 'experience', 'education', 'skills', 'languages', 'certifications', 'awards', 'volunteering'],
   languages: [],
   certifications: [],
   awards: [],
@@ -91,6 +91,23 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
 
   // Handle user authentication state changes
   useEffect(() => {
+    if (!auth) {
+        // Firebase is not configured, run in anonymous/local mode
+        const anonymousUser: UserProfile = { id: 'anonymous', email: '', role: 'user' };
+        setUser(anonymousUser);
+        setActiveUser(anonymousUser);
+        const localCv = loadLocalCvForUser('anonymous');
+        if (localCv) {
+          setActiveCv(localCv);
+        } else {
+            const now = Date.now();
+            setActiveCv({ ...createDefaultCv(), id: `local_${now}`, userId: 'anonymous', cvName: 'My Local CV', createdAt: now, updatedAt: now });
+        }
+        setUserChecked(true);
+        setIsLoaded(true);
+        return;
+    }
+    
     const unsubscribe = onAuthStateChanged(auth, async (currentUser: User | null) => {
       setIsLoaded(false);
       
@@ -133,7 +150,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
   
   // Effect to load CVs for the active user (for admins or regular users)
   useEffect(() => {
-      if (!activeUser) return;
+      if (!activeUser || !auth) return; // Don't run if firebase is not configured
       
       const loadCvs = async () => {
           setIsLoaded(false);
@@ -207,7 +224,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
   // When the local user state changes (e.g., from a mock plan upgrade),
   // update the user role in Firestore as well.
   useEffect(() => {
-    if (user && user.id !== 'anonymous') {
+    if (user && user.id !== 'anonymous' && auth) {
         getUserRole(user.id).then(dbRole => {
             if (user.role !== dbRole) {
                 updateUserRole(user.id, user.role);
@@ -218,7 +235,7 @@ export const CVProvider = ({ children }: { children: ReactNode }) => {
 
 
   const handleCreateNewCv = async () => {
-    if (!activeUser || activeUser.id === 'anonymous') {
+    if (!activeUser || activeUser.id === 'anonymous' || !auth) {
         alert("Please log in to create and save new CVs.");
         return;
     };
