@@ -3,27 +3,31 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useTranslation } from '@/context/language-context';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import SiteLayout from '@/components/site-layout';
 import { useCV } from '@/context/cv-context';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { UserRole } from '@/types';
+import { loadStripe } from '@stripe/stripe-js';
+
+// Load the Stripe.js script
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function PricingPage() {
   const { t } = useTranslation();
-  const { user, setUser } = useCV();
+  const { user } = useCV();
   const { toast } = useToast();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const [isloading, setIsLoading] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const handleChoosePlan = (plan: 'standard' | 'pro') => {
+  const handleChoosePlan = async (plan: 'standard' | 'pro') => {
     if (!user || user.id === 'anonymous') {
       toast({
         title: "Please Log In",
@@ -33,19 +37,39 @@ export default function PricingPage() {
       router.push('/editor'); // Redirect to login implicitly
       return;
     }
-    // In a real app, this would redirect to a Stripe checkout page.
-    // Here, we'll simulate the upgrade.
-    setUser({ ...user, role: plan });
-    toast({
-      title: "Plan Updated!",
-      description: `You are now on the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan.`,
-    });
-    router.push('/editor');
-  };
 
+    setIsLoading(plan);
+
+    try {
+        const response = await fetch('/api/stripe/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan, userId: user.id }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to create checkout session.');
+        }
+
+        const { sessionId } = await response.json();
+        const stripe = await stripePromise;
+        if (!stripe) throw new Error('Stripe.js has not loaded yet.');
+
+        const { error } = await stripe.redirectToCheckout({ sessionId });
+        
+        if (error) {
+            toast({ title: "Error", description: error.message, variant: "destructive" });
+        }
+    } catch (error: any) {
+        toast({ title: "Error", description: "Could not initiate payment. Please try again.", variant: "destructive" });
+    } finally {
+        setIsLoading(null);
+    }
+  };
 
   const pricingTiers = [
     {
+      id: 'free',
       name: "pricing_page.free.name",
       price: "pricing_page.free.price",
       description: "pricing_page.free.description",
@@ -59,6 +83,7 @@ export default function PricingPage() {
       variant: "outline" as const,
     },
     {
+      id: 'standard',
       name: "pricing_page.pro.name",
       price: "pricing_page.pro.price",
       description: "pricing_page.pro.description",
@@ -73,6 +98,7 @@ export default function PricingPage() {
       isPopular: true,
     },
     {
+      id: 'pro',
       name: "pricing_page.business.name",
       price: "pricing_page.business.price",
       description: "pricing_page.business.description",
@@ -131,7 +157,13 @@ export default function PricingPage() {
                     </ul>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full" onClick={tier.action} variant={tier.variant}>
+                    <Button 
+                        className="w-full" 
+                        onClick={tier.action} 
+                        variant={tier.variant}
+                        disabled={isloading === tier.id}
+                    >
+                      {isloading === tier.id && <Loader2 className="animate-spin" />}
                       {t(tier.cta as any)}
                     </Button>
                   </CardFooter>
