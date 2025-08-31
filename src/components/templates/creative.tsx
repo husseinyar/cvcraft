@@ -1,5 +1,5 @@
 import type { CVData } from "@/types";
-import { Mail, Phone, Globe } from "lucide-react";
+import { Mail, Phone, Globe, Linkedin } from "lucide-react";
 import Image from "next/image";
 
 interface TemplateProps {
@@ -76,10 +76,18 @@ export default function CreativeTemplate({ data }: TemplateProps) {
                 <Phone size={16} className="shrink-0 mt-1" />
                 <span>{data.contact.phone}</span>
              </div>
-             <div className="flex items-start gap-3">
-                <Globe size={16} className="shrink-0 mt-1" />
-                <span>{data.contact.website}</span>
-             </div>
+             {data.contact.website && (
+                <div className="flex items-start gap-3">
+                    <Globe size={16} className="shrink-0 mt-1" />
+                    <a href={data.contact.website} target="_blank" rel="noopener noreferrer">{data.contact.website}</a>
+                </div>
+             )}
+             {data.contact.linkedin && (
+                <div className="flex items-start gap-3">
+                    <Linkedin size={16} className="shrink-0 mt-1" />
+                    <a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer">{data.contact.linkedin.replace('https://www.','')}</a>
+                </div>
+             )}
           </div>
         </div>
 

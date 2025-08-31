@@ -39,6 +39,8 @@ import { DndContext, closestCenter, type DragEndEvent, PointerSensor, useSensor,
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import debounce from 'lodash/debounce';
+import { isValidUrl, normalizeUrl } from "@/lib/utils";
+import { Label } from "./ui/label";
 
 
 interface CvEditorProps {
@@ -308,7 +310,29 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
 
 // --- Section Components ---
 
-function PersonalDetailsSection({ cvData, handleInputChange, t }: any) {
+function PersonalDetailsSection({ cvData, handleInputChange, handleLocalCvChange, t }: any) {
+  const [urlErrors, setUrlErrors] = useState<{ website?: string; linkedin?: string }>({});
+
+  const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const fieldName = name.split('.')[1] as 'website' | 'linkedin';
+
+    if (value && !isValidUrl(value)) {
+      setUrlErrors(prev => ({ ...prev, [fieldName]: "Please enter a valid URL (e.g., https://example.com)" }));
+    } else {
+      setUrlErrors(prev => ({ ...prev, [fieldName]: undefined }));
+      if (value) {
+        const normalized = normalizeUrl(value);
+        if (normalized !== value) {
+          // Update the global state with the normalized URL
+          const newCvData = JSON.parse(JSON.stringify(cvData));
+          newCvData.contact[fieldName] = normalized;
+          handleLocalCvChange(newCvData);
+        }
+      }
+    }
+  };
+
   return (
     <div className="space-y-4 p-2">
       <Input name="cvName" value={cvData.cvName} onChange={handleInputChange} placeholder="CV Name (e.g. For Google)" />
@@ -316,8 +340,28 @@ function PersonalDetailsSection({ cvData, handleInputChange, t }: any) {
       <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder={t('editor.personal_details.job_title')} />
       <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder={t('editor.personal_details.email')} type="email" />
       <Input name="contact.phone" value={cvData.contact.phone} onChange={handleInputChange} placeholder={t('editor.personal_details.phone')} />
-      <Input name="contact.website" value={cvData.contact.website || ''} onChange={handleInputChange} placeholder={t('editor.personal_details.website')} />
-      <Input name="contact.linkedin" value={cvData.contact.linkedin || ''} onChange={handleInputChange} placeholder="LinkedIn Profile URL" />
+      
+      <div>
+        <Input 
+          name="contact.website" 
+          value={cvData.contact.website || ''} 
+          onChange={handleInputChange} 
+          onBlur={handleUrlBlur}
+          placeholder={t('editor.personal_details.website')} 
+        />
+        {urlErrors.website && <p className="text-xs text-destructive mt-1">{urlErrors.website}</p>}
+      </div>
+
+      <div>
+        <Input 
+          name="contact.linkedin" 
+          value={cvData.contact.linkedin || ''} 
+          onChange={handleInputChange} 
+          onBlur={handleUrlBlur}
+          placeholder="LinkedIn Profile URL" 
+        />
+         {urlErrors.linkedin && <p className="text-xs text-destructive mt-1">{urlErrors.linkedin}</p>}
+      </div>
     </div>
   );
 }

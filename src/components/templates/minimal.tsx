@@ -75,10 +75,24 @@ export default function MinimalTemplate({ data }: TemplateProps) {
 
       <div className="text-center text-gray-500 mb-12 space-x-6" style={{ fontSize: 'var(--cv-font-size-sm)' }}>
         <span>{data.contact.email}</span>
-        <span>&bull;</span>
-        <span>{data.contact.phone}</span>
-        <span>&bull;</span>
-        <span>{data.contact.website}</span>
+        {data.contact.phone && (
+          <>
+            <span>&bull;</span>
+            <span>{data.contact.phone}</span>
+          </>
+        )}
+        {data.contact.website && (
+           <>
+            <span>&bull;</span>
+             <a href={data.contact.website} target="_blank" rel="noopener noreferrer">{data.contact.website}</a>
+           </>
+        )}
+        {data.contact.linkedin && (
+           <>
+            <span>&bull;</span>
+             <a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+           </>
+        )}
       </div>
 
       <main className="leading-7">

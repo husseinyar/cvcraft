@@ -1,5 +1,5 @@
 import type { CVData } from "@/types";
-import { Mail, Phone, Globe } from "lucide-react";
+import { Mail, Phone, Globe, Linkedin } from "lucide-react";
 import React from "react";
 
 interface TemplateProps {
@@ -163,7 +163,12 @@ export default function ProfessionalTemplate({ data }: TemplateProps) {
                 <div className="space-y-2" style={{ fontSize: 'var(--cv-font-size-sm)' }}>
                     <p className="flex items-center gap-2"><Mail size={12}/> {data.contact.email}</p>
                     <p className="flex items-center gap-2"><Phone size={12}/> {data.contact.phone}</p>
-                    <p className="flex items-center gap-2"><Globe size={12}/> {data.contact.website}</p>
+                    {data.contact.website && (
+                      <p className="flex items-center gap-2"><Globe size={12}/> <a href={data.contact.website} target="_blank" rel="noopener noreferrer">{data.contact.website}</a></p>
+                    )}
+                    {data.contact.linkedin && (
+                      <p className="flex items-center gap-2"><Linkedin size={12}/> <a href={data.contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+                    )}
                 </div>
             </section>
             {asideSections.map(sectionId => (
