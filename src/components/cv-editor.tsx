@@ -51,6 +51,7 @@ interface CvEditorProps {
 
 const SECTION_COMPONENTS: Record<string, React.FC<any>> = {
   'personal-details': PersonalDetailsSection,
+  'contact': ContactSection,
   'summary': SummarySection,
   'experience': ExperienceSection,
   'education': EducationSection,
@@ -246,6 +247,7 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
   
   const sectionTitles: { [key: string]: string } = {
     'personal-details': t('editor.personal_details.title'),
+    'contact': 'Contact',
     'summary': t('editor.summary.title'),
     'experience': t('editor.experience.title'),
     'education': t('editor.education.title'),
@@ -310,7 +312,17 @@ export default function CvEditor({ cvData: initialCvData, setCvData: setGlobalCv
 
 // --- Section Components ---
 
-function PersonalDetailsSection({ cvData, handleInputChange, handleLocalCvChange, t }: any) {
+function PersonalDetailsSection({ cvData, handleInputChange, t }: any) {
+  return (
+    <div className="space-y-4 p-2">
+      <Input name="cvName" value={cvData.cvName} onChange={handleInputChange} placeholder="CV Name (e.g. For Google)" />
+      <Input name="name" value={cvData.name} onChange={handleInputChange} placeholder={t('editor.personal_details.full_name')} />
+      <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder={t('editor.personal_details.job_title')} />
+    </div>
+  );
+}
+
+function ContactSection({ cvData, handleInputChange, handleLocalCvChange, t }: any) {
   const [urlErrors, setUrlErrors] = useState<{ website?: string; linkedin?: string }>({});
 
   const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -335,9 +347,6 @@ function PersonalDetailsSection({ cvData, handleInputChange, handleLocalCvChange
 
   return (
     <div className="space-y-4 p-2">
-      <Input name="cvName" value={cvData.cvName} onChange={handleInputChange} placeholder="CV Name (e.g. For Google)" />
-      <Input name="name" value={cvData.name} onChange={handleInputChange} placeholder={t('editor.personal_details.full_name')} />
-      <Input name="jobTitle" value={cvData.jobTitle} onChange={handleInputChange} placeholder={t('editor.personal_details.job_title')} />
       <Input name="contact.email" value={cvData.contact.email} onChange={handleInputChange} placeholder={t('editor.personal_details.email')} type="email" />
       <Input name="contact.phone" value={cvData.contact.phone} onChange={handleInputChange} placeholder={t('editor.personal_details.phone')} />
       

@@ -27,7 +27,7 @@ export const createDefaultCv = (): Omit<CVData, 'id' | 'userId' | 'cvName' | 'cr
   ],
   skills: ['React', 'TypeScript', 'Next.js', 'Node.js'],
   template: 'onyx',
-  sectionOrder: ['summary', 'experience', 'education', 'skills', 'languages', 'certifications', 'awards', 'volunteering'],
+  sectionOrder: ['personal-details', 'contact', 'summary', 'experience', 'education', 'skills', 'languages', 'certifications', 'awards', 'volunteering'],
   languages: [],
   certifications: [],
   awards: [],
