@@ -30,7 +30,14 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+       {
+        protocol: 'https',
+        hostname: 'studio--cv-craft-h1bob.us-central1.hosted.app',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   async headers() {
     return [
