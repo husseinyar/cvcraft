@@ -30,7 +30,7 @@ if (hasRequiredEnvVars) {
     db = getFirestore(app);
     auth = getAuth(app);
 
-    // Connect to emulators in development, only if auth was initialized
+    // Connect to emulators in development, only if auth was successfully initialized
     if (process.env.NODE_ENV === 'development' && auth) {
         try {
             // Check if emulator is already connected to prevent re-connect errors
