@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
        {
         protocol: 'https',
-        hostname: 'localhost',
+        hostname: 'studio--cv-craft-h1bob.us-central1.hosted.app',
         port: '',
         pathname: '/**',
       },
