@@ -27,7 +27,11 @@ export function initializeAdminApp() {
         console.error("Firebase Admin initialization error:", error.message);
       }
     } else {
-        console.warn("Firebase Admin environment variables not set. Please check your .env file. Server-side Firebase features will be disabled.");
+        const missingVars = [];
+        if (!serviceAccountConfig.projectId) missingVars.push('FIREBASE_PROJECT_ID');
+        if (!process.env.FIREBASE_PRIVATE_KEY) missingVars.push('FIREBASE_PRIVATE_KEY');
+        if (!serviceAccountConfig.clientEmail) missingVars.push('FIREBASE_CLIENT_EMAIL');
+        console.warn(`Firebase Admin environment variables not set. Missing: [${missingVars.join(', ')}]. Please check your .env file. Server-side Firebase features will be disabled.`);
     }
   }
   return admin;
