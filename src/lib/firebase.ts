@@ -12,7 +12,14 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const hasRequiredEnvVars = firebaseConfig.apiKey && firebaseConfig.projectId;
+// Check if all required environment variables are defined
+const hasRequiredEnvVars = 
+    firebaseConfig.apiKey &&
+    firebaseConfig.authDomain &&
+    firebaseConfig.projectId &&
+    firebaseConfig.storageBucket &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId;
 
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
@@ -27,11 +34,11 @@ if (hasRequiredEnvVars) {
         try {
             connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
         } catch (e) {
-            console.warn("Firebase Auth Emulator not available");
+            console.warn("Could not connect to Firebase Auth Emulator. It might not be running.");
         }
     }
 } else {
-    console.warn("Firebase environment variables are not set. Firebase features will be disabled.");
+    console.warn("One or more Firebase environment variables are not set. Firebase features will be disabled.");
 }
 
 export { app, db, auth };
