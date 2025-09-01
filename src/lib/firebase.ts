@@ -30,11 +30,15 @@ if (hasRequiredEnvVars) {
     db = getFirestore(app);
     auth = getAuth(app);
 
+    // Connect to emulators in development, only if auth was initialized
     if (process.env.NODE_ENV === 'development' && auth) {
         try {
-            connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+            // Check if emulator is already connected to prevent re-connect errors
+            if (!(auth as any).emulatorConfig) {
+                connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+            }
         } catch (e) {
-            console.warn("Could not connect to Firebase Auth Emulator. It might not be running.");
+            console.warn("Could not connect to Firebase Auth Emulator. It might not be running or is already connected.");
         }
     }
 } else {
