@@ -1,4 +1,3 @@
-
 import type { CVData } from "@/types";
 import { Mail, Phone, Globe, Linkedin } from "lucide-react";
 import Image from "next/image";

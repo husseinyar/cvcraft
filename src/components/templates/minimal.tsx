@@ -97,10 +97,7 @@ export default function MinimalTemplate({ data }: TemplateProps) {
 
       <main className="leading-7">
         {sectionOrder.map((sectionId, index) => (
-          <React.Fragment key={sectionId}>
-            <SectionContent sectionId={sectionId} data={data} />
-            {index < sectionOrder.length - 1 && <hr className="my-8" />}
-          </React.Fragment>
+            <SectionContent key={sectionId} sectionId={sectionId} data={data} />
         ))}
       </main>
     </div>

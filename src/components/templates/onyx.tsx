@@ -1,4 +1,3 @@
-
 import type { CVData } from "@/types";
 import { Mail, Phone, Globe, Linkedin } from "lucide-react";
 import React from "react";
@@ -26,8 +25,8 @@ const MainSectionContent = ({ sectionId, data }: { sectionId: string, data: CVDa
       return data.experience?.length > 0 ? (
         <Section title="Experience">
             <div className="space-y-6">
-                {data.experience.map((exp, index) => (
-                  <div key={exp.id || index}>
+                {data.experience.map(exp => (
+                  <div key={exp.id}>
                     <div className="flex justify-between items-baseline mb-1">
                       <h4 className="font-semibold text-white" style={{ fontSize: 'var(--cv-font-size-lg)' }}>{exp.role}</h4>
                       <p className="text-white/50 font-medium" style={{ fontSize: 'var(--cv-font-size-sm)' }}>{exp.dates}</p>

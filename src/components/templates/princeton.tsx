@@ -1,4 +1,5 @@
 import type { CVData } from "@/types";
+import React from "react";
 
 interface TemplateProps {
   data: CVData;
