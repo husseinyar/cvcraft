@@ -30,12 +30,17 @@ export default function AdminDashboardPage() {
   const { toast } = useToast();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+
 
   useEffect(() => {
-    if (isLoaded && user?.role !== 'admin') {
-      router.replace('/');
-    } else if (isLoaded && user?.role === 'admin') {
-      fetchPosts();
+    if (isLoaded) {
+      if (user?.role !== 'admin') {
+        router.replace('/');
+      } else {
+        fetchPosts();
+        setAuthChecked(true);
+      }
     }
   }, [user, isLoaded, router]);
 
@@ -67,7 +72,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (!isLoaded || isLoading) {
+  if (!isLoaded || !authChecked || isLoading) {
     return <div className="flex items-center justify-center h-screen"><Loader2 className="h-16 w-16 animate-spin" /></div>;
   }
 
@@ -90,48 +95,52 @@ export default function AdminDashboardPage() {
         </CardHeader>
         <CardContent>
             <div className="divide-y">
-                {posts.map(post => (
-                    <div key={post.id} className="flex items-center justify-between py-4">
-                        <div>
-                            <h3 className="font-semibold">{post.title}</h3>
-                            <div className="text-sm text-muted-foreground flex items-center gap-2">
-                                <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                                    {post.status}
-                                </Badge>
-                                <span>- Created: {new Date(post.createdAt).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm">Publish</span>
-                                <Switch
-                                    checked={post.status === 'published'}
-                                    onCheckedChange={() => handleTogglePublish(post)}
-                                />
-                            </div>
-                            <Button variant="outline" size="icon" onClick={() => router.push(`/admin/edit/${post.id}`)}>
-                                <Edit className="h-4 w-4" />
-                            </Button>
-                             <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete the post.
-                                    </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeletePost(post.id)}>Continue</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </div>
-                ))}
+                {posts.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No posts created yet.</p>
+                ) : (
+                  posts.map(post => (
+                      <div key={post.id} className="flex items-center justify-between py-4">
+                          <div>
+                              <h3 className="font-semibold">{post.title}</h3>
+                              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+                                      {post.status}
+                                  </Badge>
+                                  <span>- Created: {new Date(post.createdAt).toLocaleDateString()}</span>
+                              </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                  <span className="text-sm">Publish</span>
+                                  <Switch
+                                      checked={post.status === 'published'}
+                                      onCheckedChange={() => handleTogglePublish(post)}
+                                  />
+                              </div>
+                              <Button variant="outline" size="icon" onClick={() => router.push(`/admin/edit/${post.id}`)}>
+                                  <Edit className="h-4 w-4" />
+                              </Button>
+                               <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                      <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                          This action cannot be undone. This will permanently delete the post.
+                                      </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDeletePost(post.id)}>Continue</AlertDialogAction>
+                                      </AlertDialogFooter>
+                                  </AlertDialogContent>
+                              </AlertDialog>
+                          </div>
+                      </div>
+                  ))
+                )}
             </div>
         </CardContent>
       </Card>

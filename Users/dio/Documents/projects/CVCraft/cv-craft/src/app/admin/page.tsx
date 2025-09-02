@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCV } from '@/context/cv-context';
 import { Loader2 } from 'lucide-react';
@@ -10,19 +10,25 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 export default function AdminPage() {
   const { user, isLoaded } = useCV();
   const router = useRouter();
+  const [content, setContent] = useState<'loading' | 'login' | 'redirecting'>('loading');
 
   useEffect(() => {
     if (isLoaded) {
       if (user?.role === 'admin') {
         router.replace('/admin/dashboard');
+        setContent('redirecting');
       } else if (user && user.id !== 'anonymous') {
         // User is logged in but not an admin
         router.replace('/');
+        setContent('redirecting');
+      } else {
+        // User is not logged in (anonymous)
+        setContent('login');
       }
     }
   }, [user, isLoaded, router]);
 
-  if (!isLoaded) {
+  if (content === 'loading' || content === 'redirecting') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
@@ -30,7 +36,7 @@ export default function AdminPage() {
     );
   }
 
-  if (user?.id === 'anonymous') {
+  if (content === 'login') {
     return (
       <div className="flex items-center justify-center min-h-screen bg-muted/40">
         <Card className="w-full max-w-md text-center">
@@ -45,8 +51,8 @@ export default function AdminPage() {
       </div>
     );
   }
-
-  // This content will be briefly visible while redirecting
+  
+  // Fallback to loading state
   return (
     <div className="flex items-center justify-center min-h-screen">
        <Loader2 className="h-16 w-16 animate-spin text-primary" />
